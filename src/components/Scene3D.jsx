@@ -1,6 +1,6 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, Suspense, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Float, MeshDistortMaterial, MeshTransmissionMaterial, Environment, Lightformer, Loader } from '@react-three/drei';
+import { Float, useGLTF, Environment, Lightformer, Loader, Preload, MeshDistortMaterial } from '@react-three/drei';
 import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing';
 import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
@@ -20,17 +20,22 @@ export function HeroScene({ mousePos }) {
         }}>
             <Canvas
                 camera={{ position: [0, 0, 8], fov: 45 }}
-                dpr={isMobile ? [1, 1] : [1, 1.5]}
-                gl={{ antialias: false, alpha: true, powerPreference: "high-performance" }}
+                dpr={isMobile ? [1, 2] : [1, 1.5]}
+                gl={{ antialias: isMobile, alpha: true, powerPreference: "high-performance" }}
                 style={{ background: 'transparent' }}
             >
-                <ambientLight intensity={0.15} />
-                <directionalLight position={[5, 5, 5]} intensity={0.4} color="#f5dfc8" />
-                <pointLight position={[-3, 2, 4]} intensity={0.8} color="#E05A3A" distance={12} />
-                <pointLight position={[3, -2, 3]} intensity={0.4} color="#5DB8A8" distance={10} />
+                <ambientLight intensity={0.5} />
+                <directionalLight position={[5, 5, 5]} intensity={1} color="#ffffff" />
+                <pointLight position={[-3, 2, 4]} intensity={2} color="#E05A3A" distance={12} />
+                <pointLight position={[3, -2, 3]} intensity={2} color="#5DB8A8" distance={10} />
 
-                <MouseTracker mousePos={mousePos} />
-                <FloatingObjects mousePos={mousePos} />
+                <Suspense fallback={null}>
+                    {isMobile ? <GyroTracker /> : <MouseTracker mousePos={mousePos} />}
+                    <FloatingModels mousePos={mousePos} />
+                    <Environment preset="city" />
+                    <Preload all />
+                </Suspense>
+
                 <ParticleField count={isMobile ? 300 : 800} />
 
                 <EffectComposer enabled={!isMobile}>
@@ -46,8 +51,58 @@ export function HeroScene({ mousePos }) {
                     />
                     <Vignette darkness={0.5} offset={0.3} />
                 </EffectComposer>
+
             </Canvas>
-        </div>
+
+            <MotionRequest />
+        </div >
+    );
+}
+
+/* ─── iOS Motion Permission Button ─── */
+function MotionRequest() {
+    const [show, setShow] = useState(false);
+
+    useEffect(() => {
+        // Check if iOS 13+ permission API exists
+        if (
+            typeof DeviceOrientationEvent !== 'undefined' &&
+            typeof DeviceOrientationEvent.requestPermission === 'function'
+        ) {
+            setShow(true);
+        }
+    }, []);
+
+    const requestAccess = () => {
+        DeviceOrientationEvent.requestPermission()
+            .then((response) => {
+                if (response === 'granted') {
+                    setShow(false);
+                }
+            })
+            .catch((e) => console.error(e));
+    };
+
+    if (!show) return null;
+
+    return (
+        <button
+            onClick={requestAccess}
+            style={{
+                position: 'absolute', bottom: '80px', right: '20px', zIndex: 100,
+                padding: '8px 16px', borderRadius: '20px',
+                background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)',
+                border: '1px solid rgba(255,255,255,0.2)', color: '#fff',
+                fontFamily: 'var(--font-mono)', fontSize: '0.7rem', letterSpacing: '0.1em',
+                cursor: 'pointer', outline: 'none',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                transition: 'background 0.3s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.25)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
+        >
+            ENABLE 3D 📱
+        </button>
     );
 }
 
@@ -67,102 +122,150 @@ function MouseTracker({ mousePos }) {
     return null;
 }
 
-/* ─── Floating geometric objects ─── */
-function FloatingObjects({ mousePos }) {
+/* ─── Gyro Tracker (Mobile Tilt) ─── */
+function GyroTracker() {
+    const { camera } = useThree();
+    const target = useRef({ x: 0, y: 0 });
+
+    useEffect(() => {
+        const handleOrientation = (e) => {
+            // Gamma: Left/Right tilt (-90 to 90)
+            // Beta: Front/Back tilt (-180 to 180)
+            if (e.gamma === null || e.beta === null) return;
+
+            const y = THREE.MathUtils.clamp(e.gamma, -45, 45);
+            const x = THREE.MathUtils.clamp(e.beta, 0, 90);
+
+            // Calculate subtle parallax target
+            target.current.y = (y / 45) * 0.2;
+            target.current.x = ((x - 45) / 45) * 0.2;
+        };
+
+        window.addEventListener('deviceorientation', handleOrientation);
+        return () => window.removeEventListener('deviceorientation', handleOrientation);
+    }, []);
+
+    useFrame(() => {
+        camera.rotation.x += (target.current.x - camera.rotation.x) * 0.05;
+        camera.rotation.y += (target.current.y - camera.rotation.y) * 0.05;
+    });
+
+    return null;
+}
+
+/* ─── Floating 3D Models ─── */
+function FloatingModels({ mousePos }) {
+    // Load models
+    const mac = useGLTF('macbook_pro_m3_16_inch_2024.glb');
+    const camera = useGLTF('canon_at-1_retro_camera.glb');
+    const vhs = useGLTF('vhs_tape.glb');
+    const headphone = useGLTF('headphone_with_stand.glb');
+    const mouse = useGLTF('logitech_mx_vertical_mouse.glb');
+    const mic = useGLTF('microphone_gxl_066_bafhcteks.glb');
+    const light = useGLTF('studio_umbrella_light.glb');
+
+    // Scale adjustment helper
+    const S = isMobile ? 0.7 : 1;
+
     return (
         <group>
-            {/* Main Torus — center-right, warm accent */}
-            <Float speed={1.5} rotationIntensity={0.8} floatIntensity={1.2}>
-                <mesh position={[2.8, 0.5, -1]}>
-                    <torusGeometry args={[1.2, 0.35, 32, 64]} />
+            {/* 1. MacBook — Top Right (Dev/Edit) */}
+            <Float speed={1.5} rotationIntensity={0.5} floatIntensity={1}>
+                <primitive
+                    object={mac.scene}
+                    scale={0.08 * S}
+                    position={[3.5, 2, -2]}
+                    rotation={[0.3, -0.5, 0.2]}
+                />
+            </Float>
+
+            {/* 2. Camera — Bottom Left (Film) */}
+            <Float speed={2} rotationIntensity={0.8} floatIntensity={1.2}>
+                <primitive
+                    object={camera.scene}
+                    scale={9 * S}
+                    position={[-3.2, -1.5, 1]}
+                    rotation={[0.2, 0.5, 0]}
+                />
+            </Float>
+
+            {/* 3. VHS Tape — Top Left (Retro/Edit) */}
+            <Float speed={0.8} rotationIntensity={1.2} floatIntensity={1.5}>
+                <primitive
+                    object={vhs.scene}
+                    scale={0.07 * S}
+                    position={[-2.5, 2.8, -3]}
+                    rotation={[1, 0.5, 0]}
+                />
+            </Float>
+
+            {/* 4. Headphone — Far Right (Audio/Mood) */}
+            <Float speed={1.2} rotationIntensity={0.5} floatIntensity={0.8}>
+                <primitive
+                    object={headphone.scene}
+                    scale={5 * S}
+                    position={[4.5, -1, -4]}
+                    rotation={[0, -0.5, 0.2]}
+                />
+            </Float>
+
+            {/* 5. Vertical Mouse — Center Left */}
+            <Float speed={1} rotationIntensity={1.5} floatIntensity={1}>
+                <primitive
+                    object={mouse.scene}
+                    scale={2.5 * S}
+                    position={[-4, 0.5, -2]}
+                    rotation={[0.2, 4.8, 0.2]}
+                />
+            </Float>
+
+            {/* 6. Creative Core — Center Focal Point */}
+            <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
+                <mesh position={[0, 1, -5]}>
+                    <sphereGeometry args={[1.1, 64, 64]} />
                     <MeshDistortMaterial
                         color="#E05A3A"
-                        roughness={0.15}
-                        metalness={0.9}
-                        distort={0.15}
+                        emissive="#E05A3A"
+                        emissiveIntensity={0.2}
+                        roughness={0.2}
+                        metalness={0.8}
+                        distort={0.3}
                         speed={2}
                     />
                 </mesh>
             </Float>
 
-            {/* Icosahedron — left side, glass-like */}
-            <Float speed={2} rotationIntensity={1.2} floatIntensity={0.8}>
-                <mesh position={[-3, -0.8, 0]}>
-                    <icosahedronGeometry args={[0.9, 1]} />
-                    <meshPhysicalMaterial
-                        color="#7B94B8"
-                        roughness={0.05}
-                        metalness={0.95}
-                        clearcoat={1}
-                        clearcoatRoughness={0.1}
-                    />
-                </mesh>
+            {/* 6. Mic — Far Bottom (Recording) */}
+            <Float speed={1} rotationIntensity={0.4} floatIntensity={0.5}>
+                <primitive
+                    object={mic.scene}
+                    scale={0.8 * S}
+                    position={[1.5, -2.5, -3]}
+                    rotation={[0, 0, 0.3]}
+                />
             </Float>
 
-            {/* Octahedron — top left, mint */}
-            <Float speed={1.8} rotationIntensity={1.5} floatIntensity={1}>
-                <mesh position={[-1.5, 2, -2]}>
-                    <octahedronGeometry args={[0.6, 0]} />
-                    <meshPhysicalMaterial
-                        color="#5DB8A8"
-                        roughness={0.1}
-                        metalness={0.85}
-                        clearcoat={0.8}
-                    />
-                </mesh>
+            {/* 7. Studio Light — Top Right Edge (Moved to avoid overlap) */}
+            <Float speed={1} rotationIntensity={0.2} floatIntensity={0.5}>
+                <primitive
+                    object={light.scene}
+                    scale={0.05 * S}
+                    position={[8, 4, -5]}
+                    rotation={[-0.5, -1, 0]}
+                />
             </Float>
-
-            {/* Small sphere cluster — scattered */}
-            <Float speed={2.5} rotationIntensity={0.5} floatIntensity={1.5}>
-                <mesh position={[1, -2, -1.5]}>
-                    <sphereGeometry args={[0.4, 32, 32]} />
-                    <MeshDistortMaterial
-                        color="#A57DC8"
-                        roughness={0.2}
-                        metalness={0.8}
-                        distort={0.3}
-                        speed={3}
-                    />
-                </mesh>
-            </Float>
-
-            {/* Dodecahedron — far right */}
-            <Float speed={1.2} rotationIntensity={2} floatIntensity={0.6}>
-                <mesh position={[4, 1.5, -3]}>
-                    <dodecahedronGeometry args={[0.5, 0]} />
-                    <meshPhysicalMaterial
-                        color="#C4806A"
-                        roughness={0.08}
-                        metalness={0.95}
-                        clearcoat={1}
-                    />
-                </mesh>
-            </Float>
-
-            {/* Tiny accent spheres */}
-            {[
-                [0.5, 2.5, -2, '#E05A3A', 0.15],
-                [-2.5, 1.5, -3, '#5DB8A8', 0.12],
-                [3.5, -1.5, -2.5, '#A57DC8', 0.1],
-                [-0.8, -2.2, -1, '#C4806A', 0.18],
-                [2, 2.8, -4, '#7B94B8', 0.13],
-            ].map(([x, y, z, color, size], i) => (
-                <Float key={i} speed={3 + i * 0.5} rotationIntensity={0.3} floatIntensity={2}>
-                    <mesh position={[x, y, z]}>
-                        <sphereGeometry args={[size, 16, 16]} />
-                        <meshStandardMaterial
-                            color={color}
-                            emissive={color}
-                            emissiveIntensity={0.5}
-                            roughness={0.3}
-                            metalness={0.7}
-                        />
-                    </mesh>
-                </Float>
-            ))}
         </group>
     );
 }
+
+// Preload to avoid pop-in
+useGLTF.preload('macbook_pro_m3_16_inch_2024.glb');
+useGLTF.preload('canon_at-1_retro_camera.glb');
+useGLTF.preload('vhs_tape.glb');
+useGLTF.preload('headphone_with_stand.glb');
+useGLTF.preload('logitech_mx_vertical_mouse.glb');
+useGLTF.preload('microphone_gxl_066_bafhcteks.glb');
+useGLTF.preload('speaker_with_stand.glb');
 
 /* ─── Particle Field — thousands of tiny floating dots ─── */
 function ParticleField({ count = 800 }) {
@@ -216,26 +319,32 @@ export function SkillScene({ skillId, isActive }) {
         <div style={{
             position: 'absolute', inset: 0, zIndex: 1,
             pointerEvents: 'none',
-            opacity: isActive ? 0.6 : 0.2,
+            opacity: isActive ? 0.8 : 0.2, // Increased opacity for models
             transition: 'opacity 0.8s',
         }}>
             <Canvas
                 frameloop={isActive ? "always" : "never"}
                 camera={{ position: [0, 0, 5], fov: 50 }}
                 dpr={isMobile ? [1, 1] : [1, 1.5]}
-                gl={{ antialias: false, alpha: true, powerPreference: "high-performance" }}
+                gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
                 style={{ background: 'transparent' }}
             >
-                <ambientLight intensity={0.2} />
-                <pointLight position={[3, 3, 3]} intensity={0.8} color="#E05A3A" />
+                <ambientLight intensity={0.5} />
+                <pointLight position={[3, 3, 3]} intensity={1.5} color="#E05A3A" />
+                <pointLight position={[-3, -2, 5]} intensity={1.5} color="#5DB8A8" />
 
-                <SkillObject skillId={skillId} />
+                <Suspense fallback={null}>
+                    {/* Environment for reflections */}
+                    <Environment preset="city" />
+                    <SkillObject skillId={skillId} />
+                </Suspense>
 
+                {/* Bloom Effect - carefully tuned for models */}
                 <EffectComposer enabled={isActive && !isMobile}>
-                    <Bloom intensity={0.3} luminanceThreshold={0.7} mipmapBlur />
+                    <Bloom intensity={0.4} luminanceThreshold={0.85} mipmapBlur />
                 </EffectComposer>
             </Canvas>
-        </div>
+        </div >
     );
 }
 
@@ -245,36 +354,69 @@ export function GlobalLoader() {
 
 function SkillObject({ skillId }) {
     const ref = useRef();
+
+    // Load models for skills
+    const cam = useGLTF('canon_at-1_retro_camera.glb');
+    const vhs = useGLTF('vhs_tape.glb');
+    const speaker = useGLTF('speaker_with_stand.glb');
+    const mac = useGLTF('macbook_pro_m3_16_inch_2024.glb');
+
     useFrame(({ clock }) => {
         if (!ref.current) return;
-        ref.current.rotation.x = clock.getElapsedTime() * 0.3;
-        ref.current.rotation.y = clock.getElapsedTime() * 0.2;
+        // Gentle rotation
+        ref.current.rotation.y = Math.sin(clock.getElapsedTime() * 0.3) * 0.5;
+        // bobbing
+        ref.current.position.y = Math.sin(clock.getElapsedTime() * 0.5) * 0.2;
     });
 
-    const configs = {
-        film: { geo: <torusKnotGeometry args={[0.8, 0.25, 128, 32]} />, color: '#C4806A' },
-        edit: { geo: <torusGeometry args={[0.9, 0.3, 32, 64]} />, color: '#7B94B8' },
-        '3d': { geo: <icosahedronGeometry args={[1, 1]} />, color: '#A57DC8' },
-        dev: { geo: <octahedronGeometry args={[1, 2]} />, color: '#5DB8A8' },
-    };
+    const S = isMobile ? 0.6 : 1;
 
-    const cfg = configs[skillId] || configs.film;
+    let model = null;
+    let scale = 1;
+    let rotation = [0, 0, 0];
+
+    // Mapping skillId to Model
+    switch (skillId) {
+        case 'film':
+            model = cam.scene.clone(); // Clone to use multiple times
+            scale = 8 * S;
+            rotation = [0.2, -0.5, 0];
+            break;
+        case 'edit':
+            model = vhs.scene.clone();
+            scale = 0.08 * S;
+            rotation = [1.5, 0, 0.5]; // Tilted tape
+            break;
+        case '3d':
+            model = speaker.scene.clone();
+            scale = 4.5 * S;
+            rotation = [0, 0.5, 0];
+            break;
+        case 'dev':
+            model = mac.scene.clone();
+            scale = 0.08 * S;
+            rotation = [0.2, -0.3, 0];
+            break;
+        default:
+            model = mac.scene.clone();
+    }
 
     return (
-        <Float speed={1.5} rotationIntensity={0.5} floatIntensity={1}>
-            <mesh ref={ref}>
-                {cfg.geo}
-                <MeshDistortMaterial
-                    color={cfg.color}
-                    roughness={0.12}
-                    metalness={0.9}
-                    distort={0.2}
-                    speed={2}
-                />
-            </mesh>
+        <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
+            <primitive
+                ref={ref}
+                object={model}
+                scale={scale}
+                rotation={rotation}
+            />
         </Float>
     );
 }
+
+useGLTF.preload('/canon_at-1_retro_camera.glb');
+useGLTF.preload('/vhs_tape.glb');
+useGLTF.preload('/speaker_with_stand.glb');
+useGLTF.preload('/macbook_pro_m3_16_inch_2024.glb');
 
 /* ═══════════════════════════════════════════════════
    3D TILT CARD — mouse-reactive perspective
