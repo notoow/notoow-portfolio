@@ -1,68 +1,175 @@
+/* ═══════════════════════════════════════════════════════
+   NOTOOW PORTFOLIO — Cinematic Design System v3
+   Inspired by: Dennis Snellenberg, Aristide Benoist,
+   Lusion, Cappen, Rauno Freiberg
+   ═══════════════════════════════════════════════════════ */
+
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  /* ─── Deep Blacks ─── */
+  --bg-void: #020202;
+  --bg-deep: #050505;
+  --bg-primary: #0a0a0a;
+  --bg-card: #111111;
+  --bg-elevated: #181818;
+
+  /* ─── Text ─── */
+  --text-hero: #f5f5f5;
+  --text-primary: #e0e0e0;
+  --text-secondary: #777777;
+  --text-muted: #3d3d3d;
+  --text-dim: #252525;
+
+  /* ─── Accent — Warm Vermillion (refined terracotta) ─── */
+  --accent: #E05A3A;
+  --accent-soft: rgba(224, 90, 58, 0.12);
+  --accent-glow: rgba(224, 90, 58, 0.06);
+  --accent-hover: #F06B4D;
+
+  /* ─── Skill Tones (desaturated, cinematic) ─── */
+  --tone-warm: #C4806A;
+  --tone-cool: #7B94B8;
+  --tone-vivid: #A57DC8;
+  --tone-mint: #5DB8A8;
+
+  /* ─── Surfaces ─── */
+  --border: rgba(255, 255, 255, 0.05);
+  --border-hover: rgba(255, 255, 255, 0.1);
+  --glass: rgba(255, 255, 255, 0.02);
+  --glass-hover: rgba(255, 255, 255, 0.04);
+
+  /* ─── Fonts ─── */
+  --font-kr: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+  --font-en: 'Outfit', var(--font-kr);
+  --font-mono: 'Space Grotesk', monospace;
+
+  /* ─── Easing ─── */
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  font-family: var(--font-kr);
+  line-height: 1.6;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  color: var(--text-primary);
+  background-color: var(--bg-void);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
   min-height: 100vh;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+::selection {
+  background: var(--accent);
+  color: var(--bg-void);
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
-@media (prefers-color-scheme: light) {
+img {
+  max-width: 100%;
+  display: block;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-dim);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ─── Custom cursor glow (applied via JS in component) ─── */
+.cursor-glow {
+  position: fixed;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  background: radial-gradient(circle, var(--accent-glow), transparent 70%);
+  filter: blur(60px);
+  transform: translate(-50%, -50%);
+  transition: opacity 0.4s;
+  opacity: 0;
+}
+
+.cursor-glow.active {
+  opacity: 1;
+}
+
+/* ─── Horizontal scroll container ─── */
+.hscroll-container {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.hscroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.hscroll-item {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 1024px) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    font-size: 15px;
   }
-  a:hover {
-    color: #747bff;
+}
+
+@media (max-width: 768px) {
+  :root {
+    font-size: 14px;
   }
-  button {
-    background-color: #f9f9f9;
+}
+
+@media (max-width: 480px) {
+  :root {
+    font-size: 13px;
   }
 }
