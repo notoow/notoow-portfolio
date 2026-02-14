@@ -123,22 +123,32 @@ function MouseTracker({ mousePos }) {
 }
 
 /* ─── Gyro Tracker (Mobile Tilt) ─── */
+/* ─── Gyro Tracker (Mobile Tilt with Calibration) ─── */
 function GyroTracker() {
     const { camera } = useThree();
     const target = useRef({ x: 0, y: 0 });
+    const initial = useRef(null);
 
     useEffect(() => {
         const handleOrientation = (e) => {
-            // Gamma: Left/Right tilt (-90 to 90)
-            // Beta: Front/Back tilt (-180 to 180)
             if (e.gamma === null || e.beta === null) return;
 
-            const y = THREE.MathUtils.clamp(e.gamma, -45, 45);
-            const x = THREE.MathUtils.clamp(e.beta, 0, 90);
+            // Calibrate on first valid reading
+            if (!initial.current) {
+                initial.current = { gamma: e.gamma, beta: e.beta };
+            }
 
-            // Calculate subtle parallax target
-            target.current.y = (y / 45) * 0.2;
-            target.current.x = ((x - 45) / 45) * 0.2;
+            // Calculate deltas
+            const deltaGamma = e.gamma - initial.current.gamma;
+            const deltaBeta = e.beta - initial.current.beta;
+
+            // Clamp deltas to avoid extreme rotation
+            const y = THREE.MathUtils.clamp(deltaGamma, -45, 45);
+            const x = THREE.MathUtils.clamp(deltaBeta, -45, 45);
+
+            // Map to camera rotation (softer sensitivity)
+            target.current.y = (y / 45) * 0.3; // Limit to ~0.3 rad
+            target.current.x = (x / 45) * 0.3;
         };
 
         window.addEventListener('deviceorientation', handleOrientation);
@@ -146,6 +156,7 @@ function GyroTracker() {
     }, []);
 
     useFrame(() => {
+        // Smooth interpolation
         camera.rotation.x += (target.current.x - camera.rotation.x) * 0.05;
         camera.rotation.y += (target.current.y - camera.rotation.y) * 0.05;
     });

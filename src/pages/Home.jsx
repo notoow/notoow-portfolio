@@ -240,30 +240,39 @@ function RollingStrip() {
 
 /* ─── BENTO PREVIEW GRID — 카테고리별 포트폴리오 링크 ─── */
 function BentoPreview() {
-    // reelUrl: 나중에 유튜브 포트폴리오 링크로 교체
+    const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 768);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const items = [
-        { title: '촬영', en: 'CINEMATOGRAPHY', desc: '드론 · 멀티캠 · 현장 스케치', span: 'span 1', h: '280px', accent: 'var(--tone-warm)', reelUrl: '#film' },
-        { title: '편집', en: 'POST-PRODUCTION', desc: '모션그래픽 · 컬러그레이딩 · 유튜브', span: 'span 1', h: '280px', accent: 'var(--tone-cool)', reelUrl: '#edit' },
-        { title: '3D', en: '3D VISUALIZATION', desc: '제품 렌더링 · 애니메이션 · 로고', span: 'span 1', h: '280px', accent: 'var(--tone-vivid)', reelUrl: '#3d' },
-        { title: '개발', en: 'DEVELOPMENT', desc: 'React · Python · 자동화 도구', span: 'span 2', h: '200px', accent: 'var(--tone-mint)', reelUrl: '#dev' },
-        { title: '전체 보기', en: 'FULL PORTFOLIO', desc: '모든 작업물 한눈에', span: 'span 1', h: '200px', accent: 'var(--accent)', reelUrl: '#interactive' },
+        { title: '촬영', en: 'CINEMATOGRAPHY', desc: '드론 · 멀티캠 · 현장 스케치', span: isMobile ? 'span 1' : 'span 1', h: '280px', accent: 'var(--tone-warm)', reelUrl: '#film' },
+        { title: '편집', en: 'POST-PRODUCTION', desc: '모션그래픽 · 컬러그레이딩 · 유튜브', span: isMobile ? 'span 1' : 'span 1', h: '280px', accent: 'var(--tone-cool)', reelUrl: '#edit' },
+        { title: '3D', en: '3D VISUALIZATION', desc: '제품 렌더링 · 애니메이션 · 로고', span: isMobile ? 'span 1' : 'span 1', h: '280px', accent: 'var(--tone-vivid)', reelUrl: '#3d' },
+        // Development & Full Portfolio: Full width on mobile
+        { title: '개발', en: 'DEVELOPMENT', desc: 'React · Python · 자동화 도구', span: isMobile ? 'span 1' : 'span 2', h: '200px', accent: 'var(--tone-mint)', reelUrl: '#dev' },
+        { title: '전체 보기', en: 'FULL PORTFOLIO', desc: '모든 작업물 한눈에', span: isMobile ? 'span 1' : 'span 1', h: '200px', accent: 'var(--accent)', reelUrl: '#interactive' },
     ];
 
     return (
-        <section style={{ padding: '5rem 3rem', maxWidth: '1200px', margin: '0 auto' }}>
+        <section style={{ padding: '5rem 2rem', maxWidth: '1200px', margin: '0 auto' }}>
             <div style={{
-                display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
+                display: 'grid',
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
                 gap: '0.8rem',
             }}>
                 {items.map((item, i) => (
-                    <TiltCard key={item.en} item={item} index={i} />
+                    <TiltCard key={item.en} item={item} index={i} isMobile={isMobile} />
                 ))}
             </div>
         </section>
     );
 }
 
-function TiltCard({ item, index }) {
+function TiltCard({ item, index, isMobile }) {
     const cardRef = useRef(null);
     const [hov, setHov] = useState(false);
 
@@ -294,8 +303,9 @@ function TiltCard({ item, index }) {
             onMouseLeave={handleMouseLeave}
             style={{
                 gridColumn: item.span,
-                height: item.h,
-                padding: '2rem', borderRadius: '12px',
+                height: isMobile ? 'auto' : item.h,
+                minHeight: isMobile ? '220px' : item.h,
+                padding: isMobile ? '1.5rem' : '2rem', borderRadius: '12px',
                 background: 'var(--bg-card)',
                 border: `1px solid ${hov ? 'var(--border-hover)' : 'var(--border)'}`,
                 display: 'flex', flexDirection: 'column',
@@ -305,6 +315,7 @@ function TiltCard({ item, index }) {
                 cursor: 'none',
                 transformStyle: 'preserve-3d',
                 boxShadow: hov ? `0 20px 60px ${item.accent}10` : 'none',
+                wordBreak: 'keep-all',
             }}
         >
             <div style={{
