@@ -249,8 +249,8 @@ function FloatingModels({ mousePos }) {
             <Float speed={1} rotationIntensity={0.2} floatIntensity={0.5}>
                 <primitive
                     object={light.scene}
-                    scale={0.05 * S}
-                    position={[8, 4, -5]}
+                    scale={0.005 * S}
+                    position={[8, -5, -5]}
                     rotation={[-0.5, -1, 0]}
                 />
             </Float>
