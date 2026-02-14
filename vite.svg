@@ -7,20 +7,19 @@
       <stop offset="100%" style="stop-color:#9E3B24;stop-opacity:1" /> <!-- Deep Shadow -->
     </radialGradient>
     
-    <!-- Top Highlight (Glassy Reflection) -->
-    <radialGradient id="highlight" cx="65%" cy="25%" r="50%" fx="65%" fy="25%">
-      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.8" />
-      <stop offset="40%" style="stop-color:#FFDDCF;stop-opacity:0.3" /> <!-- Soft Peach Glow -->
+    <!-- Top Highlight (Moved inward for realistic volume) -->
+    <radialGradient id="highlight" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.9" />
+      <stop offset="40%" style="stop-color:#FFDDCF;stop-opacity:0.4" />
       <stop offset="100%" style="stop-color:#FFFFFF;stop-opacity:0" />
     </radialGradient>
 
     <!-- Bottom Glow (Reflected Ambient Light) -->
     <radialGradient id="bottomGlow" cx="50%" cy="90%" r="60%" fx="50%" fy="100%">
-      <stop offset="0%" style="stop-color:#FFA07A;stop-opacity:0.5" /> <!-- Soft Orange Glow -->
+      <stop offset="0%" style="stop-color:#FFA07A;stop-opacity:0.5" />
       <stop offset="100%" style="stop-color:#FF8C69;stop-opacity:0" />
     </radialGradient>
 
-    <!-- Glow/Blur Effect -->
     <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
       <feGaussianBlur in="SourceGraphic" stdDeviation="2" />
     </filter>
@@ -35,8 +34,8 @@
   <!-- Bottom Reflected Light -->
   <ellipse cx="50" cy="85" rx="30" ry="10" fill="url(#bottomGlow)" filter="url(#softGlow)" />
 
-  <!-- Top Strong Highlight (Crucial for "Glassy" look) -->
-  <ellipse cx="75" cy="25" rx="14" ry="9" fill="url(#highlight)" transform="rotate(-35 75 25)" filter="url(#softGlow)" />
+  <!-- Top Strong Highlight (Positioned more centrally: cx=65, cy=35) -->
+  <ellipse cx="65" cy="35" rx="16" ry="10" fill="url(#highlight)" transform="rotate(-40 65 35)" filter="url(#softGlow)" />
   
   <!-- Subtle Rim Light (Left Top) -->
   <path d="M15,50 Q15,20 45,15" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round" filter="url(#softGlow)" />
