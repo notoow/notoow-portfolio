@@ -1,6 +1,6 @@
 import React, { useRef, useMemo, Suspense, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Float, useGLTF, Environment, Lightformer, Loader, Preload, MeshDistortMaterial } from '@react-three/drei';
+import { Clone, Float, useGLTF, Environment, Lightformer, Loader, Preload, MeshDistortMaterial } from '@react-three/drei';
 import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing';
 import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
@@ -157,12 +157,14 @@ function GyroTracker() {
 function FloatingModels({ mousePos }) {
     // Load models
     const mac = useGLTF('macbook_pro_m3_16_inch_2024.glb');
-    const camera = useGLTF('canon_at-1_retro_camera.glb');
+    const camera = useGLTF('canon_at-2_retro_camera.glb');
     const vhs = useGLTF('vhs_tape.glb');
     const headphone = useGLTF('headphone_with_stand.glb');
     const mouse = useGLTF('logitech_mx_vertical_mouse.glb');
     const mic = useGLTF('microphone_gxl_066_bafhcteks.glb');
     const light = useGLTF('studio_umbrella_light.glb');
+    const drone = useGLTF('dji_3_mini_pro.glb');
+    const printer = useGLTF('3d_printer.glb');
 
     // Scale adjustment helper
     const S = isMobile ? 0.7 : 1;
@@ -179,9 +181,8 @@ function FloatingModels({ mousePos }) {
                 />
             </Float>
 
-            {/* 2. Camera — Bottom Left (Film) */}
             <Float speed={2} rotationIntensity={0.8} floatIntensity={1.2}>
-                <primitive
+                <Clone
                     object={camera.scene}
                     scale={9 * S}
                     position={[-3.2, -1.5, 1]}
@@ -250,8 +251,28 @@ function FloatingModels({ mousePos }) {
                 <primitive
                     object={light.scene}
                     scale={0.005 * S}
-                    position={[8, -5, -5]}
-                    rotation={[-0.5, -1, 0]}
+                    position={[-23, -1, -17]}
+                    rotation={[0.5, 1.5, 0]}
+                />
+            </Float>
+
+            {/* 8. Drone — Between Light & Mouse/Camera (Aerial) */}
+            <Float speed={1.5} rotationIntensity={0.8} floatIntensity={1.5}>
+                <primitive
+                    object={drone.scene}
+                    scale={3 * S}
+                    position={[-5, 1.5, -2]}
+                    rotation={[0.2, 0.5, 0.1]}
+                />
+            </Float>
+
+            {/* 9. 3D Printer — Far Right (Opposite to Light) */}
+            <Float speed={0.8} rotationIntensity={0.3} floatIntensity={0.5}>
+                <primitive
+                    object={printer.scene}
+                    scale={0.016 * S}
+                    position={[8, -4, -3]}
+                    rotation={[0.1, -0.5, 0]}
                 />
             </Float>
         </group>
@@ -260,12 +281,14 @@ function FloatingModels({ mousePos }) {
 
 // Preload to avoid pop-in
 useGLTF.preload('macbook_pro_m3_16_inch_2024.glb');
-useGLTF.preload('canon_at-1_retro_camera.glb');
+useGLTF.preload('canon_at-2_retro_camera.glb');
 useGLTF.preload('vhs_tape.glb');
 useGLTF.preload('headphone_with_stand.glb');
 useGLTF.preload('logitech_mx_vertical_mouse.glb');
 useGLTF.preload('microphone_gxl_066_bafhcteks.glb');
 useGLTF.preload('speaker_with_stand.glb');
+useGLTF.preload('dji_3_mini_pro.glb');
+useGLTF.preload('3d_printer.glb');
 
 /* ─── Particle Field — thousands of tiny floating dots ─── */
 function ParticleField({ count = 800 }) {
