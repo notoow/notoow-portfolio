@@ -1,44 +1,43 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
   <defs>
-    <!-- Base Deep Red Gradient -->
-    <radialGradient id="baseGrad" cx="30%" cy="30%" r="70%" fx="40%" fy="40%">
-      <stop offset="0%" style="stop-color:#FF4D4D;stop-opacity:1" />
-      <stop offset="60%" style="stop-color:#D00000;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#600000;stop-opacity:1" />
+    <!-- Base Signature Orange Gradient -->
+    <radialGradient id="baseGrad" cx="30%" cy="30%" r="80%" fx="30%" fy="30%">
+      <stop offset="0%" style="stop-color:#FF7B5A;stop-opacity:1" /> <!-- Bright Highlight -->
+      <stop offset="50%" style="stop-color:#E05A3A;stop-opacity:1" /> <!-- Signature Base -->
+      <stop offset="100%" style="stop-color:#9E3B24;stop-opacity:1" /> <!-- Deep Shadow -->
     </radialGradient>
     
-    <!-- Top Highlight (White/Yellowish) -->
+    <!-- Top Highlight (Glassy Reflection) -->
     <radialGradient id="highlight" cx="65%" cy="25%" r="50%" fx="65%" fy="25%">
-      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.9" />
-      <stop offset="40%" style="stop-color:#FFF5E1;stop-opacity:0.4" />
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.8" />
+      <stop offset="40%" style="stop-color:#FFDDCF;stop-opacity:0.3" /> <!-- Soft Peach Glow -->
       <stop offset="100%" style="stop-color:#FFFFFF;stop-opacity:0" />
     </radialGradient>
 
-    <!-- Bottom Glow (Reflection from environment) -->
+    <!-- Bottom Glow (Reflected Ambient Light) -->
     <radialGradient id="bottomGlow" cx="50%" cy="90%" r="60%" fx="50%" fy="100%">
-      <stop offset="0%" style="stop-color:#FF8C69;stop-opacity:0.6" />
+      <stop offset="0%" style="stop-color:#FFA07A;stop-opacity:0.5" /> <!-- Soft Orange Glow -->
       <stop offset="100%" style="stop-color:#FF8C69;stop-opacity:0" />
     </radialGradient>
 
-    <!-- Glossy Reflection (Sharp White) -->
-    <filter id="blurFilter">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" />
+    <!-- Glow/Blur Effect -->
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2" />
     </filter>
   </defs>
 
-  <!-- Main Organic Sphere Shape (Slightly irregular) -->
-  <path d="M50,5 C75,5 95,25 95,50 C95,80 75,95 50,95 C25,95 5,75 5,50 C5,20 20,5 50,5 Z" 
-        fill="url(#baseGrad)" />
+  <!-- Main Organic Sphere Shape -->
+  <circle cx="50" cy="50" r="45" fill="url(#baseGrad)" />
 
-  <!-- Inner Shadow / Depth -->
-  <circle cx="50" cy="50" r="43" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="2" filter="url(#blurFilter)" />
+  <!-- Inner Softness -->
+  <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1" filter="url(#softGlow)" />
 
   <!-- Bottom Reflected Light -->
-  <ellipse cx="50" cy="85" rx="30" ry="10" fill="url(#bottomGlow)" filter="url(#blurFilter)" />
+  <ellipse cx="50" cy="85" rx="30" ry="10" fill="url(#bottomGlow)" filter="url(#softGlow)" />
 
-  <!-- Top Strong Highlight (Window Reflection Effect) -->
-  <ellipse cx="70" cy="30" rx="12" ry="8" fill="url(#highlight)" transform="rotate(-30 70 30)" filter="url(#blurFilter)" />
+  <!-- Top Strong Highlight (Crucial for "Glassy" look) -->
+  <ellipse cx="75" cy="25" rx="14" ry="9" fill="url(#highlight)" transform="rotate(-35 75 25)" filter="url(#softGlow)" />
   
-  <!-- Subtle Rim Light -->
-  <path d="M10,50 Q10,20 40,10" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="3" filter="url(#blurFilter)" />
+  <!-- Subtle Rim Light (Left Top) -->
+  <path d="M15,50 Q15,20 45,15" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round" filter="url(#softGlow)" />
 </svg>
