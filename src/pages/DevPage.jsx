@@ -14,8 +14,9 @@ const PROJECTS = [
         title: '우주 대스타 (Cosmic Superstar)',
         type: 'Unity / Kinect v2',
         desc: '고양 스타필드 매직플로우 체험존. Kinect v2의 깊이와 가속도 데이터를 정밀 제어하여 사용자를 실시간 미러링하는 인터랙티브 XR 서비스.',
-        url: 'https://youtu.be/N-MJOCrLh0A', // Placeholder link
-        color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', // Deep Purple
+        url: 'https://www.youtube.com/channel/UC98TOZLprK48X1rQeA5x9FA',
+        media: '/images/wooju-daestar.gif',
+        color: 'linear-gradient(135deg, #1d2438 0%, #2f3a5d 100%)',
         textColor: '#fff'
     },
     {
@@ -107,6 +108,23 @@ function ProjectCard({ item, index }) {
                 cursor: 'pointer',
             }}
         >
+            {item.media && (
+                <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    backgroundImage: `url(${item.media})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    filter: hover ? 'brightness(0.85)' : 'brightness(0.7)',
+                    transform: hover ? 'scale(1.03)' : 'scale(1)',
+                    transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s',
+                }} />
+            )}
+            <div style={{
+                position: 'absolute',
+                inset: 0,
+                background: item.media ? 'linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.24))' : 'transparent',
+            }} />
             <div style={{
                 padding: '2rem',
                 height: '100%',
@@ -114,6 +132,8 @@ function ProjectCard({ item, index }) {
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 color: item.textColor || '#fff',
+                position: 'relative',
+                zIndex: 2,
             }}>
                 <div>
                     <span style={{

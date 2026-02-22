@@ -1,5 +1,7 @@
 import React from 'react';
 import CategoryDetail from './CategoryDetail';
+import { useYouTubeCategoryVideos } from '../hooks/useYouTubeCategoryVideos';
+import { DEFAULT_CHANNEL_URL } from '../lib/youtube';
 
 /*
    ═══════════════════════════════════════════════════
@@ -14,14 +16,18 @@ const CATEGORY = {
     color: 'var(--tone-cool)',
 };
 
-const VIDEOS = [
-    // ↓ videoId를 실제 유튜브 영상 ID로 교체하세요
-    { videoId: 'OZU-Cxj-49w', title: '빈지노 24:26 편집', type: '뮤직 비주얼', desc: '빈지노 뮤직비디오 편집 작업' },
-    { videoId: 'mkA-BkpoX6E', title: '천사소녀 네티 OST', type: '음악 리메이크', desc: '음악 리메이크 및 영상 편집' },
-    { videoId: 'OZU-Cxj-49w', title: '편집 프로젝트 B', type: '유튜브 편집' },
-    // 추가하려면 여기에 { videoId: 'xxx', title: '제목', type: '유형' } 넣기
-];
-
 export default function EditPage() {
-    return <CategoryDetail category={CATEGORY} videos={VIDEOS} />;
+    const { videos, loading, error } = useYouTubeCategoryVideos('디자인');
+    const fallbackVideos = [
+        {
+            title: '[디자인] YouTube 채널',
+            type: loading ? '자동 파싱 중' : '채널 바로가기',
+            desc: loading
+                ? '유튜브 목록을 불러오는 중입니다.'
+                : (error ? `API 연결 필요: ${error}` : '디자인 태그 영상이 아직 없습니다.'),
+            url: DEFAULT_CHANNEL_URL,
+        },
+    ];
+
+    return <CategoryDetail category={CATEGORY} videos={videos.length ? videos : fallbackVideos} />;
 }

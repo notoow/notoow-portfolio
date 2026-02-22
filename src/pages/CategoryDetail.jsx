@@ -72,6 +72,9 @@ function VideoLightbox({ videoId, title, onClose }) {
 function VideoCard({ item, index, onPlay }) {
     const [hov, setHov] = useState(false);
     const [imgError, setImgError] = useState(false);
+    const hasVideoId = Boolean(item.videoId);
+    const hasExternalUrl = Boolean(item.url);
+    const isClickable = hasVideoId || hasExternalUrl;
 
     // Staggered heights for masonry feel
     const heights = ['340px', '280px', '360px', '300px', '320px', '290px'];
@@ -85,10 +88,18 @@ function VideoCard({ item, index, onPlay }) {
             transition={{ delay: (index % 3) * 0.08, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             onMouseEnter={() => setHov(true)}
             onMouseLeave={() => setHov(false)}
-            onClick={() => onPlay(item.videoId, item.title)}
+            onClick={() => {
+                if (hasVideoId) {
+                    onPlay(item.videoId, item.title);
+                    return;
+                }
+                if (hasExternalUrl) {
+                    window.open(item.url, '_blank', 'noopener,noreferrer');
+                }
+            }}
             style={{
                 position: 'relative', overflow: 'hidden',
-                borderRadius: '10px', cursor: 'pointer',
+                borderRadius: '10px', cursor: isClickable ? 'pointer' : 'default',
                 height: h, background: 'var(--bg-card)',
                 border: `1px solid ${hov ? 'var(--border-hover)' : 'var(--border)'}`,
                 transition: 'border-color 0.3s, box-shadow 0.3s',
@@ -96,38 +107,55 @@ function VideoCard({ item, index, onPlay }) {
             }}
         >
             {/* Thumbnail */}
-            <img
-                src={imgError ? ytThumb(item.videoId, 'hqdefault') : ytThumb(item.videoId)}
-                alt={item.title}
-                loading="lazy"
-                onError={() => setImgError(true)}
-                style={{
-                    width: '100%', height: '100%', objectFit: 'cover',
-                    transition: 'transform 0.7s var(--ease-expo), filter 0.5s',
-                    transform: hov ? 'scale(1.06)' : 'scale(1)',
-                    filter: hov ? 'brightness(0.7)' : 'brightness(0.45)',
-                }}
-            />
+            {(hasVideoId || item.thumbnail) ? (
+                <img
+                    src={item.thumbnail || (imgError ? ytThumb(item.videoId, 'hqdefault') : ytThumb(item.videoId))}
+                    alt={item.title}
+                    loading="lazy"
+                    onError={() => setImgError(true)}
+                    style={{
+                        width: '100%', height: '100%', objectFit: 'cover',
+                        transition: 'transform 0.7s var(--ease-expo), filter 0.5s',
+                        transform: hov ? 'scale(1.06)' : 'scale(1)',
+                        filter: hov ? 'brightness(0.7)' : 'brightness(0.45)',
+                    }}
+                />
+            ) : (
+                <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'linear-gradient(135deg, rgba(224,90,58,0.15), rgba(93,184,168,0.15))',
+                }} />
+            )}
 
             {/* Play button */}
-            <div style={{
-                position: 'absolute', inset: 0,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                opacity: hov ? 1 : 0, transition: 'opacity 0.4s',
-            }}>
+            {isClickable && (
                 <div style={{
-                    width: '60px', height: '60px', borderRadius: '50%',
-                    background: 'var(--accent)',
+                    position: 'absolute', inset: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    boxShadow: '0 8px 30px rgba(224,90,58,0.35)',
-                    transform: hov ? 'scale(1)' : 'scale(0.7)',
-                    transition: 'transform 0.4s var(--ease-expo)',
+                    opacity: hov ? 1 : 0, transition: 'opacity 0.4s',
                 }}>
-                    <svg width="18" height="20" viewBox="0 0 18 20" fill="none">
-                        <path d="M2 1L16 10L2 19V1Z" fill="#fff" />
-                    </svg>
+                    <div style={{
+                        width: '60px', height: '60px', borderRadius: '50%',
+                        background: 'var(--accent)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        boxShadow: '0 8px 30px rgba(224,90,58,0.35)',
+                        transform: hov ? 'scale(1)' : 'scale(0.7)',
+                        transition: 'transform 0.4s var(--ease-expo)',
+                    }}>
+                        {hasVideoId ? (
+                            <svg width="18" height="20" viewBox="0 0 18 20" fill="none">
+                                <path d="M2 1L16 10L2 19V1Z" fill="#fff" />
+                            </svg>
+                        ) : (
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="7" y1="17" x2="17" y2="7"></line>
+                                <polyline points="7 7 17 7 17 17"></polyline>
+                            </svg>
+                        )}
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Info overlay */}
             <div style={{
@@ -152,6 +180,14 @@ function VideoCard({ item, index, onPlay }) {
                         marginTop: '0.3rem', lineHeight: 1.4,
                         display: hov ? 'block' : 'none',
                     }}>{item.desc}</p>
+                )}
+                {!isClickable && (
+                    <p style={{
+                        fontSize: '0.72rem',
+                        color: 'rgba(255,255,255,0.55)',
+                        marginTop: '0.4rem',
+                        lineHeight: 1.4,
+                    }}>링크 반영 대기</p>
                 )}
             </div>
 
@@ -290,7 +326,7 @@ export default function CategoryDetail({
                         <span style={{
                             fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
                             color: 'var(--text-muted)', letterSpacing: '0.1em',
-                        }}>CLICK TO PLAY</span>
+                        }}>CLICK TO OPEN</span>
                     </div>
                 </motion.div>
             </section>
@@ -321,7 +357,7 @@ export default function CategoryDetail({
                         gap: '1rem',
                     }}>
                         {videos.map((v, i) => (
-                            <VideoCard key={`${v.videoId}-${i}`} item={v} index={i} onPlay={openVideo} />
+                            <VideoCard key={`${v.videoId || v.url || v.title}-${i}`} item={v} index={i} onPlay={openVideo} />
                         ))}
                     </div>
 

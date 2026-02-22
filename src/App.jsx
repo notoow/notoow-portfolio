@@ -7,6 +7,7 @@ import FilmPage from './pages/FilmPage';
 import EditPage from './pages/EditPage';
 import ThreeDPage from './pages/ThreeDPage';
 import DevPage from './pages/DevPage';
+import VideoAdminPage from './pages/VideoAdminPage';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GlobalLoader } from './components/Scene3D';
 import './App.css';
@@ -20,6 +21,7 @@ function getPageFromHash() {
   if (hash === '/edit' || hash === 'edit') return 'edit';
   if (hash === '/3d' || hash === '3d') return '3d';
   if (hash === '/dev' || hash === 'dev') return 'dev';
+  if (hash === '/admin-videos' || hash === 'admin-videos') return 'admin-videos';
   return 'home';
 }
 
@@ -57,6 +59,7 @@ function App() {
           {page === 'edit' && <EditPage />}
           {page === '3d' && <ThreeDPage />}
           {page === 'dev' && <DevPage />}
+          {page === 'admin-videos' && <VideoAdminPage />}
           {page === 'home' && <Home />}
         </motion.div>
       </AnimatePresence>

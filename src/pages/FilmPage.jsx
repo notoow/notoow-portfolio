@@ -1,15 +1,11 @@
 import React from 'react';
 import CategoryDetail from './CategoryDetail';
+import { useYouTubeCategoryVideos } from '../hooks/useYouTubeCategoryVideos';
+import { DEFAULT_CHANNEL_URL } from '../lib/youtube';
 
 /*
    ═══════════════════════════════════════════════════
    촬영 (CINEMATOGRAPHY) 포트폴리오
-   ═══════════════════════════════════════════════════
-   
-   videoId 교체 방법:
-   1. 유튜브 영상 URL에서 ?v= 뒤의 코드를 복사
-   2. 아래 videos 배열의 videoId에 붙여넣기
-   3. 새 프로젝트 추가: { videoId: '코드', title: '제목', type: '유형' } 추가
    ═══════════════════════════════════════════════════ */
 
 const CATEGORY = {
@@ -20,14 +16,18 @@ const CATEGORY = {
     color: 'var(--tone-warm)',
 };
 
-const VIDEOS = [
-    // ↓ videoId를 실제 유튜브 영상 ID로 교체하세요
-    { videoId: 'YN28Fyo0Q7Q', title: 'HSBC 환경캠프', type: '다큐멘터리', desc: 'HSBC 환경 캠프 현장 촬영 및 기록' },
-    { videoId: 'YN28Fyo0Q7Q', title: '촬영 프로젝트 B', type: '현장 촬영' },
-    { videoId: 'YN28Fyo0Q7Q', title: '촬영 프로젝트 C', type: '드론 촬영' },
-    // 추가하려면 여기에 { videoId: 'xxx', title: '제목', type: '유형' } 넣기
-];
-
 export default function FilmPage() {
-    return <CategoryDetail category={CATEGORY} videos={VIDEOS} />;
+    const { videos, loading, error } = useYouTubeCategoryVideos('예능');
+    const fallbackVideos = [
+        {
+            title: '[예능] YouTube 채널',
+            type: loading ? '자동 파싱 중' : '채널 바로가기',
+            desc: loading
+                ? '유튜브 목록을 불러오는 중입니다.'
+                : (error ? `API 연결 필요: ${error}` : '예능 태그 영상이 아직 없습니다.'),
+            url: DEFAULT_CHANNEL_URL,
+        },
+    ];
+
+    return <CategoryDetail category={CATEGORY} videos={videos.length ? videos : fallbackVideos} />;
 }

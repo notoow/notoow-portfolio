@@ -9,12 +9,16 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "videos:list": "node scripts/videos-list.mjs",
+    "videos:upsert": "node scripts/videos-upsert.mjs",
+    "videos:disable": "node scripts/videos-disable.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "@react-three/postprocessing": "^3.0.4",
+    "@supabase/supabase-js": "^2.97.0",
     "framer-motion": "^11.15.0",
     "lucide-react": "^0.563.0",
     "react": "^19.2.0",
