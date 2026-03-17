@@ -73,7 +73,14 @@ function getSnapshot() {
         return DEFAULT_STATE;
     }
 
-    cachedState = getResponsiveState();
+    const nextState = getResponsiveState();
+    if (
+        nextState.isMobile !== cachedState.isMobile ||
+        nextState.isTablet !== cachedState.isTablet
+    ) {
+        cachedState = nextState;
+    }
+
     return cachedState;
 }
 
