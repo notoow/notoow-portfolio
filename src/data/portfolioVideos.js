@@ -45,6 +45,13 @@ const portfolioVideos = {
             thumbnail: "https://i9.ytimg.com/vi/SvZ5ECeT53g/mqdefault.jpg?sqp=CPjm5c0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGUgYChNMA8=&rs=AOn4CLBKb4G5Bywx6ftaMSMt5zOgpruQ5Q",
         },
         {
+            title: "롯데홈쇼핑 바로알기 | 이천 자동화 물류센터",
+            url: "https://www.youtube.com/watch?v=Iv8xAVWP-Ds",
+            section: "motion",
+            type: "YouTube Unlisted",
+            thumbnail: "https://i9.ytimg.com/vi/Iv8xAVWP-Ds/mqdefault.jpg?sqp=CPjm5c0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGFQgXihlMA8=&rs=AOn4CLCgSfThu8pe402n-gGeoSkRUu2V9Q",
+        },
+        {
             title: "미국대학입시컨설팅 인트로",
             url: "https://www.youtube.com/watch?v=IHwd8zO2KRk",
             section: "design",
@@ -97,12 +104,6 @@ const portfolioVideos = {
         },
     ],
     예능: [
-        {
-            title: "롯데홈쇼핑 바로알기 | 이천 자동화 물류센터",
-            url: "https://www.youtube.com/watch?v=Iv8xAVWP-Ds",
-            type: "YouTube Unlisted",
-            thumbnail: "https://i9.ytimg.com/vi/Iv8xAVWP-Ds/mqdefault.jpg?sqp=CPjm5c0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGFQgXihlMA8=&rs=AOn4CLCgSfThu8pe402n-gGeoSkRUu2V9Q",
-        },
         {
             title: "박성웅 유딱날 2",
             url: "https://www.youtube.com/watch?v=vomJJrpoT1k",
