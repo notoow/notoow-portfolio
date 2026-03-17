@@ -173,8 +173,8 @@ function CinematicHero({ mousePos }) {
                             color: 'var(--text-secondary)', fontWeight: 400,
                         }}>
                             팀이 아닙니다.<br />
-                            카메라, 편집실, 3D 렌더링, 코드 —<br />
-                            <span style={{ color: 'var(--text-hero)', fontWeight: 600 }}>한 사람</span>이 전부 합니다.
+                            촬영, 편집, 3D, 마케팅, 개발<br />
+                            <span style={{ color: 'var(--text-hero)', fontWeight: 600 }}>한 사람</span>이 전부 가능합니다.
                         </p>
                     </motion.div>
                 </div>

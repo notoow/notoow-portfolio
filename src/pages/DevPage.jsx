@@ -23,8 +23,9 @@ const PROJECTS = [
         title: '우주 대스타 (Cosmic Superstar)',
         type: 'Unity / Kinect v2',
         desc: '고양 스타필드 매직플로우 체험존. Kinect v2의 깊이와 가속도 데이터를 정밀 제어하여 사용자를 실시간 미러링하는 인터랙티브 XR 서비스.',
-        url: 'https://www.youtube.com/channel/UC98TOZLprK48X1rQeA5x9FA',
         media: '/images/wooju-daestar.gif?v=20260318',
+        popupMedia: '/images/wooju-daestar.gif?v=20260318',
+        popupType: 'image',
         color: 'linear-gradient(135deg, #1d2438 0%, #2f3a5d 100%)',
         textColor: '#fff'
     },
@@ -89,32 +90,144 @@ const MANIFESTO = [
     }
 ];
 
+function MediaLightbox({ item, onClose }) {
+    React.useEffect(() => {
+        const onKeyDown = (event) => {
+            if (event.key === 'Escape') onClose();
+        };
+
+        document.addEventListener('keydown', onKeyDown);
+        document.body.style.overflow = 'hidden';
+
+        return () => {
+            document.removeEventListener('keydown', onKeyDown);
+            document.body.style.overflow = '';
+        };
+    }, [onClose]);
+
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={onClose}
+            style={{
+                position: 'fixed',
+                inset: 0,
+                zIndex: 9999,
+                background: 'rgba(0,0,0,0.84)',
+                backdropFilter: 'blur(16px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '2rem',
+            }}
+        >
+            <motion.div
+                initial={{ opacity: 0, y: 18, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 18, scale: 0.98 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                onClick={(event) => event.stopPropagation()}
+                style={{
+                    width: 'min(100%, 1100px)',
+                    borderRadius: '20px',
+                    overflow: 'hidden',
+                    border: '1px solid var(--border-hover)',
+                    background: 'rgba(12,12,12,0.96)',
+                    boxShadow: '0 30px 90px rgba(0,0,0,0.45)',
+                }}
+            >
+                {item.popupType === 'image' && (
+                    <img
+                        src={item.popupMedia}
+                        alt={item.title}
+                        style={{
+                            display: 'block',
+                            width: '100%',
+                            maxHeight: '78vh',
+                            objectFit: 'contain',
+                            background: '#050505',
+                        }}
+                    />
+                )}
+
+                <div style={{
+                    padding: '1.25rem 1.5rem',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: '1rem',
+                }}>
+                    <div>
+                        <span style={{
+                            display: 'block',
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: '0.62rem',
+                            color: 'var(--tone-mint)',
+                            letterSpacing: '0.1em',
+                            marginBottom: '0.35rem',
+                        }}>{item.type}</span>
+                        <strong style={{
+                            display: 'block',
+                            fontSize: '1.05rem',
+                            fontWeight: 700,
+                            color: 'var(--text-hero)',
+                        }}>{item.title}</strong>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        style={{
+                            padding: '0.75rem 1rem',
+                            borderRadius: '999px',
+                            border: '1px solid var(--border)',
+                            background: 'transparent',
+                            color: 'var(--text-secondary)',
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: '0.68rem',
+                            letterSpacing: '0.08em',
+                            cursor: 'pointer',
+                        }}
+                    >
+                        CLOSE
+                    </button>
+                </div>
+            </motion.div>
+        </motion.div>
+    );
+}
+
 function ProjectCard({ item, index }) {
     const [hover, setHover] = useState(false);
 
     return (
-        <motion.a
-            href={item.url}
-            target="_blank"
-            rel="noopener noreferrer"
+        <motion.button
+            type="button"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: index * 0.1, duration: 0.6 }}
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}
+            onClick={item.onClick}
             style={{
                 display: 'block',
                 textDecoration: 'none',
                 position: 'relative',
                 borderRadius: '16px',
                 overflow: 'hidden',
+                width: '100%',
                 aspectRatio: '16/10',
                 background: item.color || '#222',
                 boxShadow: hover ? '0 20px 50px rgba(0,0,0,0.4)' : '0 10px 30px rgba(0,0,0,0.2)',
                 transform: hover ? 'translateY(-5px)' : 'translateY(0)',
                 transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s',
                 cursor: 'pointer',
+                border: 'none',
+                padding: 0,
+                textAlign: 'left',
             }}
         >
             {item.media && (
@@ -194,7 +307,7 @@ function ProjectCard({ item, index }) {
                 backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'0.1\'/%3E%3C/svg%3E")',
                 opacity: 0.4, pointerEvents: 'none', mixBlendMode: 'overlay',
             }} />
-        </motion.a>
+        </motion.button>
     );
 }
 
@@ -271,6 +384,18 @@ function ManifestoSection() {
 }
 
 export default function DevPage() {
+    const [lightboxItem, setLightboxItem] = useState(null);
+    const projects = PROJECTS.map((item) => ({
+        ...item,
+        onClick: item.popupMedia
+            ? () => setLightboxItem(item)
+            : () => {
+                if (item.url) {
+                    window.open(item.url, '_blank', 'noopener,noreferrer');
+                }
+            },
+    }));
+
     return (
         <div style={{
             background: 'var(--bg-void)', color: 'var(--text-primary)',
@@ -359,7 +484,7 @@ export default function DevPage() {
                     gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
                     gap: '2rem',
                 }}>
-                    {PROJECTS.map((p, i) => (
+                    {projects.map((p, i) => (
                         <ProjectCard key={i} item={p} index={i} />
                     ))}
                 </div>
@@ -385,6 +510,15 @@ export default function DevPage() {
                     color: 'var(--text-muted)', letterSpacing: '0.12em',
                 }}>© 2026 NOTOOW</span>
             </footer>
+
+            <AnimatePresence>
+                {lightboxItem && (
+                    <MediaLightbox
+                        item={lightboxItem}
+                        onClose={() => setLightboxItem(null)}
+                    />
+                )}
+            </AnimatePresence>
         </div>
     );
 }

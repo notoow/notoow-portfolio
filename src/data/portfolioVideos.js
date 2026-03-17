@@ -58,6 +58,7 @@ const portfolioVideos = {
             url: "https://youtu.be/rQkWrjpCgKs",
             section: "motion",
             type: "YouTube Unlisted",
+            thumbnail: "https://i.ytimg.com/vi/rQkWrjpCgKs/hqdefault.jpg",
         },
         {
             title: "미국대학입시컨설팅 인트로",
@@ -69,7 +70,7 @@ const portfolioVideos = {
     ],
     '3D': [
         {
-            title: "이아정 멀티탭 완성본",
+            title: "멀티탭 홍보영상",
             url: "https://www.youtube.com/watch?v=Cjg20fAQUSI",
             type: "YouTube Unlisted",
             thumbnail: "https://i9.ytimg.com/vi/Cjg20fAQUSI/mqdefault.jpg?sqp=CPjm5c0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGUgZShlMA8=&rs=AOn4CLC40JioXg9kmlH_q3EaGyXQRnuIpQ",

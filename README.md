@@ -174,3 +174,9 @@ npm run videos:disable -- --video-id dQw4w9WgXcQ
 - 저장소 이름이나 배포 경로가 바뀌면 아래도 함께 확인해야 합니다:
   - `vite.config.js`
   - `index.html` 의 OG / Twitter URL
+
+## 인수인계 메모
+
+내일 다른 컴퓨터에서 이어서 작업할 때는 아래 문서를 먼저 보면 됩니다:
+
+- `NEXT_PC_HANDOFF.md`
