@@ -88,7 +88,7 @@ function CinematicHero({ mousePos, isMobile }) {
             }} />
 
             {/* Top bar */}
-            <motion.div style={{ opacity: heroOpacity, scale: heroScale }}>
+            <motion.div style={{ opacity: heroOpacity }}>
                 <div style={{
                     position: 'absolute', top: 0, left: 0, right: 0,
                     padding: isMobile ? '1.25rem 1rem' : '2rem 3rem',
