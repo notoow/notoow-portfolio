@@ -357,7 +357,7 @@ function AboutSection() {
             period: '2019 — 현재',
             role: '프리랜서',
             company: '',
-            desc: '촬영, 편집, 3D, 개발까지 1인 멀티 프로덕션. 의료, 커머스, 스포츠, 유튜브 등 다양한 업종 경험.',
+            desc: '촬영, 편집, 3D, 개발까지 1인 멀티 프로덕션.',
             current: true,
         },
     ];
