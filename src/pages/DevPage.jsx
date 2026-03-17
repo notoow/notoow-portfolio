@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useResponsive } from '../hooks/useResponsive';
 
 const CATEGORY = {
     id: 'dev',
@@ -91,6 +92,7 @@ const MANIFESTO = [
 ];
 
 function MediaLightbox({ item, onClose }) {
+    const { isMobile } = useResponsive();
     React.useEffect(() => {
         const onKeyDown = (event) => {
             if (event.key === 'Escape') onClose();
@@ -154,10 +156,11 @@ function MediaLightbox({ item, onClose }) {
                 )}
 
                 <div style={{
-                    padding: '1.25rem 1.5rem',
+                    padding: isMobile ? '1rem' : '1.25rem 1.5rem',
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'center',
+                    alignItems: isMobile ? 'flex-start' : 'center',
+                    flexDirection: isMobile ? 'column' : 'row',
                     gap: '1rem',
                 }}>
                     <div>
@@ -200,6 +203,7 @@ function MediaLightbox({ item, onClose }) {
 }
 
 function ProjectCard({ item, index }) {
+    const { isMobile } = useResponsive();
     const [hover, setHover] = useState(false);
 
     return (
@@ -248,7 +252,7 @@ function ProjectCard({ item, index }) {
                 background: item.media ? 'linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.24))' : 'transparent',
             }} />
             <div style={{
-                padding: '2rem',
+                padding: isMobile ? '1.25rem' : '2rem',
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
@@ -277,11 +281,11 @@ function ProjectCard({ item, index }) {
                     }}>{item.title}</h3>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '1rem' }}>
                     <p style={{
                         fontSize: '0.9rem',
                         opacity: 0.8,
-                        maxWidth: '80%',
+                        maxWidth: isMobile ? 'calc(100% - 54px)' : '80%',
                         lineHeight: 1.5,
                         fontFamily: 'var(--font-kr)',
                     }}>{item.desc}</p>
@@ -384,6 +388,7 @@ function ManifestoSection() {
 }
 
 export default function DevPage() {
+    const { isMobile } = useResponsive();
     const [lightboxItem, setLightboxItem] = useState(null);
     const projects = PROJECTS.map((item) => ({
         ...item,
@@ -405,7 +410,7 @@ export default function DevPage() {
             {/* ─── TOP NAV ─── */}
             <nav style={{
                 position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-                padding: '0.8rem 3rem',
+                padding: isMobile ? '0.8rem 1rem' : '0.8rem 3rem',
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 background: 'rgba(2,2,2,0.85)',
                 backdropFilter: 'blur(24px) saturate(1.5)',
@@ -423,14 +428,15 @@ export default function DevPage() {
                 <span style={{
                     fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
                     color: CATEGORY.color, letterSpacing: '0.15em',
+                    display: isMobile ? 'none' : 'inline',
                 }}>{CATEGORY.en}</span>
             </nav>
 
             {/* ─── HERO ─── */}
             <section style={{
-                height: '45vh', minHeight: '350px',
+                height: isMobile ? 'auto' : '45vh', minHeight: isMobile ? '280px' : '350px',
                 display: 'flex', alignItems: 'flex-end',
-                padding: '0 3rem 4rem', position: 'relative', overflow: 'hidden',
+                padding: isMobile ? '6rem 1rem 2.5rem' : '0 3rem 4rem', position: 'relative', overflow: 'hidden',
             }}>
                 {/* Background glow */}
                 <div style={{
@@ -478,10 +484,10 @@ export default function DevPage() {
             </section>
 
             {/* ─── PROJECT GRID ─── */}
-            <section style={{ padding: '0 3rem', maxWidth: '1400px', margin: '0 auto' }}>
+            <section style={{ padding: isMobile ? '0 1rem' : '0 3rem', maxWidth: '1400px', margin: '0 auto' }}>
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(350px, 1fr))',
                     gap: '2rem',
                 }}>
                     {projects.map((p, i) => (
@@ -496,8 +502,8 @@ export default function DevPage() {
             {/* ─── FOOTER ─── */}
             <footer style={{
                 marginTop: '0',
-                padding: '2.5rem 3rem',
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: isMobile ? '1.5rem 1rem 2.5rem' : '2.5rem 3rem',
+                display: 'flex', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center',
                 flexWrap: 'wrap', gap: '1rem',
             }}>
                 <a href="#portfolio-overview" style={{

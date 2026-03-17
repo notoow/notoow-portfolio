@@ -1,8 +1,9 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import AdaptiveThumbnail from '../components/AdaptiveThumbnail';
 import { CursorGlow } from '../components/Scene3D';
 import { getPortfolioVideosByCategory } from '../data/portfolioVideos';
-import { getYouTubeThumbnailCandidates } from '../lib/youtubeThumbnails';
+import { useResponsive } from '../hooks/useResponsive';
 
 const FILM_VIDEOS = getPortfolioVideosByCategory('예능');
 const EDIT_VIDEOS = getPortfolioVideosByCategory('디자인');
@@ -143,6 +144,8 @@ const ytEmbed = (id) => `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&mo
    LIGHTBOX
    ═══════════════════════════════════════════════════ */
 function VideoLightbox({ videoId, onClose }) {
+    const { isMobile } = useResponsive();
+
     useEffect(() => {
         const onKey = (e) => e.key === 'Escape' && onClose();
         document.addEventListener('keydown', onKey);
@@ -159,6 +162,7 @@ function VideoLightbox({ videoId, onClose }) {
                 position: 'fixed', inset: 0, zIndex: 9999,
                 background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(20px)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                padding: isMobile ? '1rem' : '2rem',
             }}
         >
             <motion.div
@@ -166,7 +170,7 @@ function VideoLightbox({ videoId, onClose }) {
                 transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                 onClick={e => e.stopPropagation()}
                 style={{
-                    width: '90vw', maxWidth: '1100px', aspectRatio: '16/9',
+                    width: isMobile ? '100%' : '90vw', maxWidth: '1100px', aspectRatio: '16/9',
                     borderRadius: '12px', overflow: 'hidden',
                     boxShadow: '0 40px 100px rgba(0,0,0,0.6)',
                 }}
@@ -177,7 +181,7 @@ function VideoLightbox({ videoId, onClose }) {
                 />
             </motion.div>
             <button onClick={onClose} style={{
-                position: 'absolute', top: '2rem', right: '2rem',
+                position: 'absolute', top: isMobile ? '1rem' : '2rem', right: isMobile ? '1rem' : '2rem',
                 width: '44px', height: '44px', borderRadius: '50%',
                 background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
                 color: '#fff', fontSize: '1.2rem', cursor: 'pointer',
@@ -192,6 +196,7 @@ function VideoLightbox({ videoId, onClose }) {
    MAIN
    ═══════════════════════════════════════════════════ */
 export default function Interactive() {
+    const { isMobile } = useResponsive();
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const [lightboxVideo, setLightboxVideo] = useState(null);
 
@@ -210,7 +215,7 @@ export default function Interactive() {
     return (
         <div style={{
             background: 'var(--bg-void)', color: 'var(--text-primary)',
-            fontFamily: 'var(--font-kr)', overflowX: 'hidden', cursor: 'none',
+            fontFamily: 'var(--font-kr)', overflowX: 'hidden', cursor: isMobile ? 'auto' : 'none',
         }}>
             <CursorGlow />
             <FloatingNav />
@@ -235,6 +240,7 @@ export default function Interactive() {
    FLOATING NAV
    ═══════════════════════════════════════════════════ */
 function FloatingNav() {
+    const { isMobile } = useResponsive();
     const [visible, setVisible] = useState(false);
     useEffect(() => {
         const fn = () => setVisible(window.scrollY > window.innerHeight * 0.5);
@@ -249,14 +255,14 @@ function FloatingNav() {
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             style={{
                 position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-                padding: '0.8rem 3rem',
+                padding: isMobile ? '0.8rem 1rem' : '0.8rem 3rem',
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 background: 'rgba(2,2,2,0.85)',
                 backdropFilter: 'blur(24px) saturate(1.5)',
                 borderBottom: '1px solid var(--border)',
             }}
         >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '0.9rem' : '1.5rem' }}>
                 <a href="#home" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.1em', transition: 'color 0.3s' }}
                     onMouseEnter={e => e.currentTarget.style.color = 'var(--text-hero)'}
                     onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>← HOME</a>
@@ -264,7 +270,7 @@ function FloatingNav() {
                     notoow<span style={{ color: 'var(--accent)' }}>.</span>
                 </a>
             </div>
-            <div style={{ display: 'flex', gap: '2rem' }}>
+            <div style={{ display: isMobile ? 'none' : 'flex', gap: '2rem' }}>
                 {['About', 'Skills', 'Works', 'Dev', 'Contact'].map(l => (
                     <a key={l} href={`#${l.toLowerCase()}`}
                         style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.08em', transition: 'color 0.3s' }}
@@ -280,6 +286,7 @@ function FloatingNav() {
    CINEMA HERO
    ═══════════════════════════════════════════════════ */
 function CinemaHero({ mousePos }) {
+    const { isMobile } = useResponsive();
     const ref = useRef(null);
     const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
     const yTitle = useTransform(scrollYProgress, [0, 1], [0, -120]);
@@ -288,13 +295,14 @@ function CinemaHero({ mousePos }) {
 
     return (
         <section ref={ref} style={{
-            height: '100vh', display: 'flex', alignItems: 'center',
+            minHeight: '100vh', display: 'flex', alignItems: 'center',
             justifyContent: 'center', position: 'relative', overflow: 'hidden',
+            padding: isMobile ? '6rem 1rem 4rem' : 0,
         }}>
             <div style={{
                 position: 'absolute',
                 left: `${50 + mousePos.x * 12}%`, top: `${50 + mousePos.y * 8}%`,
-                width: '600px', height: '600px',
+                width: isMobile ? '320px' : '600px', height: isMobile ? '320px' : '600px',
                 background: 'radial-gradient(circle, var(--accent-glow), transparent 50%)',
                 filter: 'blur(80px)', pointerEvents: 'none',
                 transition: 'left 1s, top 1s',
@@ -304,7 +312,7 @@ function CinemaHero({ mousePos }) {
                 <div style={{
                     position: 'absolute', inset: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: 'var(--font-en)', fontSize: 'clamp(15rem, 30vw, 25rem)',
+                    fontFamily: 'var(--font-en)', fontSize: isMobile ? 'clamp(8rem, 38vw, 12rem)' : 'clamp(15rem, 30vw, 25rem)',
                     fontWeight: 900, color: 'var(--text-dim)', opacity: 0.3,
                     letterSpacing: '-0.05em', userSelect: 'none', pointerEvents: 'none',
                     transform: `translate(${mousePos.x * -10}px, ${mousePos.y * -10}px)`,
@@ -315,7 +323,7 @@ function CinemaHero({ mousePos }) {
             <motion.div style={{ y: yTitle, opacity, position: 'relative', zIndex: 5, textAlign: 'center' }}>
                 <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}>
-                    <div style={{ display: 'inline-flex', gap: '0.6rem', alignItems: 'center', marginBottom: '2rem' }}>
+                    <div style={{ display: 'inline-flex', gap: '0.6rem', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', justifyContent: 'center' }}>
                         <span style={{ width: '30px', height: '1px', background: 'var(--accent)', display: 'inline-block' }} />
                         <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-secondary)', letterSpacing: '0.15em' }}>
                             4 DISCIPLINES — 1 PERSON
@@ -345,9 +353,9 @@ function CinemaHero({ mousePos }) {
             </motion.div>
 
             <div style={{
-                position: 'absolute', bottom: '2.5rem', left: '50%',
+                position: 'absolute', bottom: isMobile ? '1.5rem' : '2.5rem', left: '50%',
                 transform: 'translateX(-50%)', zIndex: 10,
-                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                display: isMobile ? 'none' : 'flex', flexDirection: 'column', alignItems: 'center',
             }}>
                 <div style={{
                     width: '1px', height: '50px',
@@ -380,6 +388,7 @@ function MarqueeBar() {
    ABOUT — 자기소개 + 이력
    ═══════════════════════════════════════════════════ */
 function AboutSection() {
+    const { isMobile } = useResponsive();
     const CAREER = [
         {
             period: '2024 — 현재',
@@ -399,7 +408,7 @@ function AboutSection() {
 
     return (
         <section id="about" style={{
-            padding: '8rem 3rem', borderTop: '1px solid var(--border)',
+            padding: isMobile ? '4rem 1rem' : '8rem 3rem', borderTop: '1px solid var(--border)',
             position: 'relative', overflow: 'hidden',
         }}>
             <div style={{
@@ -411,7 +420,7 @@ function AboutSection() {
 
             <div style={{
                 maxWidth: '1200px', margin: '0 auto',
-                display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6rem',
+                display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '3rem' : '6rem',
                 position: 'relative',
             }}>
                 {/* Left — Intro */}
@@ -481,7 +490,7 @@ function AboutSection() {
                             display: 'block', marginBottom: '2rem',
                         }}>EXPERIENCE</span>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', paddingLeft: '2rem', borderLeft: '1px solid var(--border)' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', paddingLeft: isMobile ? '1.25rem' : '2rem', borderLeft: '1px solid var(--border)' }}>
                             {CAREER.map((item, i) => (
                                 <motion.div
                                     key={item.role}
@@ -505,7 +514,8 @@ function AboutSection() {
 
                                     <div style={{
                                         display: 'flex', justifyContent: 'space-between',
-                                        alignItems: 'center', marginBottom: '0.5rem',
+                                        alignItems: isMobile ? 'flex-start' : 'center', marginBottom: '0.5rem',
+                                        gap: '0.6rem', flexWrap: 'wrap',
                                     }}>
                                         <span style={{
                                             fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
@@ -543,7 +553,7 @@ function AboutSection() {
                         </div>
 
                         <div style={{
-                            display: 'grid', gridTemplateColumns: '1fr 1fr 1fr',
+                            display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr',
                             gap: '1rem', marginTop: '2.5rem', paddingTop: '2rem',
                             borderTop: '1px solid var(--border)',
                         }}>
@@ -592,6 +602,7 @@ function FullscreenSkills({ onPlayVideo }) {
 }
 
 function SkillSlide({ skill, index, onPlay }) {
+    const { isMobile } = useResponsive();
     const ref = useRef(null);
     const isInView = useIsInView(ref, { margin: '-30%' });
     const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
@@ -599,40 +610,37 @@ function SkillSlide({ skill, index, onPlay }) {
     const imgY = useTransform(scrollYProgress, [0, 1], [-30, 30]);
     const textY = useTransform(scrollYProgress, [0, 0.5, 1], [60, 0, -40]);
     const [imgHov, setImgHov] = useState(false);
-    const [failedSources, setFailedSources] = useState([]);
     const isEven = index % 2 === 0;
-    const thumbnailCandidates = getYouTubeThumbnailCandidates(skill.videoId, skill.thumbnail);
-    const currentThumbnail =
-        thumbnailCandidates.find((candidate) => !failedSources.includes(candidate)) ||
-        thumbnailCandidates[thumbnailCandidates.length - 1] ||
-        '';
 
     return (
         <div ref={ref} style={{
-            minHeight: '100vh', display: 'grid', gridTemplateColumns: '1fr 1fr',
+            minHeight: isMobile ? 'auto' : '100vh', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
             position: 'relative', overflow: 'hidden', borderTop: '1px solid var(--border)',
         }}>
             {/* Image side with 3D object overlay */}
             <motion.div
-                style={{ position: 'relative', overflow: 'hidden', order: isEven ? 1 : 2, background: 'var(--bg-deep)', cursor: 'pointer' }}
+                style={{ position: 'relative', overflow: 'hidden', order: isMobile ? 1 : (isEven ? 1 : 2), background: 'var(--bg-deep)', cursor: 'pointer', minHeight: isMobile ? '44vh' : 'auto' }}
                 onMouseEnter={() => setImgHov(true)}
                 onMouseLeave={() => setImgHov(false)}
                 onClick={() => skill.videoId && onPlay(skill.videoId)}
             >
-                <motion.img src={currentThumbnail} alt={skill.title} loading="lazy"
-                    onError={() => {
-                        setFailedSources((current) => (
-                            currentThumbnail && !current.includes(currentThumbnail)
-                                ? [...current, currentThumbnail]
-                                : current
-                        ));
-                    }}
+                <motion.div
                     style={{
-                        width: '100%', height: '100%', objectFit: 'cover',
-                        filter: imgHov ? 'brightness(0.55) saturate(1)' : 'brightness(0.35) saturate(0.7)',
+                        width: '100%', height: '100%',
                         scale: imgScale, y: imgY, transition: 'filter 0.5s',
                     }}
-                />
+                >
+                    <AdaptiveThumbnail
+                        videoId={skill.videoId}
+                        preferredSrc={skill.thumbnail}
+                        alt={skill.title}
+                        style={{
+                            width: '100%', height: '100%', objectFit: 'cover',
+                            filter: imgHov ? 'brightness(0.55) saturate(1)' : 'brightness(0.35) saturate(0.7)',
+                            transition: 'filter 0.5s',
+                        }}
+                    />
+                </motion.div>
                 <div style={{
                     position: 'absolute',
                     inset: 0,
@@ -643,10 +651,10 @@ function SkillSlide({ skill, index, onPlay }) {
                 {/* Play button */}
                 <div style={{
                     position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    opacity: imgHov ? 1 : 0.3, transition: 'opacity 0.4s', zIndex: 2,
+                    opacity: imgHov || isMobile ? 1 : 0.3, transition: 'opacity 0.4s', zIndex: 2,
                 }}>
                     <div style={{
-                        width: '72px', height: '72px', borderRadius: '50%',
+                        width: isMobile ? '58px' : '72px', height: isMobile ? '58px' : '72px', borderRadius: '50%',
                         background: imgHov ? 'var(--accent)' : 'rgba(255,255,255,0.1)',
                         backdropFilter: 'blur(12px)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -661,30 +669,30 @@ function SkillSlide({ skill, index, onPlay }) {
                 </div>
 
                 <div style={{
-                    position: 'absolute', bottom: '2rem', left: '2rem',
-                    fontFamily: 'var(--font-en)', fontSize: '8rem',
+                    position: 'absolute', bottom: isMobile ? '1rem' : '2rem', left: isMobile ? '1rem' : '2rem',
+                    fontFamily: 'var(--font-en)', fontSize: isMobile ? '4.5rem' : '8rem',
                     fontWeight: 900, color: 'rgba(255,255,255,0.03)',
                     lineHeight: 1, userSelect: 'none', pointerEvents: 'none',
                 }}>{skill.num}</div>
 
                 <span style={{
-                    position: 'absolute', bottom: '2rem', right: '2rem', zIndex: 3,
+                    position: 'absolute', bottom: isMobile ? '1rem' : '2rem', right: isMobile ? '1rem' : '2rem', zIndex: 3,
                     fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
                     color: 'rgba(255,255,255,0.3)', letterSpacing: '0.1em',
-                    opacity: imgHov ? 1 : 0, transition: 'opacity 0.3s',
+                    opacity: imgHov || isMobile ? 1 : 0, transition: 'opacity 0.3s',
                 }}>▶ PLAY VIDEO</span>
             </motion.div>
 
             {/* Text side */}
             <div style={{
-                display: 'flex', alignItems: 'center', padding: '4rem 5rem',
-                order: isEven ? 2 : 1, position: 'relative',
+                display: 'flex', alignItems: 'center', padding: isMobile ? '2rem 1rem 2.5rem' : '4rem 5rem',
+                order: isMobile ? 2 : (isEven ? 2 : 1), position: 'relative',
             }}>
                 <div style={{
                     position: 'absolute', [isEven ? 'left' : 'right']: 0,
                     top: '30%', height: '40%', width: '3px',
                     background: isInView ? `linear-gradient(to bottom, transparent, ${skill.color}, transparent)` : 'transparent',
-                    transition: 'background 0.8s',
+                    transition: 'background 0.8s', display: isMobile ? 'none' : 'block',
                 }} />
 
                 <motion.div style={{ y: textY }}>
@@ -737,6 +745,7 @@ function SkillSlide({ skill, index, onPlay }) {
    HORIZONTAL GALLERY
    ═══════════════════════════════════════════════════ */
 function HorizontalGallery({ onPlayVideo }) {
+    const { isMobile } = useResponsive();
     const railRef = useRef(null);
 
     const scrollRail = useCallback((delta) => {
@@ -745,13 +754,13 @@ function HorizontalGallery({ onPlayVideo }) {
 
     return (
         <section id="works" style={{
-            padding: '0 0 6rem',
+            padding: isMobile ? '0 0 4rem' : '0 0 6rem',
             position: 'relative',
             borderTop: '1px solid var(--border)',
         }}>
             <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
                 <div style={{
-                    padding: '2rem 3rem', display: 'flex', justifyContent: 'space-between',
+                    padding: isMobile ? '1.5rem 1rem' : '2rem 3rem', display: 'flex', justifyContent: 'space-between',
                     alignItems: 'center', borderBottom: '1px solid var(--border)', gap: '1rem', flexWrap: 'wrap',
                 }}>
                     <div>
@@ -764,9 +773,9 @@ function HorizontalGallery({ onPlayVideo }) {
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
-                            {WORKS.length} PROJECTS · SCROLL SIDEWAYS
+                            {WORKS.length} PROJECTS {isMobile ? '' : '· SCROLL SIDEWAYS'}
                         </span>
-                        <div style={{ display: 'flex', gap: '0.6rem' }}>
+                        <div style={{ display: isMobile ? 'none' : 'flex', gap: '0.6rem' }}>
                             <button
                                 onClick={() => scrollRail(-420)}
                                 style={{
@@ -810,7 +819,7 @@ function HorizontalGallery({ onPlayVideo }) {
                     style={{
                         overflowX: 'auto',
                         overflowY: 'hidden',
-                        padding: '2rem 3rem 0',
+                        padding: isMobile ? '1rem 1rem 0' : '2rem 3rem 0',
                         scrollSnapType: 'x mandatory',
                         WebkitOverflowScrolling: 'touch',
                     }}
@@ -818,8 +827,8 @@ function HorizontalGallery({ onPlayVideo }) {
                     <motion.div style={{
                         display: 'grid',
                         gridAutoFlow: 'column',
-                        gridAutoColumns: 'minmax(320px, 380px)',
-                        gap: '1.5rem',
+                        gridAutoColumns: isMobile ? 'minmax(78vw, 78vw)' : 'minmax(320px, 380px)',
+                        gap: isMobile ? '1rem' : '1.5rem',
                         width: 'max-content',
                         paddingBottom: '1rem',
                     }}>
@@ -834,16 +843,12 @@ function HorizontalGallery({ onPlayVideo }) {
 }
 
 function GalleryCard({ work, index, onPlay }) {
+    const { isMobile } = useResponsive();
     const [hov, setHov] = useState(false);
-    const [failedSources, setFailedSources] = useState([]);
     const cardRef = useRef(null);
-    const thumbnailCandidates = getYouTubeThumbnailCandidates(work.videoId, work.thumbnail);
-    const currentThumbnail =
-        thumbnailCandidates.find((candidate) => !failedSources.includes(candidate)) ||
-        thumbnailCandidates[thumbnailCandidates.length - 1] ||
-        '';
 
     const handleMouseMove = (e) => {
+        if (isMobile) return;
         if (!cardRef.current) return;
         const rect = cardRef.current.getBoundingClientRect();
         const cx = (e.clientX - rect.left) / rect.width - 0.5;
@@ -872,16 +877,12 @@ function GalleryCard({ work, index, onPlay }) {
         >
             <div style={{
                 position: 'relative', overflow: 'hidden', borderRadius: '8px',
-                height: 'clamp(280px, 42vw, 420px)', background: 'var(--bg-deep)',
+                height: isMobile ? '320px' : 'clamp(280px, 42vw, 420px)', background: 'var(--bg-deep)',
             }}>
-                <img src={currentThumbnail} alt={work.title} loading="lazy"
-                    onError={() => {
-                        setFailedSources((current) => (
-                            currentThumbnail && !current.includes(currentThumbnail)
-                                ? [...current, currentThumbnail]
-                                : current
-                        ));
-                    }}
+                <AdaptiveThumbnail
+                    videoId={work.videoId}
+                    preferredSrc={work.thumbnail}
+                    alt={work.title}
                     style={{
                         width: '100%', height: '100%', objectFit: 'cover',
                         transition: 'transform 0.7s var(--ease-expo), filter 0.7s',
@@ -891,10 +892,10 @@ function GalleryCard({ work, index, onPlay }) {
                 />
                 <div style={{
                     position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    opacity: hov ? 1 : 0, transition: 'opacity 0.4s',
+                    opacity: hov || isMobile ? 1 : 0, transition: 'opacity 0.4s',
                 }}>
                     <div style={{
-                        width: '56px', height: '56px', borderRadius: '50%', background: 'var(--accent)',
+                        width: isMobile ? '52px' : '56px', height: isMobile ? '52px' : '56px', borderRadius: '50%', background: 'var(--accent)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         boxShadow: '0 8px 30px rgba(224,90,58,0.35)',
                         transform: hov ? 'scale(1)' : 'scale(0.8)', transition: 'transform 0.4s var(--ease-expo)',
@@ -903,7 +904,7 @@ function GalleryCard({ work, index, onPlay }) {
                     </div>
                 </div>
                 <div style={{
-                    position: 'absolute', bottom: 0, left: 0, right: 0, padding: '1.5rem',
+                    position: 'absolute', bottom: 0, left: 0, right: 0, padding: isMobile ? '1rem' : '1.5rem',
                     background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
                 }}>
                     <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'rgba(255,255,255,0.45)', letterSpacing: '0.1em', display: 'block', marginBottom: '0.25rem' }}>
@@ -924,11 +925,12 @@ function GalleryCard({ work, index, onPlay }) {
    DEV SHOWCASE — 3D tilt cards
    ═══════════════════════════════════════════════════ */
 function DevShowcase() {
+    const { isMobile } = useResponsive();
     return (
-        <section id="dev" style={{ padding: '8rem 3rem', borderTop: '1px solid var(--border)', position: 'relative' }}>
+        <section id="dev" style={{ padding: isMobile ? '4rem 1rem' : '8rem 3rem', borderTop: '1px solid var(--border)', position: 'relative' }}>
             <div style={{ position: 'absolute', top: '20%', left: '60%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(93,184,168,0.04), transparent 60%)', filter: 'blur(80px)', pointerEvents: 'none' }} />
             <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-                <div style={{ marginBottom: '4rem' }}>
+                <div style={{ marginBottom: isMobile ? '2rem' : '4rem' }}>
                     <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.15em', display: 'block', marginBottom: '1rem' }}>DEVELOPMENT</span>
                     <h2 style={{ fontFamily: 'var(--font-kr)', fontSize: 'clamp(2.2rem, 4vw, 3.2rem)', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
                         영상만 만드는 사람이<br /><span style={{ color: 'var(--tone-mint)' }}>아닙니다.</span>
@@ -941,7 +943,7 @@ function DevShowcase() {
 
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(320px, 1fr))',
                     gap: '1.25rem',
                     alignItems: 'stretch',
                 }}>
@@ -1018,6 +1020,7 @@ function DevCard({ project: p, index: i }) {
 }
 
 function ContactPopup({ onClose }) {
+    const { isMobile } = useResponsive();
     const [copied, setCopied] = useState(false);
     const email = 'tan0123@naver.com';
 
@@ -1061,7 +1064,7 @@ function ContactPopup({ onClose }) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '1.5rem',
+                padding: isMobile ? '1rem' : '1.5rem',
                 cursor: 'default',
             }}
         >
@@ -1077,7 +1080,7 @@ function ContactPopup({ onClose }) {
                     border: '1px solid var(--border-hover)',
                     background: 'rgba(12,12,12,0.96)',
                     boxShadow: '0 30px 90px rgba(0,0,0,0.45)',
-                    padding: '2rem',
+                    padding: isMobile ? '1.25rem' : '2rem',
                     textAlign: 'left',
                 }}
             >
@@ -1108,8 +1111,9 @@ function ContactPopup({ onClose }) {
                 </p>
                 <div style={{
                     display: 'flex',
-                    alignItems: 'center',
+                    alignItems: isMobile ? 'flex-start' : 'center',
                     justifyContent: 'space-between',
+                    flexDirection: isMobile ? 'column' : 'row',
                     gap: '1rem',
                     padding: '1rem 1.1rem',
                     borderRadius: '14px',
@@ -1174,8 +1178,9 @@ function ContactPopup({ onClose }) {
    TOOL CLOUD
    ═══════════════════════════════════════════════════ */
 function ToolCloud() {
+    const { isMobile } = useResponsive();
     return (
-        <section style={{ padding: '4rem 3rem', borderTop: '1px solid var(--border)' }}>
+        <section style={{ padding: isMobile ? '3rem 1rem' : '4rem 3rem', borderTop: '1px solid var(--border)' }}>
             <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.15em', display: 'block', marginBottom: '2rem' }}>TOOLKIT</span>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -1185,9 +1190,9 @@ function ToolCloud() {
                             transition={{ delay: i * 0.03 }}
                             whileHover={{ scale: 1.08, y: -3, transition: { duration: 0.2 } }}
                             style={{
-                                padding: '0.7rem 1.3rem', borderRadius: '100px',
+                                padding: isMobile ? '0.6rem 1rem' : '0.7rem 1.3rem', borderRadius: '100px',
                                 border: '1px solid var(--border)', background: 'var(--glass)',
-                                fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)',
+                                fontSize: isMobile ? '0.78rem' : '0.85rem', fontWeight: 500, color: 'var(--text-secondary)',
                                 cursor: 'default', transition: 'border-color 0.3s, color 0.3s',
                             }}
                             onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border-hover)'; e.currentTarget.style.color = 'var(--text-hero)'; }}
@@ -1204,18 +1209,20 @@ function ToolCloud() {
    FINAL CTA
    ═══════════════════════════════════════════════════ */
 function FinalCTA({ mousePos }) {
+    const { isMobile } = useResponsive();
     const [isContactOpen, setIsContactOpen] = useState(false);
 
     return (
         <>
             <section id="contact" style={{
-                height: '85vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                minHeight: isMobile ? '70vh' : '85vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 textAlign: 'center', position: 'relative', overflow: 'hidden', borderTop: '1px solid var(--border)',
+                padding: isMobile ? '4rem 1rem' : 0,
             }}>
                 <div style={{
                     position: 'absolute',
                     left: `${50 + mousePos.x * 10}%`, top: `${50 + mousePos.y * 8}%`,
-                    width: '500px', height: '500px',
+                    width: isMobile ? '280px' : '500px', height: isMobile ? '280px' : '500px',
                     background: 'radial-gradient(circle, var(--accent-glow), transparent 50%)',
                     filter: 'blur(80px)', pointerEvents: 'none', transition: 'left 1.2s, top 1.2s',
                 }} />
@@ -1231,7 +1238,7 @@ function FinalCTA({ mousePos }) {
                             type="button"
                             onClick={() => setIsContactOpen(true)}
                             style={{
-                                display: 'inline-block', padding: '1rem 3rem', borderRadius: '100px',
+                                display: 'inline-block', padding: isMobile ? '0.95rem 1.6rem' : '1rem 3rem', borderRadius: '100px',
                                 background: 'var(--text-hero)', color: 'var(--bg-void)',
                                 fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.05em',
                                 transition: 'all 0.4s var(--ease-expo)',
@@ -1258,10 +1265,11 @@ function FinalCTA({ mousePos }) {
    FOOTER
    ═══════════════════════════════════════════════════ */
 function Footer() {
+    const { isMobile } = useResponsive();
     return (
         <footer style={{
-            padding: '2.5rem 3rem', borderTop: '1px solid var(--border)',
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem',
+            padding: isMobile ? '1.5rem 1rem 2rem' : '2.5rem 3rem', borderTop: '1px solid var(--border)',
+            display: 'flex', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', flexWrap: 'wrap', gap: '1rem',
         }}>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '0.12em' }}>© 2026 NOTOOW</span>
             <div style={{ display: 'flex', gap: '1.5rem' }}>

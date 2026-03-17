@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getYouTubeThumbnailCandidates } from '../lib/youtubeThumbnails';
+import AdaptiveThumbnail from '../components/AdaptiveThumbnail';
+import { useResponsive } from '../hooks/useResponsive';
 
 /* ─── YouTube helpers ─── */
 const ytEmbed = (id) => `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&controls=1`;
@@ -9,6 +10,8 @@ const ytEmbed = (id) => `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&mo
    LIGHTBOX
    ═══════════════════════════════════════════════════ */
 function VideoLightbox({ videoId, title, onClose }) {
+    const { isMobile } = useResponsive();
+
     useEffect(() => {
         const onKey = (e) => e.key === 'Escape' && onClose();
         document.addEventListener('keydown', onKey);
@@ -33,7 +36,7 @@ function VideoLightbox({ videoId, title, onClose }) {
                 transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                 onClick={e => e.stopPropagation()}
                 style={{
-                    width: '90vw', maxWidth: '1100px', aspectRatio: '16/9',
+                    width: isMobile ? '96vw' : '90vw', maxWidth: '1100px', aspectRatio: '16/9',
                     borderRadius: '12px', overflow: 'hidden',
                     boxShadow: '0 40px 100px rgba(0,0,0,0.6)',
                 }}
@@ -55,7 +58,7 @@ function VideoLightbox({ videoId, title, onClose }) {
                 >{title}</motion.p>
             )}
             <button onClick={onClose} style={{
-                position: 'absolute', top: '2rem', right: '2rem',
+                position: 'absolute', top: isMobile ? '1rem' : '2rem', right: isMobile ? '1rem' : '2rem',
                 width: '44px', height: '44px', borderRadius: '50%',
                 background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
                 color: '#fff', fontSize: '1.2rem', cursor: 'pointer',
@@ -70,19 +73,14 @@ function VideoLightbox({ videoId, title, onClose }) {
    VIDEO CARD
    ═══════════════════════════════════════════════════ */
 function VideoCard({ item, index, onPlay }) {
+    const { isMobile } = useResponsive();
     const [hov, setHov] = useState(false);
-    const [failedSources, setFailedSources] = useState([]);
     const hasVideoId = Boolean(item.videoId);
     const hasExternalUrl = Boolean(item.url);
     const isClickable = hasVideoId || hasExternalUrl;
-    const thumbnailCandidates = getYouTubeThumbnailCandidates(item.videoId, item.thumbnail);
-    const currentThumbnail =
-        thumbnailCandidates.find((candidate) => !failedSources.includes(candidate)) ||
-        thumbnailCandidates[thumbnailCandidates.length - 1] ||
-        '';
 
     // Staggered heights for masonry feel
-    const heights = ['340px', '280px', '360px', '300px', '320px', '290px'];
+    const heights = isMobile ? ['280px', '280px', '280px', '280px'] : ['340px', '280px', '360px', '300px', '320px', '290px'];
     const h = heights[index % heights.length];
 
     return (
@@ -113,17 +111,10 @@ function VideoCard({ item, index, onPlay }) {
         >
             {/* Thumbnail */}
             {(hasVideoId || item.thumbnail) ? (
-                <img
-                    src={currentThumbnail}
+                <AdaptiveThumbnail
+                    videoId={item.videoId}
+                    preferredSrc={item.thumbnail}
                     alt={item.title}
-                    loading="lazy"
-                    onError={() => {
-                        setFailedSources((current) => (
-                            currentThumbnail && !current.includes(currentThumbnail)
-                                ? [...current, currentThumbnail]
-                                : current
-                        ));
-                    }}
                     style={{
                         width: '100%', height: '100%', objectFit: 'cover',
                         transition: 'transform 0.7s var(--ease-expo), filter 0.5s',
@@ -144,10 +135,10 @@ function VideoCard({ item, index, onPlay }) {
                 <div style={{
                     position: 'absolute', inset: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    opacity: hov ? 1 : 0, transition: 'opacity 0.4s',
+                    opacity: hov || isMobile ? 1 : 0, transition: 'opacity 0.4s',
                 }}>
                     <div style={{
-                        width: '60px', height: '60px', borderRadius: '50%',
+                        width: isMobile ? '52px' : '60px', height: isMobile ? '52px' : '60px', borderRadius: '50%',
                         background: 'var(--accent)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         boxShadow: '0 8px 30px rgba(224,90,58,0.35)',
@@ -189,7 +180,7 @@ function VideoCard({ item, index, onPlay }) {
                     <p style={{
                         fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)',
                         marginTop: '0.3rem', lineHeight: 1.4,
-                        display: hov ? 'block' : 'none',
+                        display: hov || isMobile ? 'block' : 'none',
                     }}>{item.desc}</p>
                 )}
                 {!isClickable && (
@@ -220,6 +211,7 @@ export default function CategoryDetail({
     videos,      // [{ videoId, title, type, desc? }]
     sections,    // [{ key, title, desc?, videos }]
 }) {
+    const { isMobile } = useResponsive();
     const [lightbox, setLightbox] = useState(null);
 
     const openVideo = useCallback((videoId, title) => setLightbox({ videoId, title }), []);
@@ -239,7 +231,7 @@ export default function CategoryDetail({
             {/* ─── TOP NAV ─── */}
             <nav style={{
                 position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-                padding: '0.8rem 3rem',
+                padding: isMobile ? '0.8rem 1rem' : '0.8rem 3rem',
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 background: 'rgba(2,2,2,0.85)',
                 backdropFilter: 'blur(24px) saturate(1.5)',
@@ -268,14 +260,15 @@ export default function CategoryDetail({
                 <span style={{
                     fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
                     color: category.color, letterSpacing: '0.15em',
+                    display: isMobile ? 'none' : 'inline',
                 }}>{category.en}</span>
             </nav>
 
             {/* ─── HERO ─── */}
             <section style={{
-                height: '50vh', minHeight: '380px',
+                height: isMobile ? 'auto' : '50vh', minHeight: isMobile ? '320px' : '380px',
                 display: 'flex', alignItems: 'flex-end',
-                padding: '0 3rem 4rem', position: 'relative', overflow: 'hidden',
+                padding: isMobile ? '6.5rem 1rem 2.5rem' : '0 3rem 4rem', position: 'relative', overflow: 'hidden',
             }}>
                 {/* Background glow */}
                 <div style={{
@@ -331,7 +324,7 @@ export default function CategoryDetail({
                     }}>{category.desc}</p>
 
                     <div style={{
-                        marginTop: '1.5rem', display: 'flex', gap: '1.5rem', alignItems: 'center',
+                        marginTop: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap',
                     }}>
                         <span style={{
                             fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
@@ -341,6 +334,7 @@ export default function CategoryDetail({
                         </span>
                         <span style={{
                             width: '40px', height: '1px', background: 'var(--border)',
+                            display: isMobile ? 'none' : 'inline-block',
                         }} />
                         <span style={{
                             fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
@@ -352,11 +346,11 @@ export default function CategoryDetail({
 
             {/* ─── VIDEO GRID ─── */}
             <section style={{
-                padding: '0 3rem 6rem',
+                padding: isMobile ? '0 1rem 4rem' : '0 3rem 6rem',
                 borderTop: '1px solid var(--border)',
             }}>
                 <div style={{
-                    maxWidth: '1300px', margin: '0 auto', paddingTop: '3rem',
+                    maxWidth: '1300px', margin: '0 auto', paddingTop: isMobile ? '2rem' : '3rem',
                 }}>
                     {normalizedSections.length > 0 ? (
                         <div style={{ display: 'grid', gap: '3.5rem' }}>
@@ -414,7 +408,7 @@ export default function CategoryDetail({
 
                                     <div style={{
                                         display: 'grid',
-                                        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                                        gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(240px, 1fr))',
                                         gap: '1rem',
                                     }}>
                                         {section.videos.map((v, i) => (
@@ -445,7 +439,7 @@ export default function CategoryDetail({
                             {/* Masonry-ish grid */}
                             <div style={{
                                 display: 'grid',
-                                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                                gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(240px, 1fr))',
                                 gap: '1rem',
                             }}>
                                 {videos.map((v, i) => (
@@ -474,8 +468,8 @@ export default function CategoryDetail({
 
             {/* ─── FOOTER ─── */}
             <footer style={{
-                padding: '2.5rem 3rem', borderTop: '1px solid var(--border)',
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: isMobile ? '1.5rem 1rem 2.5rem' : '2.5rem 3rem', borderTop: '1px solid var(--border)',
+                display: 'flex', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center',
                 flexWrap: 'wrap', gap: '1rem',
             }}>
                 <a href="#portfolio-overview" style={{

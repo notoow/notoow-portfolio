@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { HeroScene, CursorGlow } from '../components/Scene3D';
+import { useResponsive } from '../hooks/useResponsive';
 
 /* ═══════════════════════════════════════════
    HOME — Cinematic 3D Landing
@@ -8,6 +9,7 @@ import { HeroScene, CursorGlow } from '../components/Scene3D';
 
 export default function Home() {
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    const { isMobile } = useResponsive();
 
     useEffect(() => {
         const handler = (e) => {
@@ -41,10 +43,10 @@ export default function Home() {
     return (
         <div id="home" style={{
             background: 'var(--bg-void)', color: 'var(--text-hero)',
-            minHeight: '100vh', overflow: 'hidden', cursor: 'none',
+            minHeight: '100vh', overflow: 'hidden', cursor: isMobile ? 'auto' : 'none',
         }}>
             <CursorGlow />
-            <CinematicHero mousePos={mousePos} />
+            <CinematicHero mousePos={mousePos} isMobile={isMobile} />
             <RollingStrip />
             <BentoPreview />
             <MinimalFooter />
@@ -53,7 +55,7 @@ export default function Home() {
 }
 
 /* ─── CINEMATIC 3D HERO ─── */
-function CinematicHero({ mousePos }) {
+function CinematicHero({ mousePos, isMobile }) {
     const [time, setTime] = useState('');
     const containerRef = useRef(null);
     const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end start'] });
@@ -89,7 +91,7 @@ function CinematicHero({ mousePos }) {
             <motion.div style={{ opacity: heroOpacity, scale: heroScale }}>
                 <div style={{
                     position: 'absolute', top: 0, left: 0, right: 0,
-                    padding: '2rem 3rem',
+                    padding: isMobile ? '1.25rem 1rem' : '2rem 3rem',
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                     zIndex: 10,
                 }}>
@@ -100,10 +102,11 @@ function CinematicHero({ mousePos }) {
                     }}>
                         notoow<span style={{ color: 'var(--accent)' }}>.</span>
                     </a>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '0.75rem' : '2rem' }}>
                         <span style={{
                             fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
                             color: 'var(--text-muted)', letterSpacing: '0.1em',
+                            display: isMobile ? 'none' : 'inline',
                         }}>
                             SEOUL {time}
                         </span>
@@ -113,7 +116,7 @@ function CinematicHero({ mousePos }) {
                             padding: '0.5rem 1.2rem', borderRadius: '100px',
                             fontWeight: 600, letterSpacing: '0.06em',
                             transition: 'all 0.3s var(--ease-expo)',
-                            cursor: 'none',
+                            cursor: isMobile ? 'pointer' : 'none',
                         }}
                             onMouseEnter={e => {
                                 e.currentTarget.style.background = 'var(--accent)';
@@ -133,7 +136,7 @@ function CinematicHero({ mousePos }) {
             <motion.div style={{ opacity: heroOpacity, scale: heroScale }}>
                 <div style={{
                     position: 'relative', zIndex: 5,
-                    padding: '0 3rem', maxWidth: '1400px', margin: '0 auto', width: '100%',
+                    padding: isMobile ? '0 1rem' : '0 3rem', maxWidth: '1400px', margin: '0 auto', width: '100%',
                 }}>
                     <motion.div
                         initial={{ opacity: 0, y: 60 }}
@@ -164,8 +167,11 @@ function CinematicHero({ mousePos }) {
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.6, duration: 1 }}
                         style={{
-                            position: 'absolute', right: '3rem', bottom: '-6rem',
-                            textAlign: 'right', maxWidth: '380px',
+                            position: isMobile ? 'relative' : 'absolute',
+                            right: isMobile ? 'auto' : '3rem',
+                            bottom: isMobile ? 'auto' : '-6rem',
+                            textAlign: isMobile ? 'left' : 'right', maxWidth: '380px',
+                            marginTop: isMobile ? '1.5rem' : 0,
                         }}
                     >
                         <p style={{
@@ -182,11 +188,11 @@ function CinematicHero({ mousePos }) {
 
             {/* Bottom */}
             <div style={{
-                position: 'absolute', bottom: '3rem', left: '3rem', right: '3rem',
+                position: 'absolute', bottom: isMobile ? '1.5rem' : '3rem', left: isMobile ? '1rem' : '3rem', right: isMobile ? '1rem' : '3rem',
                 display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
                 zIndex: 10,
             }}>
-                <div style={{ display: 'flex', gap: '3rem' }}>
+                <div style={{ display: 'flex', gap: isMobile ? '1rem' : '3rem', flexWrap: 'wrap' }}>
                     {['FILM', 'EDIT', '3D', 'DEV'].map((w, i) => (
                         <motion.span
                             key={w}
@@ -210,7 +216,7 @@ function CinematicHero({ mousePos }) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1.5 }}
-                    style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem' }}
+                    style={{ display: isMobile ? 'none' : 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem' }}
                 >
                     <span style={{
                         fontFamily: 'var(--font-mono)', fontSize: '0.55rem',
@@ -296,6 +302,7 @@ function TiltCard({ item, index, isMobile }) {
     const [hov, setHov] = useState(false);
 
     const handleMouseMove = (e) => {
+        if (isMobile) return;
         if (!cardRef.current) return;
         const rect = cardRef.current.getBoundingClientRect();
         const x = (e.clientX - rect.left) / rect.width - 0.5;
@@ -331,7 +338,7 @@ function TiltCard({ item, index, isMobile }) {
                 justifyContent: 'space-between',
                 position: 'relative', overflow: 'hidden',
                 transition: 'border-color 0.4s, box-shadow 0.4s, transform 0.15s ease-out',
-                cursor: 'none',
+                cursor: isMobile ? 'pointer' : 'none',
                 transformStyle: 'preserve-3d',
                 boxShadow: hov ? `0 20px 60px ${item.accent}10` : 'none',
                 wordBreak: 'keep-all',
@@ -386,7 +393,7 @@ function MinimalFooter() {
             borderTop: '1px solid var(--border)',
             display: 'flex', justifyContent: 'space-between',
             alignItems: 'center', flexWrap: 'wrap', gap: '1rem',
-            cursor: 'none',
+            cursor: 'default',
         }}>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
                 © 2026 NOTOOW
