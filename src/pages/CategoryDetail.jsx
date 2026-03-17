@@ -207,11 +207,18 @@ function VideoCard({ item, index, onPlay }) {
 export default function CategoryDetail({
     category,    // { id, title, en, desc, color, icon }
     videos,      // [{ videoId, title, type, desc? }]
+    sections,    // [{ key, title, desc?, videos }]
 }) {
     const [lightbox, setLightbox] = useState(null);
 
     const openVideo = useCallback((videoId, title) => setLightbox({ videoId, title }), []);
     const closeVideo = useCallback(() => setLightbox(null), []);
+    const normalizedSections = Array.isArray(sections)
+        ? sections.filter((section) => Array.isArray(section?.videos) && section.videos.length > 0)
+        : [];
+    const totalProjects = normalizedSections.length > 0
+        ? normalizedSections.reduce((sum, section) => sum + section.videos.length, 0)
+        : videos.length;
 
     return (
         <div style={{
@@ -319,7 +326,7 @@ export default function CategoryDetail({
                             fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
                             color: 'var(--text-muted)', letterSpacing: '0.1em',
                         }}>
-                            {videos.length} PROJECTS
+                            {totalProjects} PROJECTS
                         </span>
                         <span style={{
                             width: '40px', height: '1px', background: 'var(--border)',
@@ -340,30 +347,105 @@ export default function CategoryDetail({
                 <div style={{
                     maxWidth: '1300px', margin: '0 auto', paddingTop: '3rem',
                 }}>
-                    {/* Grid header */}
-                    <div style={{
-                        display: 'flex', justifyContent: 'space-between',
-                        alignItems: 'center', marginBottom: '2.5rem',
-                    }}>
-                        <span style={{
-                            fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
-                            color: 'var(--text-muted)', letterSpacing: '0.15em',
-                        }}>ALL PROJECTS</span>
-                    </div>
+                    {normalizedSections.length > 0 ? (
+                        <div style={{ display: 'grid', gap: '3.5rem' }}>
+                            {normalizedSections.map((section, sectionIndex) => (
+                                <div key={section.key || section.title}>
+                                    <div style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'flex-end',
+                                        gap: '1rem',
+                                        marginBottom: '1.5rem',
+                                        flexWrap: 'wrap',
+                                    }}>
+                                        <div>
+                                            <span style={{
+                                                fontFamily: 'var(--font-mono)',
+                                                fontSize: '0.62rem',
+                                                color: category.color,
+                                                letterSpacing: '0.15em',
+                                                display: 'block',
+                                                marginBottom: '0.4rem',
+                                            }}>
+                                                {String(sectionIndex + 1).padStart(2, '0')}
+                                            </span>
+                                            <h2 style={{
+                                                fontFamily: 'var(--font-kr)',
+                                                fontSize: 'clamp(1.8rem, 3vw, 2.6rem)',
+                                                fontWeight: 800,
+                                                letterSpacing: '-0.03em',
+                                                lineHeight: 1.1,
+                                            }}>
+                                                {section.title}
+                                            </h2>
+                                            {section.desc && (
+                                                <p style={{
+                                                    marginTop: '0.6rem',
+                                                    maxWidth: '680px',
+                                                    color: 'var(--text-secondary)',
+                                                    lineHeight: 1.7,
+                                                    fontSize: '0.95rem',
+                                                }}>
+                                                    {section.desc}
+                                                </p>
+                                            )}
+                                        </div>
+                                        <span style={{
+                                            fontFamily: 'var(--font-mono)',
+                                            fontSize: '0.62rem',
+                                            color: 'var(--text-muted)',
+                                            letterSpacing: '0.12em',
+                                        }}>
+                                            {section.videos.length} PROJECTS
+                                        </span>
+                                    </div>
 
-                    {/* Masonry-ish grid */}
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(3, 1fr)',
-                        gap: '1rem',
-                    }}>
-                        {videos.map((v, i) => (
-                            <VideoCard key={`${v.videoId || v.url || v.title}-${i}`} item={v} index={i} onPlay={openVideo} />
-                        ))}
-                    </div>
+                                    <div style={{
+                                        display: 'grid',
+                                        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                                        gap: '1rem',
+                                    }}>
+                                        {section.videos.map((v, i) => (
+                                            <VideoCard
+                                                key={`${section.key || section.title}-${v.videoId || v.url || v.title}-${i}`}
+                                                item={v}
+                                                index={i}
+                                                onPlay={openVideo}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <>
+                            {/* Grid header */}
+                            <div style={{
+                                display: 'flex', justifyContent: 'space-between',
+                                alignItems: 'center', marginBottom: '2.5rem',
+                            }}>
+                                <span style={{
+                                    fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
+                                    color: 'var(--text-muted)', letterSpacing: '0.15em',
+                                }}>ALL PROJECTS</span>
+                            </div>
+
+                            {/* Masonry-ish grid */}
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                                gap: '1rem',
+                            }}>
+                                {videos.map((v, i) => (
+                                    <VideoCard key={`${v.videoId || v.url || v.title}-${i}`} item={v} index={i} onPlay={openVideo} />
+                                ))}
+                            </div>
+                        </>
+                    )}
 
                     {/* Empty state */}
-                    {videos.length === 0 && (
+                    {totalProjects === 0 && (
                         <div style={{
                             padding: '6rem 0', textAlign: 'center',
                         }}>

@@ -5,42 +5,49 @@ const portfolioVideos = {
         {
             title: "캐릭터 립싱크 | 조선멤버스 취준생 면접 필승 전략",
             url: "https://www.youtube.com/watch?v=Qcezswtg2yU",
+            section: "motion",
             type: "YouTube Unlisted",
             thumbnail: "https://i9.ytimg.com/vi/Qcezswtg2yU/mqdefault.jpg?sqp=CPjm5c0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGUgZShlMA8=&rs=AOn4CLD7zIXMGf9JklazW5nZA8plWBb22Q",
         },
         {
             title: "국회 국집소 예능 영상 2",
             url: "https://www.youtube.com/watch?v=KwJkwZOR1f4",
+            section: "edit",
             type: "YouTube Unlisted",
             thumbnail: "https://i9.ytimg.com/vi/KwJkwZOR1f4/mqdefault.jpg?sqp=CPjm5c0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGEEgZShTMA8=&rs=AOn4CLCBJkSqSqksoo_W5Wn_YHmNMF5xDg",
         },
         {
             title: "국회 어쩌다인턴 예능 영상 1",
             url: "https://www.youtube.com/watch?v=UU7XzIeqlK0",
+            section: "edit",
             type: "YouTube Unlisted",
             thumbnail: "https://i9.ytimg.com/vi/UU7XzIeqlK0/mqdefault.jpg?sqp=CPjm5c0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGUgWShWMA8=&rs=AOn4CLColH79Ejc2fILXEtKDA7rhwNZOTg",
         },
         {
             title: "가정의학과 자막 디자인",
             url: "https://www.youtube.com/watch?v=j4O7CKTEONI",
+            section: "design",
             type: "YouTube Unlisted",
             thumbnail: "https://i9.ytimg.com/vi/j4O7CKTEONI/mqdefault.jpg?sqp=CPjm5c0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGUgZShlMA8=&rs=AOn4CLAjN8iy7qgnyPLkvTjKnogGcYCnZQ",
         },
         {
             title: "구슬 애착인형 경연대회",
             url: "https://www.youtube.com/watch?v=RZ2EzlKigqo",
+            section: "edit",
             type: "YouTube Unlisted",
             thumbnail: "https://i9.ytimg.com/vi/RZ2EzlKigqo/mqdefault.jpg?sqp=CPjm5c0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGUgZShlMA8=&rs=AOn4CLBwf9h6ZGrabNhCQkrphSxslJsmlQ",
         },
         {
             title: "여행 영상",
             url: "https://www.youtube.com/watch?v=SvZ5ECeT53g",
+            section: "edit",
             type: "YouTube Unlisted",
             thumbnail: "https://i9.ytimg.com/vi/SvZ5ECeT53g/mqdefault.jpg?sqp=CPjm5c0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGUgYChNMA8=&rs=AOn4CLBKb4G5Bywx6ftaMSMt5zOgpruQ5Q",
         },
         {
             title: "미국대학입시컨설팅 인트로",
             url: "https://www.youtube.com/watch?v=IHwd8zO2KRk",
+            section: "motion",
             type: "YouTube Unlisted",
             thumbnail: "https://i9.ytimg.com/vi/IHwd8zO2KRk/mqdefault.jpg?sqp=CPjm5c0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGCwgVSh_MA8=&rs=AOn4CLAfGft02lCL84xfDOdTSmlYHf-ZIA",
         },
@@ -174,6 +181,7 @@ export function getPortfolioVideosByCategory(categoryTag) {
                 desc,
                 thumbnail,
                 url,
+                section: String(item?.section || '').trim(),
             };
         })
         .filter(Boolean);
