@@ -595,14 +595,13 @@ function SkillSlide({ skill, index, onPlay }) {
     const imgY = useTransform(scrollYProgress, [0, 1], [-30, 30]);
     const textY = useTransform(scrollYProgress, [0, 0.5, 1], [60, 0, -40]);
     const [imgHov, setImgHov] = useState(false);
-    const [thumbIndex, setThumbIndex] = useState(0);
+    const [failedSources, setFailedSources] = useState([]);
     const isEven = index % 2 === 0;
     const thumbnailCandidates = getYouTubeThumbnailCandidates(skill.videoId, skill.thumbnail);
-    const currentThumbnail = thumbnailCandidates[Math.min(thumbIndex, Math.max(thumbnailCandidates.length - 1, 0))] || '';
-
-    useEffect(() => {
-        setThumbIndex(0);
-    }, [skill.videoId, skill.thumbnail]);
+    const currentThumbnail =
+        thumbnailCandidates.find((candidate) => !failedSources.includes(candidate)) ||
+        thumbnailCandidates[thumbnailCandidates.length - 1] ||
+        '';
 
     return (
         <div ref={ref} style={{
@@ -618,7 +617,11 @@ function SkillSlide({ skill, index, onPlay }) {
             >
                 <motion.img src={currentThumbnail} alt={skill.title} loading="lazy"
                     onError={() => {
-                        setThumbIndex((current) => Math.min(current + 1, Math.max(thumbnailCandidates.length - 1, 0)));
+                        setFailedSources((current) => (
+                            currentThumbnail && !current.includes(currentThumbnail)
+                                ? [...current, currentThumbnail]
+                                : current
+                        ));
                     }}
                     style={{
                         width: '100%', height: '100%', objectFit: 'cover',
@@ -828,14 +831,13 @@ function HorizontalGallery({ onPlayVideo }) {
 
 function GalleryCard({ work, index, onPlay }) {
     const [hov, setHov] = useState(false);
-    const [thumbIndex, setThumbIndex] = useState(0);
+    const [failedSources, setFailedSources] = useState([]);
     const cardRef = useRef(null);
     const thumbnailCandidates = getYouTubeThumbnailCandidates(work.videoId, work.thumbnail);
-    const currentThumbnail = thumbnailCandidates[Math.min(thumbIndex, Math.max(thumbnailCandidates.length - 1, 0))] || '';
-
-    useEffect(() => {
-        setThumbIndex(0);
-    }, [work.videoId, work.thumbnail]);
+    const currentThumbnail =
+        thumbnailCandidates.find((candidate) => !failedSources.includes(candidate)) ||
+        thumbnailCandidates[thumbnailCandidates.length - 1] ||
+        '';
 
     const handleMouseMove = (e) => {
         if (!cardRef.current) return;
@@ -870,7 +872,11 @@ function GalleryCard({ work, index, onPlay }) {
             }}>
                 <img src={currentThumbnail} alt={work.title} loading="lazy"
                     onError={() => {
-                        setThumbIndex((current) => Math.min(current + 1, Math.max(thumbnailCandidates.length - 1, 0)));
+                        setFailedSources((current) => (
+                            currentThumbnail && !current.includes(currentThumbnail)
+                                ? [...current, currentThumbnail]
+                                : current
+                        ));
                     }}
                     style={{
                         width: '100%', height: '100%', objectFit: 'cover',
@@ -1255,10 +1261,13 @@ function Footer() {
         }}>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '0.12em' }}>© 2026 NOTOOW</span>
             <div style={{ display: 'flex', gap: '1.5rem' }}>
-                {['YouTube', 'Instagram'].map(p => (
-                    <a key={p} href="#" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '0.08em', transition: 'color 0.3s' }}
+                {[
+                    { label: 'YouTube', href: 'https://www.youtube.com/@notoow_official' },
+                    { label: 'Contact', href: '#contact' },
+                ].map((item) => (
+                    <a key={item.label} href={item.href} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '0.08em', transition: 'color 0.3s' }}
                         onMouseEnter={e => e.target.style.color = 'var(--text-hero)'}
-                        onMouseLeave={e => e.target.style.color = 'var(--text-muted)'}>{p}</a>
+                        onMouseLeave={e => e.target.style.color = 'var(--text-muted)'}>{item.label}</a>
                 ))}
             </div>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '0.12em' }}>SEOUL, KR</span>

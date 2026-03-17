@@ -71,16 +71,15 @@ function VideoLightbox({ videoId, title, onClose }) {
    ═══════════════════════════════════════════════════ */
 function VideoCard({ item, index, onPlay }) {
     const [hov, setHov] = useState(false);
-    const [thumbIndex, setThumbIndex] = useState(0);
+    const [failedSources, setFailedSources] = useState([]);
     const hasVideoId = Boolean(item.videoId);
     const hasExternalUrl = Boolean(item.url);
     const isClickable = hasVideoId || hasExternalUrl;
     const thumbnailCandidates = getYouTubeThumbnailCandidates(item.videoId, item.thumbnail);
-    const currentThumbnail = thumbnailCandidates[Math.min(thumbIndex, Math.max(thumbnailCandidates.length - 1, 0))] || '';
-
-    useEffect(() => {
-        setThumbIndex(0);
-    }, [item.videoId, item.thumbnail]);
+    const currentThumbnail =
+        thumbnailCandidates.find((candidate) => !failedSources.includes(candidate)) ||
+        thumbnailCandidates[thumbnailCandidates.length - 1] ||
+        '';
 
     // Staggered heights for masonry feel
     const heights = ['340px', '280px', '360px', '300px', '320px', '290px'];
@@ -119,7 +118,11 @@ function VideoCard({ item, index, onPlay }) {
                     alt={item.title}
                     loading="lazy"
                     onError={() => {
-                        setThumbIndex((current) => Math.min(current + 1, Math.max(thumbnailCandidates.length - 1, 0)));
+                        setFailedSources((current) => (
+                            currentThumbnail && !current.includes(currentThumbnail)
+                                ? [...current, currentThumbnail]
+                                : current
+                        ));
                     }}
                     style={{
                         width: '100%', height: '100%', objectFit: 'cover',

@@ -31,7 +31,7 @@ export function HeroScene({ mousePos }) {
 
                 <Suspense fallback={null}>
                     {isMobile ? <GyroTracker /> : <MouseTracker mousePos={mousePos} />}
-                    <FloatingModels mousePos={mousePos} />
+                    <FloatingModels />
                     <Environment preset="city" />
                     <Preload all />
                 </Suspense>
@@ -61,17 +61,10 @@ export function HeroScene({ mousePos }) {
 
 /* ─── iOS Motion Permission Button ─── */
 function MotionRequest() {
-    const [show, setShow] = useState(false);
-
-    useEffect(() => {
-        // Check if iOS 13+ permission API exists
-        if (
-            typeof DeviceOrientationEvent !== 'undefined' &&
-            typeof DeviceOrientationEvent.requestPermission === 'function'
-        ) {
-            setShow(true);
-        }
-    }, []);
+    const [show, setShow] = useState(() => (
+        typeof DeviceOrientationEvent !== 'undefined' &&
+        typeof DeviceOrientationEvent.requestPermission === 'function'
+    ));
 
     const requestAccess = () => {
         DeviceOrientationEvent.requestPermission()
@@ -115,7 +108,10 @@ function MouseTracker({ mousePos }) {
         targetRotation.current.x = mousePos.y * 0.08;
         targetRotation.current.y = mousePos.x * 0.12;
 
+        // React Three Fiber cameras are imperative scene objects.
+        // eslint-disable-next-line react-hooks/immutability
         camera.rotation.x += (targetRotation.current.x - camera.rotation.x) * 0.03;
+        // eslint-disable-next-line react-hooks/immutability
         camera.rotation.y += (targetRotation.current.y - camera.rotation.y) * 0.03;
     });
 
@@ -157,7 +153,10 @@ function GyroTracker() {
 
     useFrame(() => {
         // Smooth interpolation
+        // React Three Fiber cameras are imperative scene objects.
+        // eslint-disable-next-line react-hooks/immutability
         camera.rotation.x += (target.current.x - camera.rotation.x) * 0.05;
+        // eslint-disable-next-line react-hooks/immutability
         camera.rotation.y += (target.current.y - camera.rotation.y) * 0.05;
     });
 
@@ -165,7 +164,7 @@ function GyroTracker() {
 }
 
 /* ─── Floating 3D Models ─── */
-function FloatingModels({ mousePos }) {
+function FloatingModels() {
     // Load models
     const mac = useGLTF('macbook_pro_m3_16_inch_2024.glb');
     const camera = useGLTF('canon_at-2_retro_camera.glb');
@@ -306,14 +305,19 @@ function ParticleField({ count = 800 }) {
     const mesh = useRef();
 
     const particles = useMemo(() => {
+        let seed = count * 7919;
+        const nextRandom = () => {
+            seed = (seed * 1664525 + 1013904223) % 4294967296;
+            return seed / 4294967296;
+        };
         const positions = new Float32Array(count * 3);
         const sizes = new Float32Array(count);
 
         for (let i = 0; i < count; i++) {
-            positions[i * 3] = (Math.random() - 0.5) * 25;
-            positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
-            positions[i * 3 + 2] = (Math.random() - 0.5) * 15;
-            sizes[i] = Math.random() * 2 + 0.5;
+            positions[i * 3] = (nextRandom() - 0.5) * 25;
+            positions[i * 3 + 1] = (nextRandom() - 0.5) * 20;
+            positions[i * 3 + 2] = (nextRandom() - 0.5) * 15;
+            sizes[i] = nextRandom() * 2 + 0.5;
         }
 
         return { positions, sizes };
@@ -455,31 +459,6 @@ useGLTF.preload('/macbook_pro_m3_16_inch_2024.glb');
 /* ═══════════════════════════════════════════════════
    3D TILT CARD — mouse-reactive perspective
    ═══════════════════════════════════════════════════ */
-export function useTilt3D() {
-    const ref = useRef(null);
-
-    const handleMouseMove = (e) => {
-        if (!ref.current) return;
-        const rect = ref.current.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width - 0.5;
-        const y = (e.clientY - rect.top) / rect.height - 0.5;
-
-        ref.current.style.transform = `
-            perspective(800px)
-            rotateY(${x * 12}deg)
-            rotateX(${-y * 12}deg)
-            scale3d(1.02, 1.02, 1.02)
-        `;
-    };
-
-    const handleMouseLeave = () => {
-        if (!ref.current) return;
-        ref.current.style.transform = 'perspective(800px) rotateY(0deg) rotateX(0deg) scale3d(1,1,1)';
-    };
-
-    return { ref, handleMouseMove, handleMouseLeave };
-}
-
 /* ═══════════════════════════════════════════════════
    CURSOR GLOW TRAIL
    ═══════════════════════════════════════════════════ */

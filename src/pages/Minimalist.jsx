@@ -3,12 +3,6 @@ import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 
 export default function Minimalist() {
-    const fadeInUp = {
-        initial: { y: 60, opacity: 0 },
-        animate: { y: 0, opacity: 1 },
-        transition: { duration: 0.8, ease: "easeOut" }
-    };
-
     return (
         <div style={{
             maxWidth: '800px',

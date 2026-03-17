@@ -60,7 +60,7 @@ export default function CyberTerminal() {
                         setHistory(prev => [...prev, `Directory not found: ${param}`]);
                     }
                     break;
-                case 'cat':
+                case 'cat': {
                     const file = Object.values(FILES).flat().find(f => f.name === param);
                     if (file) {
                         setHistory(prev => [...prev, `File: ${file.name}`, `Type: ${file.type}`, `Date: ${file.date}`, `Description: ${file.desc}`]);
@@ -68,7 +68,8 @@ export default function CyberTerminal() {
                         setHistory(prev => [...prev, `File not found: ${param}`]);
                     }
                     break;
-                case 'play':
+                }
+                case 'play': {
                     const videoFile = Object.values(FILES).flat().find(f => f.name === param);
                     if (videoFile) {
                         setHistory(prev => [...prev, `Launching viewer for ${videoFile.name}...`]);
@@ -77,11 +78,12 @@ export default function CyberTerminal() {
                         setHistory(prev => [...prev, `File not found: ${param}`]);
                     }
                     break;
+                }
                 case 'clear':
                     setHistory([]);
                     break;
                 case 'exit':
-                    window.location.href = '/';
+                    window.location.hash = 'home';
                     break;
                 case '':
                     break;
@@ -118,7 +120,7 @@ export default function CyberTerminal() {
             <nav style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', borderBottom: '1px solid #00ff00', paddingBottom: '1rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <Terminal size={20} />
-                    <span>OTOOW_SYSTEM_V2</span>
+                    <span>NOTOOW_SYSTEM_V2</span>
                 </div>
                 <a href="#home" style={{ color: '#00ff00', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     [ DISCONNECT ]
