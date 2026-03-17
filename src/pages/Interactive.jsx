@@ -553,7 +553,7 @@ function AboutSection() {
                         </div>
 
                         <div style={{
-                            display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr',
+                            display: 'grid', gridTemplateColumns: '1fr 1fr 1fr',
                             gap: '1rem', marginTop: '2.5rem', paddingTop: '2rem',
                             borderTop: '1px solid var(--border)',
                         }}>
@@ -575,7 +575,7 @@ function AboutSection() {
                                         display: 'block', marginBottom: '0.3rem',
                                     }}>{s.label}</span>
                                     <span style={{
-                                        fontFamily: 'var(--font-en)', fontSize: '1.5rem',
+                                        fontFamily: 'var(--font-en)', fontSize: isMobile ? '1.1rem' : '1.5rem',
                                         fontWeight: 700, color: 'var(--text-hero)',
                                     }}>{s.value}</span>
                                 </motion.div>
