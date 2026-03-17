@@ -52,6 +52,12 @@ const portfolioVideos = {
             thumbnail: "https://i9.ytimg.com/vi/Iv8xAVWP-Ds/mqdefault.jpg?sqp=CPjm5c0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGFQgXihlMA8=&rs=AOn4CLCgSfThu8pe402n-gGeoSkRUu2V9Q",
         },
         {
+            title: "고양시지속가능발전협의회 홍보영상",
+            url: "https://youtu.be/rQkWrjpCgKs",
+            section: "motion",
+            type: "YouTube Unlisted",
+        },
+        {
             title: "미국대학입시컨설팅 인트로",
             url: "https://www.youtube.com/watch?v=IHwd8zO2KRk",
             section: "design",
@@ -157,6 +163,22 @@ function extractVideoId(input) {
     return '';
 }
 
+function buildYouTubeThumbnail(videoId, quality = 'maxresdefault') {
+    return videoId ? `https://img.youtube.com/vi/${videoId}/${quality}.jpg` : '';
+}
+
+function resolveThumbnail(thumbnail, videoId) {
+    const value = String(thumbnail || '').trim();
+    if (!videoId) return value;
+
+    // Replace imported medium-quality thumbnails with higher-resolution YouTube sources.
+    if (!value || /\/(?:mqdefault|default)\.jpg/i.test(value)) {
+        return buildYouTubeThumbnail(videoId);
+    }
+
+    return value;
+}
+
 export function getPortfolioVideosByCategory(categoryTag) {
     const items = portfolioVideos[categoryTag];
     if (!Array.isArray(items)) return [];
@@ -180,7 +202,7 @@ export function getPortfolioVideosByCategory(categoryTag) {
                 title: title || `Untitled ${index + 1}`,
                 type,
                 desc,
-                thumbnail,
+                thumbnail: resolveThumbnail(thumbnail, videoId),
                 url,
                 section: String(item?.section || '').trim(),
             };

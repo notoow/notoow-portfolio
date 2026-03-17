@@ -109,7 +109,9 @@ function VideoCard({ item, index, onPlay }) {
             {/* Thumbnail */}
             {(hasVideoId || item.thumbnail) ? (
                 <img
-                    src={item.thumbnail || (imgError ? ytThumb(item.videoId, 'hqdefault') : ytThumb(item.videoId))}
+                    src={imgError && hasVideoId
+                        ? ytThumb(item.videoId, 'hqdefault')
+                        : (item.thumbnail || ytThumb(item.videoId))}
                     alt={item.title}
                     loading="lazy"
                     onError={() => setImgError(true)}
