@@ -1,7 +1,6 @@
 import React from 'react';
 import CategoryDetail from './CategoryDetail';
 import { useYouTubeCategoryVideos } from '../hooks/useYouTubeCategoryVideos';
-import { DEFAULT_CHANNEL_URL } from '../lib/youtube';
 
 /*
    ═══════════════════════════════════════════════════
@@ -20,12 +19,11 @@ export default function FilmPage() {
     const { videos, loading, error } = useYouTubeCategoryVideos('예능');
     const fallbackVideos = [
         {
-            title: '[예능] YouTube 채널',
-            type: loading ? '자동 파싱 중' : '채널 바로가기',
+            title: '촬영 포트폴리오 준비 중',
+            type: loading ? '불러오는 중' : '링크 추가 대기',
             desc: loading
-                ? '유튜브 목록을 불러오는 중입니다.'
-                : (error ? `API 연결 필요: ${error}` : '예능 태그 영상이 아직 없습니다.'),
-            url: DEFAULT_CHANNEL_URL,
+                ? '포트폴리오 영상을 불러오는 중입니다.'
+                : (error ? `영상 연결 오류: ${error}` : 'src/data/portfolioVideos.js 에 일부공개 유튜브 링크를 추가해 주세요.'),
         },
     ];
 

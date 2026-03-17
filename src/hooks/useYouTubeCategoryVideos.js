@@ -5,6 +5,7 @@ import {
     fetchChannelVideos,
     filterVideosByCategoryTag,
 } from '../lib/youtube';
+import { getPortfolioVideosByCategory, portfolioVideoMode } from '../data/portfolioVideos';
 import { hasSupabaseConfig, supabase } from '../lib/supabase';
 
 function mapSupabaseVideo(row) {
@@ -28,6 +29,7 @@ export function useYouTubeCategoryVideos(categoryTag, maxResults = 24) {
 
     const channelId = import.meta.env.VITE_YOUTUBE_CHANNEL_ID || DEFAULT_CHANNEL_ID;
     const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
+    const manualVideos = useMemo(() => getPortfolioVideosByCategory(categoryTag), [categoryTag]);
 
     useEffect(() => {
         let alive = true;
@@ -35,6 +37,22 @@ export function useYouTubeCategoryVideos(categoryTag, maxResults = 24) {
         async function run() {
             setLoading(true);
             setError('');
+            setVideos([]);
+
+            if (portfolioVideoMode === 'manual') {
+                if (!alive) return;
+                setVideos(manualVideos);
+                setLoading(false);
+                return;
+            }
+
+            if (manualVideos.length > 0) {
+                if (!alive) return;
+                setVideos(manualVideos);
+                setLoading(false);
+                return;
+            }
+
             let supabaseError = '';
 
             try {
@@ -56,6 +74,12 @@ export function useYouTubeCategoryVideos(categoryTag, maxResults = 24) {
                     }
                 }
 
+                if (!apiKey) {
+                    if (!alive) return;
+                    setVideos([]);
+                    return;
+                }
+
                 const allVideos = await fetchChannelVideos({ channelId, apiKey, maxResults });
                 if (!alive) return;
                 setVideos(filterVideosByCategoryTag(allVideos, categoryTag));
@@ -74,7 +98,7 @@ export function useYouTubeCategoryVideos(categoryTag, maxResults = 24) {
 
         run();
         return () => { alive = false; };
-    }, [apiKey, categoryTag, channelId, maxResults]);
+    }, [apiKey, categoryTag, channelId, manualVideos, maxResults]);
 
     return useMemo(() => ({ videos, loading, error }), [videos, loading, error]);
 }

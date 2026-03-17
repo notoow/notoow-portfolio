@@ -11,6 +11,15 @@ const CATEGORY = {
 
 const PROJECTS = [
     {
+        title: '클로드코드로 생산성 10배 올리기',
+        type: 'YouTube / Dev Workflow',
+        desc: 'Claude Code를 활용해 영상 제작과 개발 워크플로우를 자동화하고, 실제 작업 생산성을 끌어올린 과정을 정리한 영상.',
+        url: 'https://www.youtube.com/watch?v=ggYmI9DIgJs',
+        media: 'https://i.ytimg.com/vi/ggYmI9DIgJs/hqdefault.jpg',
+        color: 'linear-gradient(135deg, #162a2d 0%, #2f766b 100%)',
+        textColor: '#f6fffd'
+    },
+    {
         title: '우주 대스타 (Cosmic Superstar)',
         type: 'Unity / Kinect v2',
         desc: '고양 스타필드 매직플로우 체험존. Kinect v2의 깊이와 가속도 데이터를 정밀 제어하여 사용자를 실시간 미러링하는 인터랙티브 XR 서비스.',

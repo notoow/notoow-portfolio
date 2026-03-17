@@ -15,7 +15,35 @@ The React Compiler is not enabled on this template because of its impact on dev 
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
 
-## YouTube Auto Parsing
+## Manual YouTube Links (Recommended for Unlisted)
+
+If you want to show unlisted YouTube videos on the portfolio, you do not need Supabase.
+
+Setup:
+
+1. Open `src/data/portfolioVideos.js`
+2. Add each unlisted video under one of these categories:
+   - `디자인`
+   - `3D`
+   - `예능`
+3. For each item, add at least `title` and `url`
+
+Example:
+
+```js
+디자인: [
+  {
+    title: '브랜드 필름 편집',
+    url: 'https://www.youtube.com/watch?v=VIDEO_ID',
+    desc: '인트로 / 모션그래픽 / 컬러그레이딩',
+  },
+]
+```
+
+The app will extract the YouTube video ID from the URL and open the video in the portfolio lightbox.
+`portfolioVideoMode` is currently set to `manual`, so only the links in that file will be shown.
+
+## Optional: YouTube Auto Parsing
 
 This project can auto-load videos from a YouTube channel and split them by title tags:
 
@@ -31,7 +59,7 @@ Setup:
 
 The site uses YouTube Data API v3 (`channels` + `playlistItems`) and no manual per-video input is needed.
 
-## Supabase Video Source (Recommended for Unlisted)
+## Optional: Supabase Video Source
 
 Because YouTube API key mode cannot list all unlisted videos automatically, the app supports Supabase as the primary source.
 
