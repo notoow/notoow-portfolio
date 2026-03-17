@@ -3,8 +3,12 @@ import path from 'node:path';
 import os from 'node:os';
 
 const sourceArg = process.argv[2];
-const downloadsPath = path.join(os.homedir(), 'Downloads', 'studio-videos.json');
-const sourcePath = path.resolve(sourceArg || downloadsPath);
+const sourceCandidates = [
+    sourceArg ? path.resolve(sourceArg) : '',
+    path.join(os.homedir(), 'Downloads', 'studio-videos.json'),
+    path.join(os.homedir(), 'Desktop', 'CustomDownloads', 'studio-videos.json'),
+].filter(Boolean);
+const sourcePath = sourceCandidates.find((candidate) => fs.existsSync(candidate)) || sourceCandidates[0];
 const targetPath = path.resolve('src/data/portfolioVideos.js');
 
 function normalize(value) {
@@ -15,11 +19,20 @@ function classifyCategory(row) {
     const text = normalize(`${row.title} ${row.text}`).toLowerCase();
     if (/\[(3d|3디)\]/i.test(text)) return '3D';
     if (/\[(예능|film|촬영|cinematography)\]/i.test(text)) return '예능';
-    if (/\[(디자인|edit|편집|design)\]/i.test(text)) return '디자인';
+    if (/\[(디자인|edit|편집|design|모션|motion)\]/i.test(text)) return '디자인';
 
-    if (/blender|cinema ?4d|c4d|octane|3d|모델링|렌더/.test(text)) return '3D';
+    if (/blender|octane|3d|모델링|렌더/.test(text)) return '3D';
     if (/드론|촬영|현장|멀티캠|스케치|film|cinematography/.test(text)) return '예능';
     return '디자인';
+}
+
+function inferEditSection(row) {
+    const text = normalize(`${row.title} ${row.text}`).toLowerCase();
+
+    if (/모션|motion|립싱크|애니메이션|그래픽/.test(text)) return 'motion';
+    if (/디자인|자막|타이틀|썸네일/.test(text)) return 'design';
+
+    return 'edit';
 }
 
 function sortRows(a, b) {
@@ -28,14 +41,20 @@ function sortRows(a, b) {
     return titleA.localeCompare(titleB, 'ko');
 }
 
-function toEntry(row) {
-    return {
+function toEntry(row, category) {
+    const entry = {
         title: normalize(row.title) || 'Untitled',
         url: row.watchUrl,
         desc: '',
         type: 'YouTube Unlisted',
         thumbnail: row.thumbnail || '',
     };
+
+    if (category === '디자인') {
+        entry.section = inferEditSection(row);
+    }
+
+    return entry;
 }
 
 function formatEntry(entry) {
@@ -48,6 +67,9 @@ function formatEntry(entry) {
     if (entry.desc) {
         lines.push(`            desc: ${JSON.stringify(entry.desc)},`);
     }
+    if (entry.section) {
+        lines.push(`            section: ${JSON.stringify(entry.section)},`);
+    }
     lines.push(`            type: ${JSON.stringify(entry.type)},`);
     if (entry.thumbnail) {
         lines.push(`            thumbnail: ${JSON.stringify(entry.thumbnail)},`);
@@ -57,7 +79,9 @@ function formatEntry(entry) {
 }
 
 function buildFileContent(grouped) {
-    return `export const portfolioVideoMode = 'manual';
+    return `import { normalizeYouTubeThumbnail } from '../lib/youtubeThumbnails';
+
+export const portfolioVideoMode = 'manual';
 
 const portfolioVideos = {
     디자인: [
@@ -91,6 +115,10 @@ function extractVideoId(input) {
     return '';
 }
 
+function resolveThumbnail(thumbnail, videoId) {
+    return normalizeYouTubeThumbnail(thumbnail, videoId);
+}
+
 export function getPortfolioVideosByCategory(categoryTag) {
     const items = portfolioVideos[categoryTag];
     if (!Array.isArray(items)) return [];
@@ -114,8 +142,9 @@ export function getPortfolioVideosByCategory(categoryTag) {
                 title: title || \`Untitled \${index + 1}\`,
                 type,
                 desc,
-                thumbnail,
+                thumbnail: resolveThumbnail(thumbnail, videoId),
                 url,
+                section: String(item?.section || '').trim(),
             };
         })
         .filter(Boolean);
@@ -145,7 +174,8 @@ function main() {
     };
 
     unlisted.sort(sortRows).forEach((row) => {
-        grouped[classifyCategory(row)].push(toEntry(row));
+        const category = classifyCategory(row);
+        grouped[category].push(toEntry(row, category));
     });
 
     fs.writeFileSync(targetPath, buildFileContent(grouped), 'utf8');

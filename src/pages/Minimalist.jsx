@@ -15,7 +15,7 @@ export default function Minimalist() {
         }}>
             <nav style={{ marginBottom: '4rem' }}>
                 <a href="#home" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#666', fontSize: '0.9rem', textDecoration: 'none' }}>
-                    <ArrowLeft size={16} /> Back to Styles
+                    <ArrowLeft size={16} /> Back to Home
                 </a>
             </nav>
 
@@ -41,7 +41,7 @@ export default function Minimalist() {
                     transition={{ delay: 0.4, duration: 0.8 }}
                     style={{ fontSize: '1.2rem', color: '#666', maxWidth: '400px', lineHeight: 1.6 }}
                 >
-                    Crafting digital experiences with precision and clarity. Based in the cloud.
+                    Crafting digital experiences with precision and clarity. Based in Seoul.
                 </motion.p>
             </header>
 
@@ -92,15 +92,20 @@ export default function Minimalist() {
                         />
                         <SkillList
                             title="Development & 3D"
-                            items={['React / Next.js', 'Cinema 4D', 'Blender', 'WebGL / Three.js']}
+                            items={['React / Next.js', 'Blender', 'WebGL / Three.js', 'Automation']}
                         />
                     </div>
                 </Section>
 
                 <Section title="Contact">
-                    <a href="mailto:hello@example.com" style={{ fontSize: '2rem', fontFamily: "'Playfair Display', serif", textDecoration: 'underline', textUnderlineOffset: '8px' }}>
-                        Get in touch &rarr;
-                    </a>
+                    <div>
+                        <p style={{ fontSize: '0.95rem', color: '#666', marginBottom: '1rem', lineHeight: 1.7 }}>
+                            For project inquiries, email directly.
+                        </p>
+                        <span style={{ fontSize: '2rem', fontFamily: "'Playfair Display', serif", textDecoration: 'underline', textUnderlineOffset: '8px' }}>
+                            tan0123@naver.com
+                        </span>
+                    </div>
                 </Section>
             </main>
 

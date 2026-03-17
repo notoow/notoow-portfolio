@@ -11,7 +11,7 @@ const CATEGORY = {
     id: '3d',
     title: '3D',
     en: '3D VISUALIZATION',
-    desc: 'Cinema 4D, Blender 기반 제품 3D 렌더링, 홍보 애니메이션, 로고 제작.',
+    desc: 'Blender 기반 제품 3D 렌더링, 홍보 애니메이션, 비주얼 제작.',
     color: 'var(--tone-vivid)',
 };
 

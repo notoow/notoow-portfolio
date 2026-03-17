@@ -73,7 +73,7 @@ function MotionRequest() {
                     setShow(false);
                 }
             })
-            .catch((e) => console.error(e));
+            .catch(() => setShow(false));
     };
 
     if (!show) return null;
@@ -111,7 +111,6 @@ function MouseTracker({ mousePos }) {
         // React Three Fiber cameras are imperative scene objects.
         // eslint-disable-next-line react-hooks/immutability
         camera.rotation.x += (targetRotation.current.x - camera.rotation.x) * 0.03;
-        // eslint-disable-next-line react-hooks/immutability
         camera.rotation.y += (targetRotation.current.y - camera.rotation.y) * 0.03;
     });
 
@@ -156,7 +155,6 @@ function GyroTracker() {
         // React Three Fiber cameras are imperative scene objects.
         // eslint-disable-next-line react-hooks/immutability
         camera.rotation.x += (target.current.x - camera.rotation.x) * 0.05;
-        // eslint-disable-next-line react-hooks/immutability
         camera.rotation.y += (target.current.y - camera.rotation.y) * 0.05;
     });
 

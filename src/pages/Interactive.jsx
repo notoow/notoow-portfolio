@@ -1270,8 +1270,8 @@ function Footer() {
                     { label: 'Contact', href: '#contact' },
                 ].map((item) => (
                     <a key={item.label} href={item.href} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '0.08em', transition: 'color 0.3s' }}
-                        onMouseEnter={e => e.target.style.color = 'var(--text-hero)'}
-                        onMouseLeave={e => e.target.style.color = 'var(--text-muted)'}>{item.label}</a>
+                        onMouseEnter={e => e.currentTarget.style.color = 'var(--text-hero)'}
+                        onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>{item.label}</a>
                 ))}
             </div>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '0.12em' }}>SEOUL, KR</span>

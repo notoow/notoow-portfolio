@@ -371,7 +371,7 @@ function TiltCard({ item, index, isMobile }) {
                     transition: 'color 0.3s, transform 0.3s',
                     transform: hov ? 'translateX(4px)' : 'translateX(0)',
                 }}>
-                    REEL 보기 →
+                    포트폴리오 보기 →
                 </span>
             </div>
         </motion.a>
