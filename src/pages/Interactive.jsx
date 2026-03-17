@@ -1,10 +1,42 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { CursorGlow, useTilt3D, SkillScene } from '../components/Scene3D';
+import { CursorGlow } from '../components/Scene3D';
+import { getPortfolioVideosByCategory } from '../data/portfolioVideos';
 
-/* ═══════════════════════════════════════════════════
-   VIDEO DATA — 나중에 videoId만 교체하면 OK
-   ═══════════════════════════════════════════════════ */
+const FILM_VIDEOS = getPortfolioVideosByCategory('예능');
+const EDIT_VIDEOS = getPortfolioVideosByCategory('디자인');
+const THREE_D_VIDEOS = getPortfolioVideosByCategory('3D');
+const DEV_VIDEO = {
+    title: '클로드코드로 생산성 10배 올리기',
+    videoId: 'ggYmI9DIgJs',
+    thumbnail: 'https://i.ytimg.com/vi/ggYmI9DIgJs/hqdefault.jpg',
+    section: 'dev',
+};
+
+const EDIT_SECTION_LABELS = {
+    edit: '영상편집',
+    motion: '모션그래픽',
+    design: '디자인 제작',
+};
+
+function toSkillVideo(item, fallback) {
+    return {
+        videoId: item?.videoId || fallback.videoId,
+        thumbnail: item?.thumbnail || fallback.thumbnail || '',
+    };
+}
+
+function toWork(item, cat, type) {
+    if (!item?.videoId) return null;
+
+    return {
+        title: item.title,
+        type,
+        cat,
+        videoId: item.videoId,
+        thumbnail: item.thumbnail || '',
+    };
+}
 
 const SKILLS_DATA = [
     {
@@ -12,59 +44,58 @@ const SKILLS_DATA = [
         title: '촬영',
         en: 'CINEMATOGRAPHY',
         num: '01',
-        desc: '드론, 멀티캠, 현장 스케치 등 다양한 촬영 환경에서의 실전 경험. 의료, 커머스, 스포츠 등 다방면.',
+        desc: '드론, 멀티캠, 현장 스케치 등 다양한 촬영 환경에서의 실전 경험을 쌓아왔습니다.',
         detail: '다방면 촬영 · 드론 운용',
         color: 'var(--tone-warm)',
-        videoId: 'YN28Fyo0Q7Q',
         reelUrl: '#film',
+        ...toSkillVideo(FILM_VIDEOS[0], {}),
     },
     {
         id: 'edit',
         title: '편집',
         en: 'POST-PRODUCTION',
         num: '02',
-        desc: '인트로, 모션그래픽, 유튜브 디자인대판, 커러그레이딩. 유튜브 채널 다수 경험.',
-        detail: '모션그래픽 · 커러그레이딩',
+        desc: '영상편집, 모션그래픽, 디자인 제작, 컬러그레이딩까지 포스트 프로덕션 전반을 다룹니다.',
+        detail: '영상편집 · 모션그래픽 · 컬러그레이딩',
         color: 'var(--tone-cool)',
-        videoId: 'OZU-Cxj-49w',
         reelUrl: '#edit',
+        ...toSkillVideo(EDIT_VIDEOS[0], {}),
     },
     {
         id: '3d',
         title: '3D',
         en: '3D VISUALIZATION',
         num: '03',
-        desc: 'Cinema 4D, Blender 기반 제품 3D 렌더링, 홍보 애니메이션, 로고 제작.',
-        detail: 'Cinema 4D · Blender',
+        desc: 'Blender 기반 제품 3D 렌더링과 홍보 애니메이션, 비주얼 작업을 진행합니다.',
+        detail: 'Blender · 제품 비주얼',
         color: 'var(--tone-vivid)',
-        videoId: '3sVkYrFfHjw',
         reelUrl: '#3d',
+        ...toSkillVideo(THREE_D_VIDEOS[0], {}),
     },
     {
         id: 'dev',
         title: '개발',
         en: 'DEVELOPMENT',
         num: '04',
-        desc: '웹앱, 자동화 도구, AI 통합 서비스를 직접 설계하고 구현. React, Python, FFmpeg 기반.',
-        detail: 'React · TypeScript · Python',
+        desc: '웹앱, 자동화 도구, AI 통합 서비스를 직접 설계하고 구현합니다.',
+        detail: 'React · Python · FFmpeg',
         color: 'var(--tone-mint)',
-        videoId: 'N-MJOCrLh0A',
         reelUrl: '#dev',
+        ...toSkillVideo(DEV_VIDEO, DEV_VIDEO),
     },
 ];
 
 const WORKS = [
-    { title: '빈지노 24:26 3D 커버', type: '3D 뮤직비주얼', cat: '3D', videoId: 'OZU-Cxj-49w' },
-    { title: 'Blender 3D Text Logo', type: '3D 타이포', cat: '3D', videoId: '3sVkYrFfHjw' },
-    { title: 'Building 2D Animation', type: '2D 애니메이션', cat: '3D', videoId: 'Av2oG8Mp3ic' },
-    { title: 'AstraZeneca 백신 3D', type: '3D 제품', cat: '3D', videoId: 'XDLWgUJ2eD4' },
-    { title: 'Cactus Jack 3D Logo', type: '3D 로고', cat: '3D', videoId: 'f4j-vPBNb0k' },
-    { title: '천사소녀 네티 OST', type: '음악 리메이크', cat: 'EDIT', videoId: 'mkA-BkpoX6E' },
-    { title: 'HSBC 환경캠프', type: '다큐멘터리', cat: 'FILM', videoId: 'YN28Fyo0Q7Q' },
-    { title: 'Unity Tutorials', type: '개발 튜토리얼', cat: 'DEV', videoId: 'N-MJOCrLh0A' },
-    { title: '촬영 프로젝트 A', type: '촬영', cat: 'FILM', videoId: 'YN28Fyo0Q7Q' },
-    { title: '편집 프로젝트 A', type: '편집', cat: 'EDIT', videoId: 'OZU-Cxj-49w' },
-];
+    toWork(FILM_VIDEOS[0], 'FILM', '촬영'),
+    toWork(EDIT_VIDEOS[0], 'EDIT', EDIT_SECTION_LABELS[EDIT_VIDEOS[0]?.section] || '포스트 프로덕션'),
+    toWork(THREE_D_VIDEOS[0], '3D', '3D 비주얼'),
+    toWork(DEV_VIDEO, 'DEV', '개발 워크플로우'),
+    toWork(FILM_VIDEOS[1], 'FILM', '촬영'),
+    toWork(EDIT_VIDEOS[1], 'EDIT', EDIT_SECTION_LABELS[EDIT_VIDEOS[1]?.section] || '포스트 프로덕션'),
+    toWork(THREE_D_VIDEOS[1], '3D', '3D 비주얼'),
+    toWork(EDIT_VIDEOS[2], 'EDIT', EDIT_SECTION_LABELS[EDIT_VIDEOS[2]?.section] || '포스트 프로덕션'),
+    toWork(THREE_D_VIDEOS[2], '3D', '3D 비주얼'),
+].filter(Boolean);
 
 const DEV_PROJECTS = [
     {
@@ -95,7 +126,7 @@ const DEV_PROJECTS = [
 
 const TOOLS = [
     'Premiere Pro', 'After Effects', 'DaVinci Resolve',
-    'Cinema 4D', 'Blender', 'Photoshop',
+    'Blender', 'Photoshop',
     'Figma', 'React', 'Python',
     'Three.js', 'FFmpeg', 'DJI Drone',
 ];
@@ -544,7 +575,7 @@ function AboutSection() {
 }
 
 /* ═══════════════════════════════════════════════════
-   FULLSCREEN SKILLS — with 3D object per slide
+   FULLSCREEN SKILLS
    ═══════════════════════════════════════════════════ */
 function FullscreenSkills({ onPlayVideo }) {
     return (
@@ -576,9 +607,9 @@ function SkillSlide({ skill, index, onPlay }) {
                 style={{ position: 'relative', overflow: 'hidden', order: isEven ? 1 : 2, background: 'var(--bg-deep)', cursor: 'pointer' }}
                 onMouseEnter={() => setImgHov(true)}
                 onMouseLeave={() => setImgHov(false)}
-                onClick={() => onPlay(skill.videoId)}
+                onClick={() => skill.videoId && onPlay(skill.videoId)}
             >
-                <motion.img src={ytThumb(skill.videoId)} alt={skill.title} loading="lazy"
+                <motion.img src={skill.thumbnail || ytThumb(skill.videoId)} alt={skill.title} loading="lazy"
                     onError={(e) => { e.target.src = ytThumb(skill.videoId, 'hqdefault'); }}
                     style={{
                         width: '100%', height: '100%', objectFit: 'cover',
@@ -586,9 +617,12 @@ function SkillSlide({ skill, index, onPlay }) {
                         scale: imgScale, y: imgY, transition: 'filter 0.5s',
                     }}
                 />
-
-                {/* 3D object floating over the image */}
-                <SkillScene skillId={skill.id} isActive={isInView} />
+                <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.45) 100%)',
+                    pointerEvents: 'none',
+                }} />
 
                 {/* Play button */}
                 <div style={{
@@ -659,7 +693,7 @@ function SkillSlide({ skill, index, onPlay }) {
                                 fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: skill.color, letterSpacing: '0.06em',
                             }}>{skill.detail}</span>
 
-                            <a href={skill.reelUrl} target="_blank" rel="noopener noreferrer"
+                            <a href={skill.reelUrl}
                                 onClick={(e) => e.stopPropagation()}
                                 style={{
                                     display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
@@ -684,25 +718,25 @@ function SkillSlide({ skill, index, onPlay }) {
 }
 
 /* ═══════════════════════════════════════════════════
-   HORIZONTAL GALLERY — 3D tilt on cards
+   HORIZONTAL GALLERY
    ═══════════════════════════════════════════════════ */
 function HorizontalGallery({ onPlayVideo }) {
-    const containerRef = useRef(null);
-    const { scrollYProgress } = useScroll({ target: containerRef });
-    const x = useTransform(scrollYProgress, [0, 1], ['0%', '-70%']);
+    const railRef = useRef(null);
+
+    const scrollRail = useCallback((delta) => {
+        railRef.current?.scrollBy({ left: delta, behavior: 'smooth' });
+    }, []);
 
     return (
-        <section id="works" ref={containerRef} style={{
-            height: `${WORKS.length * 40}vh`, position: 'relative',
+        <section id="works" style={{
+            padding: '0 0 6rem',
+            position: 'relative',
             borderTop: '1px solid var(--border)',
         }}>
-            <div style={{
-                position: 'sticky', top: 0, height: '100vh',
-                display: 'flex', flexDirection: 'column', overflow: 'hidden',
-            }}>
+            <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
                 <div style={{
                     padding: '2rem 3rem', display: 'flex', justifyContent: 'space-between',
-                    alignItems: 'center', borderBottom: '1px solid var(--border)', flexShrink: 0,
+                    alignItems: 'center', borderBottom: '1px solid var(--border)', gap: '1rem', flexWrap: 'wrap',
                 }}>
                     <div>
                         <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.15em', display: 'block', marginBottom: '0.3rem' }}>
@@ -712,13 +746,67 @@ function HorizontalGallery({ onPlayVideo }) {
                             실제 <span style={{ color: 'var(--accent)' }}>프로젝트</span>
                         </h2>
                     </div>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
-                        {WORKS.length} PROJECTS · CLICK TO PLAY
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
+                            {WORKS.length} PROJECTS · SCROLL SIDEWAYS
+                        </span>
+                        <div style={{ display: 'flex', gap: '0.6rem' }}>
+                            <button
+                                onClick={() => scrollRail(-420)}
+                                style={{
+                                    width: '42px',
+                                    height: '42px',
+                                    borderRadius: '999px',
+                                    border: '1px solid var(--border)',
+                                    background: 'var(--bg-card)',
+                                    color: 'var(--text-hero)',
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                ←
+                            </button>
+                            <button
+                                onClick={() => scrollRail(420)}
+                                style={{
+                                    width: '42px',
+                                    height: '42px',
+                                    borderRadius: '999px',
+                                    border: '1px solid var(--border)',
+                                    background: 'var(--bg-card)',
+                                    color: 'var(--text-hero)',
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                →
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                <div style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '0 3rem' }}>
-                    <motion.div style={{ display: 'flex', gap: '1.5rem', x, padding: '2rem 0' }}>
+                <div
+                    ref={railRef}
+                    onWheel={(e) => {
+                        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                            e.preventDefault();
+                            e.currentTarget.scrollLeft += e.deltaY;
+                        }
+                    }}
+                    style={{
+                        overflowX: 'auto',
+                        overflowY: 'hidden',
+                        padding: '2rem 3rem 0',
+                        scrollSnapType: 'x mandatory',
+                        WebkitOverflowScrolling: 'touch',
+                    }}
+                >
+                    <motion.div style={{
+                        display: 'grid',
+                        gridAutoFlow: 'column',
+                        gridAutoColumns: 'minmax(320px, 380px)',
+                        gap: '1.5rem',
+                        width: 'max-content',
+                        paddingBottom: '1rem',
+                    }}>
                         {WORKS.map((w, i) => (
                             <GalleryCard key={`${w.title}-${i}`} work={w} index={i} onPlay={onPlayVideo} />
                         ))}
@@ -752,18 +840,19 @@ function GalleryCard({ work, index, onPlay }) {
             onMouseEnter={() => setHov(true)}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
-            onClick={() => onPlay(work.videoId)}
+            onClick={() => work.videoId && onPlay(work.videoId)}
             style={{
-                flexShrink: 0, width: '380px', cursor: 'pointer',
+                flexShrink: 0, width: '100%', cursor: 'pointer',
                 transition: 'transform 0.15s ease-out',
                 transformStyle: 'preserve-3d',
+                scrollSnapAlign: 'start',
             }}
         >
             <div style={{
                 position: 'relative', overflow: 'hidden', borderRadius: '8px',
-                height: '50vh', minHeight: '300px', background: 'var(--bg-deep)',
+                height: 'clamp(280px, 42vw, 420px)', background: 'var(--bg-deep)',
             }}>
-                <img src={ytThumb(work.videoId)} alt={work.title} loading="lazy"
+                <img src={work.thumbnail || ytThumb(work.videoId)} alt={work.title} loading="lazy"
                     onError={(e) => { e.target.src = ytThumb(work.videoId, 'hqdefault'); }}
                     style={{
                         width: '100%', height: '100%', objectFit: 'cover',
