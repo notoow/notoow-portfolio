@@ -1,15 +1,39 @@
 # Next PC Handoff
 
+## Latest Snapshot
+
+- latest commit: `4aa5917`
+- branch: `main`
+- working tree on this PC: clean
+- GitHub Pages deploy after latest commit: done
+
+오늘 기준으로 추가 반영된 핵심:
+
+- `#portfolio` 포함 주요 페이지 모바일 반응형 개선
+- YouTube 썸네일 로직 고도화
+- 수동 지정한 `ytimg` 썸네일 우선 존중
+- 썸네일이 깨질 때 후보 썸네일 + `oEmbed` fallback 사용
+- 공용 반응형 훅 / 공용 적응형 썸네일 컴포넌트 추가
+
 ## Working Tomorrow
 
 이 프로젝트는 현재 `manual` 영상 모드가 기본이라 `.env` 없이도 실행 가능합니다.
 
 새 컴퓨터에서 시작 순서:
 
-1. 저장소 클론
+1. 저장소 클론 또는 기존 폴더에서 최신 `main` pull
 2. `npm install`
 3. `npm run dev`
 4. 배포 전 확인은 `npm run lint` 와 `npm run build`
+
+처음 확인 추천:
+
+```bash
+git rev-parse --short HEAD
+git status
+```
+
+정상이라면 `HEAD` 는 `4aa5917` 이어야 합니다.
 
 배포:
 
@@ -37,6 +61,9 @@ npm run deploy
 - `src/pages/CategoryDetail.jsx`: 촬영/편집/3D 공통 상세
 - `src/pages/DevPage.jsx`: 개발 페이지
 - `src/data/portfolioVideos.js`: 실제 영상 데이터
+- `src/components/AdaptiveThumbnail.jsx`: 공용 썸네일 표시 / fallback
+- `src/hooks/useResponsive.js`: 공용 모바일/태블릿 판별
+- `src/lib/youtubeThumbnails.js`: YouTube 썸네일 후보 / probe / oEmbed fallback
 - `scripts/studio-browser-export.js`: YouTube Studio export
 - `scripts/studio-import.mjs`: export JSON import
 
@@ -76,6 +103,41 @@ node scripts/studio-import.mjs "C:\path\to\studio-videos.json"
 - 문의 이메일: `tan0123@naver.com`
 - 개발 페이지 `우주 대스타`는 현재 GIF 팝업 사용
 - `고양시지속가능발전협의회 홍보영상` 썸네일은 고정 `hqdefault` 로 설정됨
+- `#home`, `#portfolio`, `#film`, `#edit`, `#3d`, `#dev` 모바일 반응형 1차 정리 완료
+- `Interactive.jsx` 의 스킬 섹션 / 가로 갤러리 / CTA / 푸터도 모바일 대응 반영
+- 촬영/편집/3D 상세 카드와 라이트박스도 모바일 대응 반영
+- 썸네일은 이제 `maxresdefault -> sddefault -> hqdefault -> mqdefault -> oEmbed` 순서로 더 똑똑하게 fallback
+- 이미 수동으로 넣어둔 같은 영상의 `ytimg` 썸네일 URL은 강제로 다른 품질로 바꾸지 않음
+
+## Responsive Scope
+
+이번에 모바일 대응한 주요 페이지:
+
+- `src/pages/Home.jsx`
+- `src/pages/Interactive.jsx`
+- `src/pages/CategoryDetail.jsx`
+- `src/pages/DevPage.jsx`
+
+체크 포인트:
+
+- iPhone급 폭에서 상단 네비 줄바꿈/겹침 없는지
+- `#portfolio` 스킬 섹션이 1열로 자연스럽게 보이는지
+- `#portfolio` 가로 프로젝트 카드가 터치 스와이프 가능한지
+- 상세 페이지 카드가 1열로 보이고 모달 닫기 버튼이 화면 밖으로 안 나가는지
+- 홈 첫 화면에서 커서 숨김 같은 데스크톱 전용 동작이 모바일에서 거슬리지 않는지
+
+## Thumbnail Notes
+
+지금 구조는 단순히 `maxresdefault` 하나만 쓰는 방식이 아닙니다.
+
+- 수동 지정 썸네일이 같은 영상의 `ytimg` URL이면 그대로 우선 사용
+- 해당 썸네일이 실패하면 다른 품질 후보를 순서대로 시도
+- 그래도 실패하면 YouTube `oEmbed` thumbnail URL 사용
+
+관련 수정 포인트:
+
+- `src/components/AdaptiveThumbnail.jsx`
+- `src/lib/youtubeThumbnails.js`
 
 ## Nice Next Improvements
 
@@ -85,6 +147,9 @@ node scripts/studio-import.mjs "C:\path\to\studio-videos.json"
 - 썸네일 누락 영상 자동 점검 스크립트 추가
 - DevPage 프로젝트 카드에 외부 링크 / 팝업 타입을 명시적으로 분리한 공용 컴포넌트화
 - 큰 페이지들의 inline style 일부를 공용 스타일 또는 컴포넌트로 정리
+- `Home.jsx` 의 `BentoPreview` 도 `useResponsive` 훅으로 통일 가능
+- 페이지별 터치 제스처 / hover-only 인터랙션을 더 줄여서 모바일 UX 다듬기
+- 실제 기기에서 세로/가로 회전 시 레이아웃 재확인
 
 ## Quick Check Before Push
 
@@ -92,6 +157,13 @@ node scripts/studio-import.mjs "C:\path\to\studio-videos.json"
 npm run lint
 npm run build
 git status
+```
+
+배포까지 할 경우:
+
+```bash
+git push origin main
+npm run deploy
 ```
 
 ## Notes
