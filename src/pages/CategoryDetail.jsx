@@ -235,7 +235,7 @@ export default function CategoryDetail({
                 borderBottom: '1px solid var(--border)',
             }}>
                 <a
-                    href="#"
+                    href="#portfolio-overview"
                     style={{
                         display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
                         fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
@@ -247,7 +247,7 @@ export default function CategoryDetail({
                 >
                     ← BACK
                 </a>
-                <a href="#" style={{
+                <a href="#home" style={{
                     fontFamily: 'var(--font-en)', fontSize: '1.1rem',
                     fontWeight: 700, color: 'var(--text-hero)',
                     textDecoration: 'none',
@@ -467,7 +467,7 @@ export default function CategoryDetail({
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 flexWrap: 'wrap', gap: '1rem',
             }}>
-                <a href="#" style={{
+                <a href="#portfolio-overview" style={{
                     fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
                     color: 'var(--text-muted)', letterSpacing: '0.1em',
                     transition: 'color 0.3s',

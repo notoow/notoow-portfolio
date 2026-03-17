@@ -20,8 +20,26 @@ export default function Home() {
         return () => window.removeEventListener('mousemove', handler);
     }, []);
 
+    useEffect(() => {
+        const timer = window.setTimeout(() => {
+            const hash = window.location.hash.replace('#', '');
+
+            if (!hash || hash === 'home') {
+                window.scrollTo({ top: 0, behavior: 'auto' });
+                return;
+            }
+
+            const target = document.getElementById(hash);
+            if (target) {
+                target.scrollIntoView({ block: 'start', behavior: 'auto' });
+            }
+        }, 60);
+
+        return () => window.clearTimeout(timer);
+    }, []);
+
     return (
-        <div style={{
+        <div id="home" style={{
             background: 'var(--bg-void)', color: 'var(--text-hero)',
             minHeight: '100vh', overflow: 'hidden', cursor: 'none',
         }}>
@@ -75,12 +93,13 @@ function CinematicHero({ mousePos }) {
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                     zIndex: 10,
                 }}>
-                    <span style={{
+                    <a href="#home" style={{
                         fontFamily: 'var(--font-en)', fontSize: '1.5rem',
                         fontWeight: 700, letterSpacing: '-0.02em',
+                        color: 'var(--text-hero)', textDecoration: 'none',
                     }}>
                         notoow<span style={{ color: 'var(--accent)' }}>.</span>
-                    </span>
+                    </a>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
                         <span style={{
                             fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
@@ -258,7 +277,7 @@ function BentoPreview() {
     ];
 
     return (
-        <section style={{ padding: '5rem 2rem', maxWidth: '1200px', margin: '0 auto' }}>
+        <section id="portfolio-overview" style={{ padding: '5rem 2rem', maxWidth: '1200px', margin: '0 auto' }}>
             <div style={{
                 display: 'grid',
                 gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',

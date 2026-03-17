@@ -20,18 +20,37 @@
     return '';
   };
 
+  const getScrollContainer = () => {
+    const sampleRow = document.querySelector('ytcp-video-row');
+    let node = sampleRow?.parentElement;
+
+    while (node && node !== document.body) {
+      const style = window.getComputedStyle(node);
+      const canScroll = /(auto|scroll)/.test(style.overflowY) && node.scrollHeight > node.clientHeight + 20;
+      if (canScroll) return node;
+      node = node.parentElement;
+    }
+
+    return document.scrollingElement || document.documentElement;
+  };
+
   let previousCount = -1;
   let stablePasses = 0;
+  let lastHeight = -1;
+  const scrollContainer = getScrollContainer();
 
-  while (stablePasses < 3) {
-    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
-    await sleep(1200);
+  while (stablePasses < 5) {
+    scrollContainer.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' });
+    await sleep(1500);
     const count = document.querySelectorAll('ytcp-video-row').length;
-    if (count === previousCount) {
+    const height = scrollContainer.scrollHeight;
+
+    if (count === previousCount && height === lastHeight) {
       stablePasses += 1;
     } else {
       stablePasses = 0;
       previousCount = count;
+      lastHeight = height;
     }
   }
 

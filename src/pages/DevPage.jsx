@@ -286,13 +286,13 @@ export default function DevPage() {
                 backdropFilter: 'blur(24px) saturate(1.5)',
                 borderBottom: '1px solid var(--border)',
             }}>
-                <a href="#" style={{
+                <a href="#portfolio-overview" style={{
                     display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
                     fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
                     color: 'var(--text-muted)', letterSpacing: '0.1em',
                     textDecoration: 'none', transition: 'color 0.3s',
                 }}>← BACK</a>
-                <a href="#" style={{ fontFamily: 'var(--font-en)', fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-hero)', textDecoration: 'none' }}>
+                <a href="#home" style={{ fontFamily: 'var(--font-en)', fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-hero)', textDecoration: 'none' }}>
                     notoow<span style={{ color: 'var(--accent)' }}>.</span>
                 </a>
                 <span style={{
@@ -375,7 +375,7 @@ export default function DevPage() {
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 flexWrap: 'wrap', gap: '1rem',
             }}>
-                <a href="#" style={{
+                <a href="#portfolio-overview" style={{
                     fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
                     color: 'var(--text-muted)', letterSpacing: '0.1em',
                     textDecoration: 'none', transition: 'color 0.3s',

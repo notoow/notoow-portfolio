@@ -5,7 +5,7 @@ const portfolioVideos = {
         {
             title: "캐릭터 립싱크 | 조선멤버스 취준생 면접 필승 전략",
             url: "https://www.youtube.com/watch?v=Qcezswtg2yU",
-            section: "motion",
+            section: "design",
             type: "YouTube Unlisted",
             thumbnail: "https://i9.ytimg.com/vi/Qcezswtg2yU/mqdefault.jpg?sqp=CPjm5c0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGUgZShlMA8=&rs=AOn4CLD7zIXMGf9JklazW5nZA8plWBb22Q",
         },
@@ -40,14 +40,14 @@ const portfolioVideos = {
         {
             title: "여행 영상",
             url: "https://www.youtube.com/watch?v=SvZ5ECeT53g",
-            section: "edit",
+            section: "design",
             type: "YouTube Unlisted",
             thumbnail: "https://i9.ytimg.com/vi/SvZ5ECeT53g/mqdefault.jpg?sqp=CPjm5c0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGUgYChNMA8=&rs=AOn4CLBKb4G5Bywx6ftaMSMt5zOgpruQ5Q",
         },
         {
             title: "미국대학입시컨설팅 인트로",
             url: "https://www.youtube.com/watch?v=IHwd8zO2KRk",
-            section: "motion",
+            section: "design",
             type: "YouTube Unlisted",
             thumbnail: "https://i9.ytimg.com/vi/IHwd8zO2KRk/mqdefault.jpg?sqp=CPjm5c0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGCwgVSh_MA8=&rs=AOn4CLAfGft02lCL84xfDOdTSmlYHf-ZIA",
         },

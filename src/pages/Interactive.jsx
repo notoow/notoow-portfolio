@@ -256,9 +256,9 @@ function FloatingNav() {
                 <a href="#home" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.1em', transition: 'color 0.3s' }}
                     onMouseEnter={e => e.currentTarget.style.color = 'var(--text-hero)'}
                     onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>← HOME</a>
-                <span style={{ fontFamily: 'var(--font-en)', fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-hero)' }}>
+                <a href="#home" style={{ fontFamily: 'var(--font-en)', fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-hero)', textDecoration: 'none' }}>
                     notoow<span style={{ color: 'var(--accent)' }}>.</span>
-                </span>
+                </a>
             </div>
             <div style={{ display: 'flex', gap: '2rem' }}>
                 {['About', 'Skills', 'Works', 'Dev', 'Contact'].map(l => (
