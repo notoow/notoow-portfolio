@@ -1015,7 +1015,7 @@ function DevCard({ project: p, index: i }) {
 
 function ContactPopup({ onClose }) {
     const [copied, setCopied] = useState(false);
-    const email = 'hello@notoow.com';
+    const email = 'tan0123@naver.com';
 
     useEffect(() => {
         const onKeyDown = (event) => {
