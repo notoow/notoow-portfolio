@@ -14,7 +14,7 @@ import './App.css';
 
 function getPageFromHash() {
   const hash = window.location.hash.replace('#', '');
-  if (hash === '/interactive' || hash === 'interactive') return 'interactive';
+  if (hash === '/interactive' || hash === 'interactive' || hash === '/portfolio' || hash === 'portfolio') return 'portfolio';
   if (hash === '/minimal' || hash === 'minimal') return 'minimal';
   if (hash === '/terminal' || hash === 'terminal') return 'terminal';
   if (hash === '/film' || hash === 'film') return 'film';
@@ -52,7 +52,7 @@ function App() {
           transition={{ duration: 0.4 }}
           style={{ width: '100%', minHeight: '100vh' }}
         >
-          {page === 'interactive' && <Interactive />}
+          {page === 'portfolio' && <Interactive />}
           {page === 'minimal' && <Minimalist />}
           {page === 'terminal' && <CyberTerminal />}
           {page === 'film' && <FilmPage />}

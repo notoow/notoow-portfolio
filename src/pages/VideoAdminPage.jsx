@@ -182,7 +182,7 @@ export default function VideoAdminPage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                     <h1 style={{ fontSize: '2rem' }}>Video Admin</h1>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <a href="#interactive" style={{ color: '#9aa0a6', textDecoration: 'none' }}>← 포트폴리오</a>
+                        <a href="#" style={{ color: '#9aa0a6', textDecoration: 'none' }}>← 포트폴리오</a>
                         {session && <button onClick={handleSignOut}>로그아웃</button>}
                     </div>
                 </div>

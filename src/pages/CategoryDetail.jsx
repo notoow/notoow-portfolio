@@ -228,7 +228,7 @@ export default function CategoryDetail({
                 borderBottom: '1px solid var(--border)',
             }}>
                 <a
-                    href="#interactive"
+                    href="#"
                     style={{
                         display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
                         fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
@@ -240,12 +240,13 @@ export default function CategoryDetail({
                 >
                     ← BACK
                 </a>
-                <span style={{
+                <a href="#" style={{
                     fontFamily: 'var(--font-en)', fontSize: '1.1rem',
                     fontWeight: 700, color: 'var(--text-hero)',
+                    textDecoration: 'none',
                 }}>
                     notoow<span style={{ color: 'var(--accent)' }}>.</span>
-                </span>
+                </a>
                 <span style={{
                     fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
                     color: category.color, letterSpacing: '0.15em',
@@ -384,7 +385,7 @@ export default function CategoryDetail({
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 flexWrap: 'wrap', gap: '1rem',
             }}>
-                <a href="#interactive" style={{
+                <a href="#" style={{
                     fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
                     color: 'var(--text-muted)', letterSpacing: '0.1em',
                     transition: 'color 0.3s',

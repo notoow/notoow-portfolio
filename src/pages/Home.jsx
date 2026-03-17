@@ -88,7 +88,7 @@ function CinematicHero({ mousePos }) {
                         }}>
                             SEOUL {time}
                         </span>
-                        <a href="#interactive" style={{
+                        <a href="#portfolio" style={{
                             fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
                             color: 'var(--bg-void)', background: 'var(--text-hero)',
                             padding: '0.5rem 1.2rem', borderRadius: '100px',
@@ -254,7 +254,7 @@ function BentoPreview() {
         { title: '3D', en: '3D VISUALIZATION', desc: '제품 렌더링 · 애니메이션 · 로고', span: isMobile ? 'span 1' : 'span 1', h: '280px', accent: 'var(--tone-vivid)', reelUrl: '#3d' },
         // Development & Full Portfolio: Full width on mobile
         { title: '개발', en: 'DEVELOPMENT', desc: 'React · Python · 자동화 도구', span: isMobile ? 'span 1' : 'span 2', h: '200px', accent: 'var(--tone-mint)', reelUrl: '#dev' },
-        { title: '전체 보기', en: 'FULL PORTFOLIO', desc: '모든 작업물 한눈에', span: isMobile ? 'span 1' : 'span 1', h: '200px', accent: 'var(--accent)', reelUrl: '#interactive' },
+        { title: '전체 보기', en: 'FULL PORTFOLIO', desc: '모든 작업물 한눈에', span: isMobile ? 'span 1' : 'span 1', h: '200px', accent: 'var(--accent)', reelUrl: '#portfolio' },
     ];
 
     return (

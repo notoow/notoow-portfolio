@@ -286,15 +286,15 @@ export default function DevPage() {
                 backdropFilter: 'blur(24px) saturate(1.5)',
                 borderBottom: '1px solid var(--border)',
             }}>
-                <a href="#interactive" style={{
+                <a href="#" style={{
                     display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
                     fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
                     color: 'var(--text-muted)', letterSpacing: '0.1em',
                     textDecoration: 'none', transition: 'color 0.3s',
                 }}>← BACK</a>
-                <span style={{ fontFamily: 'var(--font-en)', fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-hero)' }}>
+                <a href="#" style={{ fontFamily: 'var(--font-en)', fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-hero)', textDecoration: 'none' }}>
                     notoow<span style={{ color: 'var(--accent)' }}>.</span>
-                </span>
+                </a>
                 <span style={{
                     fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
                     color: CATEGORY.color, letterSpacing: '0.15em',
@@ -375,7 +375,7 @@ export default function DevPage() {
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 flexWrap: 'wrap', gap: '1rem',
             }}>
-                <a href="#interactive" style={{
+                <a href="#" style={{
                     fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
                     color: 'var(--text-muted)', letterSpacing: '0.1em',
                     textDecoration: 'none', transition: 'color 0.3s',
