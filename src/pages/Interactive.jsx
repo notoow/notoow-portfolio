@@ -49,6 +49,7 @@ const SKILLS_DATA = [
         detail: '다방면 촬영 · 드론 운용',
         color: 'var(--tone-warm)',
         reelUrl: '#film',
+        reelLabel: '촬영 포트폴리오',
         ...toSkillVideo(FILM_VIDEOS[0], {}),
     },
     {
@@ -60,6 +61,7 @@ const SKILLS_DATA = [
         detail: '영상편집 · 모션그래픽 · 컬러그레이딩',
         color: 'var(--tone-cool)',
         reelUrl: '#edit',
+        reelLabel: '편집 포트폴리오',
         ...toSkillVideo(EDIT_VIDEOS[0], {}),
     },
     {
@@ -71,6 +73,7 @@ const SKILLS_DATA = [
         detail: 'Blender · 제품 비주얼',
         color: 'var(--tone-vivid)',
         reelUrl: '#3d',
+        reelLabel: '3D 포트폴리오',
         ...toSkillVideo(THREE_D_VIDEOS[0], {}),
     },
     {
@@ -82,6 +85,7 @@ const SKILLS_DATA = [
         detail: 'React · Python · FFmpeg',
         color: 'var(--tone-mint)',
         reelUrl: '#dev',
+        reelLabel: '개발 포트폴리오',
         ...toSkillVideo(DEV_VIDEO, DEV_VIDEO),
     },
 ];
@@ -719,7 +723,7 @@ function SkillSlide({ skill, index, onPlay }) {
                                 onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = `0 8px 25px ${skill.color}40`; }}
                                 onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}
                             >
-                                전체 포트폴리오 →
+                                {skill.reelLabel || `${skill.title} 포트폴리오`} →
                             </a>
                         </div>
                     </motion.div>
