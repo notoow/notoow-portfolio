@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useResponsive } from '../hooks/useResponsive';
 
+const BASE_URL = import.meta.env.BASE_URL;
+const WOOJU_DAESTAR_GIF = `${BASE_URL}images/wooju-daestar.gif?v=20260318`;
+
 const CATEGORY = {
     id: 'dev',
     title: '개발',
@@ -24,8 +27,8 @@ const PROJECTS = [
         title: '우주 대스타 (Cosmic Superstar)',
         type: 'Unity / Kinect v2',
         desc: '고양 스타필드 매직플로우 체험존. Kinect v2의 깊이와 가속도 데이터를 정밀 제어하여 사용자를 실시간 미러링하는 인터랙티브 XR 서비스.',
-        media: '/images/wooju-daestar.gif?v=20260318',
-        popupMedia: '/images/wooju-daestar.gif?v=20260318',
+        media: WOOJU_DAESTAR_GIF,
+        popupMedia: WOOJU_DAESTAR_GIF,
         popupType: 'image',
         color: 'linear-gradient(135deg, #1d2438 0%, #2f3a5d 100%)',
         textColor: '#fff'
