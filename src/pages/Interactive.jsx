@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { CursorGlow } from '../components/Scene3D';
 import { getPortfolioVideosByCategory } from '../data/portfolioVideos';
+import { getYouTubeThumbnailCandidates } from '../lib/youtubeThumbnails';
 
 const FILM_VIDEOS = getPortfolioVideosByCategory('예능');
 const EDIT_VIDEOS = getPortfolioVideosByCategory('디자인');
@@ -132,7 +133,6 @@ const TOOLS = [
 ];
 
 /* ─── YouTube helpers ─── */
-const ytThumb = (id, q = 'maxresdefault') => `https://img.youtube.com/vi/${id}/${q}.jpg`;
 const ytEmbed = (id) => `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&controls=1`;
 
 /* ═══════════════════════════════════════════════════
@@ -595,7 +595,14 @@ function SkillSlide({ skill, index, onPlay }) {
     const imgY = useTransform(scrollYProgress, [0, 1], [-30, 30]);
     const textY = useTransform(scrollYProgress, [0, 0.5, 1], [60, 0, -40]);
     const [imgHov, setImgHov] = useState(false);
+    const [thumbIndex, setThumbIndex] = useState(0);
     const isEven = index % 2 === 0;
+    const thumbnailCandidates = getYouTubeThumbnailCandidates(skill.videoId, skill.thumbnail);
+    const currentThumbnail = thumbnailCandidates[Math.min(thumbIndex, Math.max(thumbnailCandidates.length - 1, 0))] || '';
+
+    useEffect(() => {
+        setThumbIndex(0);
+    }, [skill.videoId, skill.thumbnail]);
 
     return (
         <div ref={ref} style={{
@@ -609,8 +616,10 @@ function SkillSlide({ skill, index, onPlay }) {
                 onMouseLeave={() => setImgHov(false)}
                 onClick={() => skill.videoId && onPlay(skill.videoId)}
             >
-                <motion.img src={skill.thumbnail || ytThumb(skill.videoId)} alt={skill.title} loading="lazy"
-                    onError={(e) => { e.target.src = ytThumb(skill.videoId, 'hqdefault'); }}
+                <motion.img src={currentThumbnail} alt={skill.title} loading="lazy"
+                    onError={() => {
+                        setThumbIndex((current) => Math.min(current + 1, Math.max(thumbnailCandidates.length - 1, 0)));
+                    }}
                     style={{
                         width: '100%', height: '100%', objectFit: 'cover',
                         filter: imgHov ? 'brightness(0.55) saturate(1)' : 'brightness(0.35) saturate(0.7)',
@@ -819,7 +828,14 @@ function HorizontalGallery({ onPlayVideo }) {
 
 function GalleryCard({ work, index, onPlay }) {
     const [hov, setHov] = useState(false);
+    const [thumbIndex, setThumbIndex] = useState(0);
     const cardRef = useRef(null);
+    const thumbnailCandidates = getYouTubeThumbnailCandidates(work.videoId, work.thumbnail);
+    const currentThumbnail = thumbnailCandidates[Math.min(thumbIndex, Math.max(thumbnailCandidates.length - 1, 0))] || '';
+
+    useEffect(() => {
+        setThumbIndex(0);
+    }, [work.videoId, work.thumbnail]);
 
     const handleMouseMove = (e) => {
         if (!cardRef.current) return;
@@ -852,8 +868,10 @@ function GalleryCard({ work, index, onPlay }) {
                 position: 'relative', overflow: 'hidden', borderRadius: '8px',
                 height: 'clamp(280px, 42vw, 420px)', background: 'var(--bg-deep)',
             }}>
-                <img src={work.thumbnail || ytThumb(work.videoId)} alt={work.title} loading="lazy"
-                    onError={(e) => { e.target.src = ytThumb(work.videoId, 'hqdefault'); }}
+                <img src={currentThumbnail} alt={work.title} loading="lazy"
+                    onError={() => {
+                        setThumbIndex((current) => Math.min(current + 1, Math.max(thumbnailCandidates.length - 1, 0)));
+                    }}
                     style={{
                         width: '100%', height: '100%', objectFit: 'cover',
                         transition: 'transform 0.7s var(--ease-expo), filter 0.7s',
@@ -911,7 +929,12 @@ function DevShowcase() {
                     </p>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                    gap: '1.25rem',
+                    alignItems: 'stretch',
+                }}>
                     {DEV_PROJECTS.map((p, i) => (
                         <DevCard key={p.title} project={p} index={i} />
                     ))}
@@ -949,17 +972,21 @@ function DevCard({ project: p, index: i }) {
                 padding: '2rem', borderRadius: '12px',
                 border: '1px solid var(--border)', background: 'var(--bg-card)',
                 position: 'relative', overflow: 'hidden',
-                marginTop: i % 2 === 1 ? '3rem' : 0,
+                minHeight: '270px',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
                 transition: 'transform 0.15s ease-out, border-color 0.3s',
                 transformStyle: 'preserve-3d',
             }}
             onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--border-hover)'}
-            onMouseLeave2={e => e.currentTarget.style.borderColor = 'var(--border)'}
+            onMouseLeaveCapture={e => e.currentTarget.style.borderColor = 'var(--border)'}
         >
             <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '100px', height: '100px', background: `radial-gradient(circle, ${p.accent}10, transparent 65%)`, filter: 'blur(20px)', pointerEvents: 'none' }} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem', position: 'relative' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', marginBottom: '0.8rem', position: 'relative' }}>
                 <h4 style={{ fontSize: '1.1rem', fontWeight: 700 }}>{p.title}</h4>
                 <span style={{
+                    flexShrink: 0,
                     padding: '0.2rem 0.6rem', borderRadius: '100px', fontSize: '0.58rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em',
                     background: p.status === 'Live' ? 'rgba(93,184,168,0.1)' : 'var(--glass)',
                     color: p.status === 'Live' ? 'var(--tone-mint)' : 'var(--text-muted)',
@@ -967,7 +994,7 @@ function DevCard({ project: p, index: i }) {
                 }}>{p.status}</span>
             </div>
             <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.65, marginBottom: '1rem', position: 'relative' }}>{p.desc}</p>
-            <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', position: 'relative' }}>
+            <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', position: 'relative', marginTop: 'auto' }}>
                 {p.tech.map(t => (
                     <span key={t} style={{
                         padding: '0.2rem 0.5rem', borderRadius: '4px',
@@ -976,6 +1003,159 @@ function DevCard({ project: p, index: i }) {
                     }}>{t}</span>
                 ))}
             </div>
+        </motion.div>
+    );
+}
+
+function ContactPopup({ onClose }) {
+    const [copied, setCopied] = useState(false);
+    const email = 'hello@notoow.com';
+
+    useEffect(() => {
+        const onKeyDown = (event) => {
+            if (event.key === 'Escape') onClose();
+        };
+
+        document.addEventListener('keydown', onKeyDown);
+        document.body.style.overflow = 'hidden';
+
+        return () => {
+            document.removeEventListener('keydown', onKeyDown);
+            document.body.style.overflow = '';
+        };
+    }, [onClose]);
+
+    const handleCopy = async () => {
+        try {
+            await navigator.clipboard.writeText(email);
+            setCopied(true);
+            window.setTimeout(() => setCopied(false), 1800);
+        } catch {
+            setCopied(false);
+        }
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={onClose}
+            style={{
+                position: 'fixed',
+                inset: 0,
+                zIndex: 9999,
+                background: 'rgba(0,0,0,0.72)',
+                backdropFilter: 'blur(14px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '1.5rem',
+                cursor: 'default',
+            }}
+        >
+            <motion.div
+                initial={{ opacity: 0, y: 18, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 18, scale: 0.98 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                onClick={(event) => event.stopPropagation()}
+                style={{
+                    width: 'min(100%, 520px)',
+                    borderRadius: '20px',
+                    border: '1px solid var(--border-hover)',
+                    background: 'rgba(12,12,12,0.96)',
+                    boxShadow: '0 30px 90px rgba(0,0,0,0.45)',
+                    padding: '2rem',
+                    textAlign: 'left',
+                }}
+            >
+                <span style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.62rem',
+                    color: 'var(--tone-mint)',
+                    letterSpacing: '0.15em',
+                    display: 'block',
+                    marginBottom: '1rem',
+                }}>CONTACT</span>
+                <h3 style={{
+                    fontFamily: 'var(--font-kr)',
+                    fontSize: '1.8rem',
+                    fontWeight: 800,
+                    letterSpacing: '-0.02em',
+                    marginBottom: '0.8rem',
+                    color: 'var(--text-hero)',
+                }}>
+                    이메일로 연락 주세요.
+                </h3>
+                <p style={{
+                    color: 'var(--text-secondary)',
+                    lineHeight: 1.7,
+                    marginBottom: '1.5rem',
+                }}>
+                    메일 앱을 강제로 열지 않고, 주소만 바로 복사할 수 있게 바꿨습니다.
+                </p>
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '1rem',
+                    padding: '1rem 1.1rem',
+                    borderRadius: '14px',
+                    border: '1px solid var(--border)',
+                    background: 'var(--glass)',
+                    marginBottom: '1.25rem',
+                }}>
+                    <span style={{
+                        fontFamily: 'var(--font-en)',
+                        fontSize: '1rem',
+                        fontWeight: 600,
+                        color: 'var(--text-hero)',
+                        wordBreak: 'break-all',
+                    }}>{email}</span>
+                    <button
+                        type="button"
+                        onClick={handleCopy}
+                        style={{
+                            flexShrink: 0,
+                            padding: '0.75rem 1rem',
+                            borderRadius: '999px',
+                            border: '1px solid rgba(93,184,168,0.25)',
+                            background: copied ? 'rgba(93,184,168,0.14)' : 'rgba(255,255,255,0.04)',
+                            color: copied ? 'var(--tone-mint)' : 'var(--text-hero)',
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: '0.68rem',
+                            letterSpacing: '0.08em',
+                            cursor: 'pointer',
+                        }}
+                    >
+                        {copied ? 'COPIED' : 'COPY EMAIL'}
+                    </button>
+                </div>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                }}>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        style={{
+                            padding: '0.9rem 1.4rem',
+                            borderRadius: '999px',
+                            border: '1px solid var(--border)',
+                            background: 'transparent',
+                            color: 'var(--text-secondary)',
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: '0.68rem',
+                            letterSpacing: '0.08em',
+                            cursor: 'pointer',
+                        }}
+                    >
+                        CLOSE
+                    </button>
+                </div>
+            </motion.div>
         </motion.div>
     );
 }
@@ -1014,39 +1194,53 @@ function ToolCloud() {
    FINAL CTA
    ═══════════════════════════════════════════════════ */
 function FinalCTA({ mousePos }) {
+    const [isContactOpen, setIsContactOpen] = useState(false);
+
     return (
-        <section id="contact" style={{
-            height: '85vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            textAlign: 'center', position: 'relative', overflow: 'hidden', borderTop: '1px solid var(--border)',
-        }}>
-            <div style={{
-                position: 'absolute',
-                left: `${50 + mousePos.x * 10}%`, top: `${50 + mousePos.y * 8}%`,
-                width: '500px', height: '500px',
-                background: 'radial-gradient(circle, var(--accent-glow), transparent 50%)',
-                filter: 'blur(80px)', pointerEvents: 'none', transition: 'left 1.2s, top 1.2s',
-            }} />
-            <div style={{ position: 'relative', zIndex: 2 }}>
-                <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.15em', display: 'block', marginBottom: '1.5rem' }}>NEXT PROJECT</span>
-                    <h2 style={{ fontFamily: 'var(--font-kr)', fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', fontWeight: 800, lineHeight: 1.1, letterSpacing: '-0.03em', marginBottom: '1.5rem' }}>
-                        다음 프로젝트,<br />
-                        <span style={{ background: 'linear-gradient(135deg, var(--accent), #F2A97B)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>함께 만들어볼까요?</span>
-                    </h2>
-                    <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', marginBottom: '3rem' }}>촬영 · 편집 · 3D · 개발 — 어떤 조합이든.</p>
-                    <a href="mailto:hello@notoow.com" style={{
-                        display: 'inline-block', padding: '1rem 3rem', borderRadius: '100px',
-                        background: 'var(--text-hero)', color: 'var(--bg-void)',
-                        fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.05em',
-                        transition: 'all 0.4s var(--ease-expo)',
-                    }}
-                        onMouseEnter={e => { e.target.style.background = 'var(--accent)'; e.target.style.transform = 'scale(1.05)'; e.target.style.boxShadow = '0 12px 40px rgba(224,90,58,0.3)'; }}
-                        onMouseLeave={e => { e.target.style.background = 'var(--text-hero)'; e.target.style.transform = 'scale(1)'; e.target.style.boxShadow = 'none'; }}>
-                        프로젝트 문의하기
-                    </a>
-                </motion.div>
-            </div>
-        </section>
+        <>
+            <section id="contact" style={{
+                height: '85vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                textAlign: 'center', position: 'relative', overflow: 'hidden', borderTop: '1px solid var(--border)',
+            }}>
+                <div style={{
+                    position: 'absolute',
+                    left: `${50 + mousePos.x * 10}%`, top: `${50 + mousePos.y * 8}%`,
+                    width: '500px', height: '500px',
+                    background: 'radial-gradient(circle, var(--accent-glow), transparent 50%)',
+                    filter: 'blur(80px)', pointerEvents: 'none', transition: 'left 1.2s, top 1.2s',
+                }} />
+                <div style={{ position: 'relative', zIndex: 2 }}>
+                    <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.15em', display: 'block', marginBottom: '1.5rem' }}>NEXT PROJECT</span>
+                        <h2 style={{ fontFamily: 'var(--font-kr)', fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', fontWeight: 800, lineHeight: 1.1, letterSpacing: '-0.03em', marginBottom: '1.5rem' }}>
+                            다음 프로젝트,<br />
+                            <span style={{ background: 'linear-gradient(135deg, var(--accent), #F2A97B)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>함께 만들어볼까요?</span>
+                        </h2>
+                        <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', marginBottom: '3rem' }}>촬영 · 편집 · 3D · 개발 — 어떤 조합이든.</p>
+                        <button
+                            type="button"
+                            onClick={() => setIsContactOpen(true)}
+                            style={{
+                                display: 'inline-block', padding: '1rem 3rem', borderRadius: '100px',
+                                background: 'var(--text-hero)', color: 'var(--bg-void)',
+                                fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.05em',
+                                transition: 'all 0.4s var(--ease-expo)',
+                                border: 'none',
+                                cursor: 'pointer',
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.background = 'var(--accent)'; e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = '0 12px 40px rgba(224,90,58,0.3)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = 'var(--text-hero)'; e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}
+                        >
+                            프로젝트 문의하기
+                        </button>
+                    </motion.div>
+                </div>
+            </section>
+
+            <AnimatePresence>
+                {isContactOpen && <ContactPopup onClose={() => setIsContactOpen(false)} />}
+            </AnimatePresence>
+        </>
     );
 }
 

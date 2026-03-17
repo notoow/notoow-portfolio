@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getYouTubeThumbnailCandidates } from '../lib/youtubeThumbnails';
 
 /* ─── YouTube helpers ─── */
-const ytThumb = (id, q = 'maxresdefault') => `https://img.youtube.com/vi/${id}/${q}.jpg`;
 const ytEmbed = (id) => `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&controls=1`;
 
 /* ═══════════════════════════════════════════════════
@@ -71,10 +71,16 @@ function VideoLightbox({ videoId, title, onClose }) {
    ═══════════════════════════════════════════════════ */
 function VideoCard({ item, index, onPlay }) {
     const [hov, setHov] = useState(false);
-    const [imgError, setImgError] = useState(false);
+    const [thumbIndex, setThumbIndex] = useState(0);
     const hasVideoId = Boolean(item.videoId);
     const hasExternalUrl = Boolean(item.url);
     const isClickable = hasVideoId || hasExternalUrl;
+    const thumbnailCandidates = getYouTubeThumbnailCandidates(item.videoId, item.thumbnail);
+    const currentThumbnail = thumbnailCandidates[Math.min(thumbIndex, Math.max(thumbnailCandidates.length - 1, 0))] || '';
+
+    useEffect(() => {
+        setThumbIndex(0);
+    }, [item.videoId, item.thumbnail]);
 
     // Staggered heights for masonry feel
     const heights = ['340px', '280px', '360px', '300px', '320px', '290px'];
@@ -109,12 +115,12 @@ function VideoCard({ item, index, onPlay }) {
             {/* Thumbnail */}
             {(hasVideoId || item.thumbnail) ? (
                 <img
-                    src={imgError && hasVideoId
-                        ? ytThumb(item.videoId, 'hqdefault')
-                        : (item.thumbnail || ytThumb(item.videoId))}
+                    src={currentThumbnail}
                     alt={item.title}
                     loading="lazy"
-                    onError={() => setImgError(true)}
+                    onError={() => {
+                        setThumbIndex((current) => Math.min(current + 1, Math.max(thumbnailCandidates.length - 1, 0)));
+                    }}
                     style={{
                         width: '100%', height: '100%', objectFit: 'cover',
                         transition: 'transform 0.7s var(--ease-expo), filter 0.5s',

@@ -1,3 +1,5 @@
+import { normalizeYouTubeThumbnail } from '../lib/youtubeThumbnails';
+
 export const portfolioVideoMode = 'manual';
 
 const portfolioVideos = {
@@ -163,20 +165,8 @@ function extractVideoId(input) {
     return '';
 }
 
-function buildYouTubeThumbnail(videoId, quality = 'maxresdefault') {
-    return videoId ? `https://img.youtube.com/vi/${videoId}/${quality}.jpg` : '';
-}
-
 function resolveThumbnail(thumbnail, videoId) {
-    const value = String(thumbnail || '').trim();
-    if (!videoId) return value;
-
-    // Replace imported medium-quality thumbnails with higher-resolution YouTube sources.
-    if (!value || /\/(?:mqdefault|default)\.jpg/i.test(value)) {
-        return buildYouTubeThumbnail(videoId);
-    }
-
-    return value;
+    return normalizeYouTubeThumbnail(thumbnail, videoId);
 }
 
 export function getPortfolioVideosByCategory(categoryTag) {

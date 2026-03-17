@@ -68,6 +68,7 @@ export async function fetchChannelVideos({ channelId, apiKey, maxResults = 24 })
             const title = item?.snippet?.title || 'Untitled';
             const thumb =
                 item?.snippet?.thumbnails?.maxres?.url ||
+                item?.snippet?.thumbnails?.standard?.url ||
                 item?.snippet?.thumbnails?.high?.url ||
                 item?.snippet?.thumbnails?.medium?.url ||
                 item?.snippet?.thumbnails?.default?.url;
