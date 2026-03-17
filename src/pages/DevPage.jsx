@@ -24,7 +24,7 @@ const PROJECTS = [
         type: 'Unity / Kinect v2',
         desc: '고양 스타필드 매직플로우 체험존. Kinect v2의 깊이와 가속도 데이터를 정밀 제어하여 사용자를 실시간 미러링하는 인터랙티브 XR 서비스.',
         url: 'https://www.youtube.com/channel/UC98TOZLprK48X1rQeA5x9FA',
-        media: '/images/wooju-daestar.gif',
+        media: '/images/wooju-daestar.gif?v=20260318',
         color: 'linear-gradient(135deg, #1d2438 0%, #2f3a5d 100%)',
         textColor: '#fff'
     },
