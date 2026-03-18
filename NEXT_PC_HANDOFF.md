@@ -90,6 +90,7 @@ npm run deploy
 - `scripts/studio-browser-export.js`: YouTube Studio export
 - `scripts/studio-import.mjs`: export JSON import
 - `scripts/export_case_study_slides.ps1`: 로컬 PPT를 슬라이드 이미지로 export
+- `scripts/videos-*.mjs`: 레거시 Supabase 관리 스크립트
 
 ## Dev Case Study
 
@@ -166,6 +167,7 @@ node scripts/studio-import.mjs "C:\path\to\studio-videos.json"
 - 문의 이메일: `tan0123@naver.com`
 - 첫 진입에서 Three/Drei가 메인 번들에 직접 실리지 않도록 정리됨
 - 공개 앱에는 `#admin-videos` 라우트가 더 이상 연결되지 않음
+- `src/pages/VideoAdminPage.jsx` 는 제거되어 공개 프론트 코드와 분리됨
 - 개발 페이지 `우주 대스타`는 현재 YouTube 영상 모달 사용
 - `고양시지속가능발전협의회 홍보영상` 썸네일은 고정 `hqdefault` 로 설정됨
 - `#home`, `#portfolio`, `#film`, `#edit`, `#3d`, `#dev` 모바일 반응형 1차 정리 완료

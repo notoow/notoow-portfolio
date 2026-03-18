@@ -46,11 +46,12 @@ npm run deploy
 - `3D`
 - `예능`
 
-편집 페이지는 `디자인` 카테고리 안에서 다시 3개 섹션으로 나뉩니다:
+편집 페이지는 `디자인` 카테고리 안에서 다시 4개 섹션으로 나뉩니다:
 
 - `section: 'edit'`
 - `section: 'motion'`
 - `section: 'design'`
+- `section: 'ai'`
 
 예시:
 
@@ -140,6 +141,11 @@ Copy-Item .env.example .env
 - YouTube API fallback
 - Supabase 기반 영상 목록 조회
 - Supabase CLI 쓰기 스크립트
+
+참고:
+
+- 공개 배포본에는 관리자 페이지 라우트가 연결되어 있지 않습니다
+- Supabase 관련 항목은 레거시 fallback / CLI 관리 용도로만 남아 있습니다
 
 ## 레거시 Supabase / YouTube 스크립트
 
