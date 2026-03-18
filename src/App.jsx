@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import PageLoader from './components/PageLoader';
 import './App.css';
 
-const ENABLE_ADMIN_PAGE = import.meta.env.DEV || import.meta.env.VITE_ENABLE_ADMIN_PAGE === 'true';
 const Minimalist = lazy(() => import('./pages/Minimalist'));
 const Interactive = lazy(() => import('./pages/Interactive'));
 const CyberTerminal = lazy(() => import('./pages/CyberTerminal'));
@@ -12,7 +11,6 @@ const FilmPage = lazy(() => import('./pages/FilmPage'));
 const EditPage = lazy(() => import('./pages/EditPage'));
 const ThreeDPage = lazy(() => import('./pages/ThreeDPage'));
 const DevPage = lazy(() => import('./pages/DevPage'));
-const VideoAdminPage = lazy(() => import('./pages/VideoAdminPage'));
 
 function getPageFromHash() {
   const hash = window.location.hash.replace('#', '');
@@ -23,7 +21,6 @@ function getPageFromHash() {
   if (hash === '/edit' || hash === 'edit') return 'edit';
   if (hash === '/3d' || hash === '3d') return '3d';
   if (hash === '/dev' || hash === 'dev') return 'dev';
-  if (ENABLE_ADMIN_PAGE && (hash === '/admin-videos' || hash === 'admin-videos')) return 'admin-videos';
   return 'home';
 }
 
@@ -54,7 +51,6 @@ function App() {
     if (page === 'edit') return EditPage;
     if (page === '3d') return ThreeDPage;
     if (page === 'dev') return DevPage;
-    if (ENABLE_ADMIN_PAGE && page === 'admin-videos') return VideoAdminPage;
     return Home;
   })();
 

@@ -11,6 +11,8 @@
 - 메인 홈 카드 hover 떨림 완화
 - 커서 꼬리 이펙트 제거, 단일 glow만 유지
 - 미사용 보관용 3D 파일 정리
+- 공개 앱에서 관리자 라우트 제거
+- 수동 영상 모드일 때 Supabase / YouTube 모듈은 지연 로드로만 접근
 - 첫 진입 번들 최적화:
   홈 텍스트 먼저 렌더 -> 3D HeroScene은 첫 페인트 직후 별도 preload/lazy mount
   나머지 상세/포트폴리오/개발 페이지도 route-level lazy load
@@ -163,6 +165,7 @@ node scripts/studio-import.mjs "C:\path\to\studio-videos.json"
 - 연락 버튼은 메일 앱이 아니라 사이트 내부 팝업 사용
 - 문의 이메일: `tan0123@naver.com`
 - 첫 진입에서 Three/Drei가 메인 번들에 직접 실리지 않도록 정리됨
+- 공개 앱에는 `#admin-videos` 라우트가 더 이상 연결되지 않음
 - 개발 페이지 `우주 대스타`는 현재 YouTube 영상 모달 사용
 - `고양시지속가능발전협의회 홍보영상` 썸네일은 고정 `hqdefault` 로 설정됨
 - `#home`, `#portfolio`, `#film`, `#edit`, `#3d`, `#dev` 모바일 반응형 1차 정리 완료

@@ -1,12 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-    DEFAULT_CHANNEL_ID,
-    DEFAULT_CHANNEL_URL,
-    fetchChannelVideos,
-    filterVideosByCategoryTag,
-} from '../lib/youtube';
 import { getPortfolioVideosByCategory, portfolioVideoMode } from '../data/portfolioVideos';
-import { hasSupabaseConfig, supabase } from '../lib/supabase';
+
+const DEFAULT_CHANNEL_ID = 'UC98TOZLprK48X1rQeA5x9FA';
+const DEFAULT_CHANNEL_URL = `https://www.youtube.com/channel/${DEFAULT_CHANNEL_ID}`;
 
 function mapSupabaseVideo(row) {
     const videoId = row.video_id || '';
@@ -56,6 +52,8 @@ export function useYouTubeCategoryVideos(categoryTag, maxResults = 24) {
             let supabaseError = '';
 
             try {
+                const { hasSupabaseConfig, supabase } = await import('../lib/supabase');
+
                 if (hasSupabaseConfig && supabase) {
                     const { data, error: dbError } = await supabase
                         .from('portfolio_videos')
@@ -80,6 +78,7 @@ export function useYouTubeCategoryVideos(categoryTag, maxResults = 24) {
                     return;
                 }
 
+                const { fetchChannelVideos, filterVideosByCategoryTag } = await import('../lib/youtube');
                 const allVideos = await fetchChannelVideos({ channelId, apiKey, maxResults });
                 if (!alive) return;
                 setVideos(filterVideosByCategoryTag(allVideos, categoryTag));
