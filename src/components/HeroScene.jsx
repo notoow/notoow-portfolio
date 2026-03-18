@@ -216,7 +216,9 @@ function FloatingModels({ pointerRef }) {
     const camera = useGLTF(assetUrl('canon_at-2_retro_camera.glb'));
     const vhs = useGLTF(assetUrl('vhs_tape.glb'));
     const mic = useGLTF(assetUrl('microphone_gxl_066_bafhcteks.glb'));
+    const light = useGLTF(assetUrl('studio_umbrella_light.glb'));
     const drone = useGLTF(assetUrl('dji_3_mini_pro.glb'));
+    const printer = useGLTF(assetUrl('3d_printer.glb'));
 
     const scaleFactor = isMobileViewport ? 0.7 : 1;
     const groupRef = useRef(null);
@@ -299,12 +301,30 @@ function FloatingModels({ pointerRef }) {
                 />
             </Float>
 
+            <Float speed={0.9} rotationIntensity={0.18} floatIntensity={0.4}>
+                <primitive
+                    object={light.scene}
+                    scale={0.0046 * scaleFactor}
+                    position={[-22, -1.2, -17]}
+                    rotation={[0.45, 1.5, 0]}
+                />
+            </Float>
+
             <Float speed={1.5} rotationIntensity={0.8} floatIntensity={1.5}>
                 <primitive
                     object={drone.scene}
                     scale={3 * scaleFactor}
                     position={[-5, 1.5, -2]}
                     rotation={[0.2, 0.5, 0.1]}
+                />
+            </Float>
+
+            <Float speed={0.75} rotationIntensity={0.25} floatIntensity={0.45}>
+                <primitive
+                    object={printer.scene}
+                    scale={0.015 * scaleFactor}
+                    position={[8.5, -4.1, -3.4]}
+                    rotation={[0.1, -0.5, 0]}
                 />
             </Float>
         </group>
@@ -315,7 +335,9 @@ useGLTF.preload(assetUrl('macbook_pro_m3_16_inch_2024.glb'));
 useGLTF.preload(assetUrl('canon_at-2_retro_camera.glb'));
 useGLTF.preload(assetUrl('vhs_tape.glb'));
 useGLTF.preload(assetUrl('microphone_gxl_066_bafhcteks.glb'));
+useGLTF.preload(assetUrl('studio_umbrella_light.glb'));
 useGLTF.preload(assetUrl('dji_3_mini_pro.glb'));
+useGLTF.preload(assetUrl('3d_printer.glb'));
 
 function ParticleField({ count = 800 }) {
     const mesh = useRef();
