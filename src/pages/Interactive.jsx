@@ -1097,18 +1097,11 @@ function ContactPopup({ onClose }) {
                     fontSize: '1.8rem',
                     fontWeight: 800,
                     letterSpacing: '-0.02em',
-                    marginBottom: '0.8rem',
+                    marginBottom: '1.5rem',
                     color: 'var(--text-hero)',
                 }}>
                     이메일로 연락 주세요.
                 </h3>
-                <p style={{
-                    color: 'var(--text-secondary)',
-                    lineHeight: 1.7,
-                    marginBottom: '1.5rem',
-                }}>
-                    메일 앱을 강제로 열지 않고, 주소만 바로 복사할 수 있게 바꿨습니다.
-                </p>
                 <div style={{
                     display: 'flex',
                     alignItems: isMobile ? 'flex-start' : 'center',
