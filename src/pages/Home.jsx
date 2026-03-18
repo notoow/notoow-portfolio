@@ -1,9 +1,10 @@
-import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
+import React, { Suspense, lazy, startTransition, useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import CursorGlow from '../components/CursorGlow';
 import { useResponsive } from '../hooks/useResponsive';
 
-const LazyHeroScene = lazy(() => import('../components/HeroScene'));
+const loadHeroScene = () => import('../components/HeroScene');
+const LazyHeroScene = lazy(loadHeroScene);
 
 /* ═══════════════════════════════════════════
    HOME — Cinematic 3D Landing
@@ -12,17 +13,30 @@ const LazyHeroScene = lazy(() => import('../components/HeroScene'));
 export default function Home() {
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const [shouldRenderScene, setShouldRenderScene] = useState(false);
+    const [sceneReady, setSceneReady] = useState(false);
     const { isMobile } = useResponsive();
+    const mouseFrameRef = useRef(0);
+    const latestMouseRef = useRef({ x: 0, y: 0 });
 
     useEffect(() => {
         const handler = (e) => {
-            setMousePos({
+            latestMouseRef.current = {
                 x: (e.clientX / window.innerWidth - 0.5) * 2,
                 y: (e.clientY / window.innerHeight - 0.5) * 2,
+            };
+
+            if (mouseFrameRef.current) return;
+
+            mouseFrameRef.current = window.requestAnimationFrame(() => {
+                mouseFrameRef.current = 0;
+                setMousePos(latestMouseRef.current);
             });
         };
         window.addEventListener('mousemove', handler);
-        return () => window.removeEventListener('mousemove', handler);
+        return () => {
+            window.removeEventListener('mousemove', handler);
+            window.cancelAnimationFrame(mouseFrameRef.current);
+        };
     }, []);
 
     useEffect(() => {
@@ -46,26 +60,19 @@ export default function Home() {
     useEffect(() => {
         let frameId = 0;
         let timeoutId = 0;
-        let idleId = 0;
 
-        const enableScene = () => {
-            frameId = window.requestAnimationFrame(() => {
-                setShouldRenderScene(true);
-            });
-        };
-
-        if (typeof window.requestIdleCallback === 'function') {
-            idleId = window.requestIdleCallback(enableScene, { timeout: 900 });
-        } else {
-            timeoutId = window.setTimeout(enableScene, 120);
-        }
+        frameId = window.requestAnimationFrame(() => {
+            void loadHeroScene();
+            timeoutId = window.setTimeout(() => {
+                startTransition(() => {
+                    setShouldRenderScene(true);
+                });
+            }, 120);
+        });
 
         return () => {
             window.cancelAnimationFrame(frameId);
             window.clearTimeout(timeoutId);
-            if (typeof window.cancelIdleCallback === 'function') {
-                window.cancelIdleCallback(idleId);
-            }
         };
     }, []);
 
@@ -75,7 +82,13 @@ export default function Home() {
             minHeight: '100vh', overflow: 'hidden', cursor: 'auto',
         }}>
             <CursorGlow />
-            <CinematicHero mousePos={mousePos} isMobile={isMobile} shouldRenderScene={shouldRenderScene} />
+            <CinematicHero
+                mousePos={mousePos}
+                isMobile={isMobile}
+                shouldRenderScene={shouldRenderScene}
+                sceneReady={sceneReady}
+                onSceneReady={() => setSceneReady(true)}
+            />
             <RollingStrip />
             <BentoPreview />
             <MinimalFooter />
@@ -84,7 +97,7 @@ export default function Home() {
 }
 
 /* ─── CINEMATIC 3D HERO ─── */
-function CinematicHero({ mousePos, isMobile, shouldRenderScene }) {
+function CinematicHero({ mousePos, isMobile, shouldRenderScene, sceneReady, onSceneReady }) {
     const [time, setTime] = useState('');
     const containerRef = useRef(null);
     const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end start'] });
@@ -109,9 +122,21 @@ function CinematicHero({ mousePos, isMobile, shouldRenderScene }) {
             {/* 3D Scene (behind everything) */}
             {shouldRenderScene && (
                 <Suspense fallback={null}>
-                    <LazyHeroScene mousePos={mousePos} />
+                    <LazyHeroScene mousePos={mousePos} onReady={onSceneReady} />
                 </Suspense>
             )}
+
+            <div
+                style={{
+                    position: 'absolute',
+                    inset: 0,
+                    zIndex: 1,
+                    pointerEvents: 'none',
+                    background: 'radial-gradient(circle at 50% 45%, rgba(224,90,58,0.16), transparent 34%), radial-gradient(circle at 62% 54%, rgba(93,184,168,0.10), transparent 30%)',
+                    opacity: sceneReady ? 0 : 1,
+                    transition: 'opacity 0.8s var(--ease-expo)',
+                }}
+            />
 
             {/* Noise grain */}
             <div style={{

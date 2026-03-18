@@ -11,8 +11,13 @@
 - 메인 홈 카드 hover 떨림 완화
 - 커서 꼬리 이펙트 제거, 단일 glow만 유지
 - 첫 진입 번들 최적화:
-  홈 텍스트 먼저 렌더 -> 3D HeroScene은 idle 시점 lazy load
+  홈 텍스트 먼저 렌더 -> 3D HeroScene은 첫 페인트 직후 별도 preload/lazy mount
   나머지 상세/포트폴리오/개발 페이지도 route-level lazy load
+- 홈 HeroScene 로딩 체감 개선:
+  3D 청크는 첫 페인트 직후 미리 fetch 시작
+  실제 Canvas는 준비 완료 후 페이드인
+  placeholder gradient로 빈 장면 노출 방지
+  particle / DPR도 살짝 낮춰 버벅임 완화
 - `우주 대스타` GIF 제거 후 실제 YouTube 영상 모달로 교체
 - Dev 페이지 `클로드코드로 생산성 10배 올리기`를 긴 구글슬라이드 iframe 대신
   `영상 + 한 장씩 넘기는 슬라이드 덱` 구조로 개선

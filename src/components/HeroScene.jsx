@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Environment, Float, MeshDistortMaterial, Preload, useGLTF } from '@react-three/drei';
+import { Environment, Float, MeshDistortMaterial, useGLTF } from '@react-three/drei';
 import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing';
 import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
@@ -8,7 +8,14 @@ import * as THREE from 'three';
 const isMobileViewport = typeof window !== 'undefined' && window.innerWidth < 768;
 const assetUrl = (path) => `${import.meta.env.BASE_URL}${path}`;
 
-export default function HeroScene({ mousePos }) {
+export default function HeroScene({ mousePos, onReady }) {
+    const [isVisible, setIsVisible] = useState(false);
+
+    const handleReady = () => {
+        setIsVisible(true);
+        onReady?.();
+    };
+
     return (
         <div
             style={{
@@ -16,11 +23,13 @@ export default function HeroScene({ mousePos }) {
                 inset: 0,
                 zIndex: 1,
                 pointerEvents: 'none',
+                opacity: isVisible ? 1 : 0,
+                transition: 'opacity 0.9s var(--ease-expo)',
             }}
         >
             <Canvas
                 camera={{ position: [0, 0, 8], fov: 45 }}
-                dpr={isMobileViewport ? [1, 2] : [1, 1.5]}
+                dpr={isMobileViewport ? [1, 1.3] : [1, 1.2]}
                 gl={{ antialias: isMobileViewport, alpha: true, powerPreference: 'high-performance' }}
                 style={{ background: 'transparent' }}
             >
@@ -30,13 +39,8 @@ export default function HeroScene({ mousePos }) {
                 <pointLight position={[3, -2, 3]} intensity={2} color="#5DB8A8" distance={10} />
 
                 <Suspense fallback={null}>
-                    {isMobileViewport ? <GyroTracker /> : <MouseTracker mousePos={mousePos} />}
-                    <FloatingModels />
-                    <Environment preset="city" />
-                    <Preload all />
+                    <SceneContent mousePos={mousePos} onReady={handleReady} />
                 </Suspense>
-
-                <ParticleField count={isMobileViewport ? 300 : 800} />
 
                 <EffectComposer enabled={!isMobileViewport}>
                     <Bloom
@@ -55,6 +59,25 @@ export default function HeroScene({ mousePos }) {
 
             <MotionRequest />
         </div>
+    );
+}
+
+function SceneContent({ mousePos, onReady }) {
+    const didReportReady = useRef(false);
+
+    useEffect(() => {
+        if (didReportReady.current) return;
+        didReportReady.current = true;
+        onReady?.();
+    }, [onReady]);
+
+    return (
+        <>
+            {isMobileViewport ? <GyroTracker /> : <MouseTracker mousePos={mousePos} />}
+            <FloatingModels />
+            <Environment preset="city" />
+            <ParticleField count={isMobileViewport ? 180 : 420} />
+        </>
     );
 }
 
