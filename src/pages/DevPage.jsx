@@ -31,7 +31,7 @@ const CATEGORY = {
 const PROJECTS = [
     {
         title: '클로드코드로 생산성 10배 올리기',
-        type: '전자책 / Dev Workflow',
+        type: '전자책/ Dev Workflow',
         desc: 'Claude Code를 활용해 영상 제작과 개발 워크플로우를 자동화하고, 실제 작업 생산성을 끌어올린 과정을 정리한 콘텐츠.',
         media: `https://i.ytimg.com/vi/${CLAUDE_CODE_VIDEO_ID}/hqdefault.jpg`,
         popupType: 'case-study',
