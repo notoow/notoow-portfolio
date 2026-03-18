@@ -6,6 +6,20 @@ import * as THREE from 'three';
 
 const isMobileViewport = typeof window !== 'undefined' && window.innerWidth < 768;
 const assetUrl = (path) => `${import.meta.env.BASE_URL}${path}`;
+const getScreenAngle = () => {
+    if (typeof window === 'undefined') return 0;
+    if (typeof window.screen?.orientation?.angle === 'number') return window.screen.orientation.angle;
+    if (typeof window.orientation === 'number') return window.orientation;
+    return 0;
+};
+const shortestAngleDelta = (current, initial) => {
+    let delta = current - initial;
+
+    while (delta > 180) delta -= 360;
+    while (delta < -180) delta += 360;
+
+    return delta;
+};
 
 const HeroScene = React.memo(function HeroScene({ onReady }) {
     const [isVisible, setIsVisible] = useState(false);
@@ -176,35 +190,62 @@ function MouseTracker({ pointerRef }) {
 function GyroTracker() {
     const { camera } = useThree();
     const target = useRef({ x: 0, y: 0 });
-    const initial = useRef(null);
+    const smoothed = useRef({ x: 0, y: 0 });
+    const baseline = useRef(null);
+    const screenAngle = useRef(getScreenAngle());
 
     useEffect(() => {
+        const resetBaseline = () => {
+            baseline.current = null;
+        };
+
         const handleOrientation = (event) => {
             if (event.gamma === null || event.beta === null) return;
 
-            if (!initial.current) {
-                initial.current = { gamma: event.gamma, beta: event.beta };
+            const angle = getScreenAngle();
+            if (!baseline.current || angle !== screenAngle.current) {
+                baseline.current = { gamma: event.gamma, beta: event.beta };
+                screenAngle.current = angle;
+                target.current.x = 0;
+                target.current.y = 0;
+                smoothed.current.x = 0;
+                smoothed.current.y = 0;
+                return;
             }
 
-            const deltaGamma = event.gamma - initial.current.gamma;
-            const deltaBeta = event.beta - initial.current.beta;
+            const deltaGamma = shortestAngleDelta(event.gamma, baseline.current.gamma);
+            const deltaBeta = shortestAngleDelta(event.beta, baseline.current.beta);
 
-            const y = THREE.MathUtils.clamp(deltaGamma, -45, 45);
-            const x = THREE.MathUtils.clamp(deltaBeta, -45, 45);
+            const y = THREE.MathUtils.clamp(deltaGamma, -30, 30);
+            const x = THREE.MathUtils.clamp(deltaBeta, -26, 26);
 
-            target.current.y = (y / 45) * 0.3;
-            target.current.x = (x / 45) * 0.3;
+            target.current.y = (y / 30) * 0.2;
+            target.current.x = (x / 26) * 0.16;
         };
 
         window.addEventListener('deviceorientation', handleOrientation);
-        return () => window.removeEventListener('deviceorientation', handleOrientation);
+        window.addEventListener('orientationchange', resetBaseline);
+        window.addEventListener('blur', resetBaseline);
+        document.addEventListener('visibilitychange', resetBaseline);
+
+        return () => {
+            window.removeEventListener('deviceorientation', handleOrientation);
+            window.removeEventListener('orientationchange', resetBaseline);
+            window.removeEventListener('blur', resetBaseline);
+            document.removeEventListener('visibilitychange', resetBaseline);
+        };
     }, []);
 
     useFrame(() => {
+        smoothed.current.x = THREE.MathUtils.lerp(smoothed.current.x, target.current.x, 0.12);
+        smoothed.current.y = THREE.MathUtils.lerp(smoothed.current.y, target.current.y, 0.12);
+
         // React Three Fiber cameras are imperative scene objects.
         /* eslint-disable react-hooks/immutability */
-        camera.rotation.x += (target.current.x - camera.rotation.x) * 0.05;
-        camera.rotation.y += (target.current.y - camera.rotation.y) * 0.05;
+        camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, smoothed.current.x, 0.12);
+        camera.rotation.y = THREE.MathUtils.lerp(camera.rotation.y, smoothed.current.y, 0.12);
+        camera.position.x = THREE.MathUtils.lerp(camera.position.x, smoothed.current.y * 0.45, 0.08);
+        camera.position.y = THREE.MathUtils.lerp(camera.position.y, smoothed.current.x * 0.32, 0.08);
         /* eslint-enable react-hooks/immutability */
     });
 
