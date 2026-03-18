@@ -43,7 +43,7 @@ export default function Home() {
     return (
         <div id="home" style={{
             background: 'var(--bg-void)', color: 'var(--text-hero)',
-            minHeight: '100vh', overflow: 'hidden', cursor: isMobile ? 'auto' : 'none',
+            minHeight: '100vh', overflow: 'hidden', cursor: 'auto',
         }}>
             <CursorGlow />
             <CinematicHero mousePos={mousePos} isMobile={isMobile} />
@@ -116,7 +116,7 @@ function CinematicHero({ mousePos, isMobile }) {
                             padding: '0.5rem 1.2rem', borderRadius: '100px',
                             fontWeight: 600, letterSpacing: '0.06em',
                             transition: 'all 0.3s var(--ease-expo)',
-                            cursor: isMobile ? 'pointer' : 'none',
+                            cursor: 'pointer',
                         }}
                             onMouseEnter={e => {
                                 e.currentTarget.style.background = 'var(--accent)';
@@ -320,7 +320,7 @@ function TiltCard({ item, index, isMobile }) {
                 justifyContent: 'space-between',
                 position: 'relative', overflow: 'hidden',
                 transition: 'border-color 0.4s, box-shadow 0.4s, transform 0.3s var(--ease-expo)',
-                cursor: isMobile ? 'pointer' : 'none',
+                cursor: 'pointer',
                 transform: hov ? 'translateY(-4px)' : 'translateY(0)',
                 boxShadow: hov ? `0 20px 60px ${item.accent}10` : 'none',
                 wordBreak: 'keep-all',

@@ -197,7 +197,6 @@ function VideoLightbox({ videoId, onClose }) {
    MAIN
    ═══════════════════════════════════════════════════ */
 export default function Interactive() {
-    const { isMobile } = useResponsive();
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const [lightboxVideo, setLightboxVideo] = useState(null);
 
@@ -216,7 +215,7 @@ export default function Interactive() {
     return (
         <div style={{
             background: 'var(--bg-void)', color: 'var(--text-primary)',
-            fontFamily: 'var(--font-kr)', overflowX: 'hidden', cursor: isMobile ? 'auto' : 'none',
+            fontFamily: 'var(--font-kr)', overflowX: 'hidden', cursor: 'auto',
         }}>
             <CursorGlow />
             <FloatingNav />
