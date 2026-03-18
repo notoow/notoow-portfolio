@@ -21,14 +21,58 @@ const shortestAngleDelta = (current, initial) => {
 };
 const MOTION_PERMISSION_STORAGE_KEY = 'notoow-hero-motion-enabled';
 
+function getHeroProfile(isMobileViewport) {
+    if (typeof window === 'undefined') {
+        return {
+            useGyro: isMobileViewport,
+            bloomEnabled: !isMobileViewport,
+            dpr: isMobileViewport ? [1, 1] : [1, 1.05],
+            environmentResolution: isMobileViewport ? 40 : 64,
+            particleCount: isMobileViewport ? 90 : 220,
+            canvasMode: isMobileViewport ? 'mobile' : 'desktop',
+        };
+    }
+
+    const coarsePointer = window.matchMedia?.('(pointer: coarse)')?.matches ?? isMobileViewport;
+    const touchPoints = navigator.maxTouchPoints || 0;
+    const deviceMemory = navigator.deviceMemory ?? 4;
+    const hardwareConcurrency = navigator.hardwareConcurrency ?? 6;
+    const looksLikePhoneHardware = coarsePointer || touchPoints > 0;
+    const shouldReduceEffects = looksLikePhoneHardware || deviceMemory <= 4 || hardwareConcurrency <= 6;
+
+    return {
+        useGyro: looksLikePhoneHardware,
+        bloomEnabled: !shouldReduceEffects,
+        dpr: shouldReduceEffects ? [1, 1] : [1, 1.05],
+        environmentResolution: shouldReduceEffects ? 40 : 64,
+        particleCount: shouldReduceEffects ? 90 : 220,
+        canvasMode: shouldReduceEffects ? 'reduced' : 'desktop',
+    };
+}
+
 const HeroScene = React.memo(function HeroScene({ isMobile = false, onReady }) {
     const [isVisible, setIsVisible] = useState(false);
-    const viewportMode = isMobile ? 'mobile' : 'desktop';
+    const [profile, setProfile] = useState(() => getHeroProfile(isMobile));
 
     const handleReady = () => {
         setIsVisible(true);
         onReady?.();
     };
+
+    useEffect(() => {
+        const updateProfile = () => {
+            setProfile(getHeroProfile(isMobile));
+        };
+
+        updateProfile();
+        window.addEventListener('resize', updateProfile);
+        window.addEventListener('orientationchange', updateProfile);
+
+        return () => {
+            window.removeEventListener('resize', updateProfile);
+            window.removeEventListener('orientationchange', updateProfile);
+        };
+    }, [isMobile]);
 
     useEffect(() => {
         if (typeof THREE.setConsoleFunction !== 'function') {
@@ -70,9 +114,9 @@ const HeroScene = React.memo(function HeroScene({ isMobile = false, onReady }) {
             }}
         >
             <Canvas
-                key={viewportMode}
+                key={profile.canvasMode}
                 camera={{ position: [0, 0, 8], fov: 45 }}
-                dpr={isMobile ? [1, 1] : [1, 1.05]}
+                dpr={profile.dpr}
                 gl={{ antialias: false, alpha: true, powerPreference: 'high-performance' }}
                 performance={{ min: 0.8 }}
                 style={{ background: 'transparent' }}
@@ -83,10 +127,10 @@ const HeroScene = React.memo(function HeroScene({ isMobile = false, onReady }) {
                 <pointLight position={[3, -2, 3]} intensity={2} color="#5DB8A8" distance={10} />
 
                 <Suspense fallback={null}>
-                    <SceneContent isMobile={isMobile} onReady={handleReady} />
+                    <SceneContent profile={profile} onReady={handleReady} />
                 </Suspense>
 
-                <EffectComposer enabled={!isMobile}>
+                <EffectComposer enabled={profile.bloomEnabled}>
                     <Bloom
                         intensity={0.28}
                         luminanceThreshold={0.72}
@@ -95,14 +139,14 @@ const HeroScene = React.memo(function HeroScene({ isMobile = false, onReady }) {
                 </EffectComposer>
             </Canvas>
 
-            <MotionRequest isMobile={isMobile} />
+            <MotionRequest isMobile={profile.useGyro} />
         </div>
     );
 });
 
 export default HeroScene;
 
-function SceneContent({ isMobile, onReady }) {
+function SceneContent({ profile, onReady }) {
     const didReportReady = useRef(false);
     const pointerRef = useRef({ x: 0, y: 0 });
 
@@ -115,10 +159,10 @@ function SceneContent({ isMobile, onReady }) {
 
     return (
         <>
-            {isMobile ? <GyroTracker /> : <MouseTracker pointerRef={pointerRef} />}
-            <FloatingModels isMobile={isMobile} pointerRef={pointerRef} />
-            <Environment preset="city" resolution={64} />
-            <ParticleField count={isMobile ? 90 : 220} />
+            {profile.useGyro ? <GyroTracker /> : <MouseTracker pointerRef={pointerRef} />}
+            <FloatingModels isMobile={profile.useGyro} pointerRef={pointerRef} />
+            <Environment preset="city" resolution={profile.environmentResolution} />
+            <ParticleField count={profile.particleCount} />
         </>
     );
 }
