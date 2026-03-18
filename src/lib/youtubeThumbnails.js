@@ -17,7 +17,8 @@ export function normalizeYouTubeThumbnail(src, videoId) {
     if (/ytimg\.com\/vi\/|img\.youtube\.com\/vi\//i.test(value)) {
         const currentIdMatch = value.match(/\/vi\/([^/]+)\//i);
         if (!currentIdMatch?.[1] || currentIdMatch[1] === id) {
-            return value;
+            const qualityMatch = value.match(/\/(maxresdefault|sddefault|hqdefault|mqdefault|default)\.(?:jpg|webp)/i);
+            return getYouTubeThumbnailUrl(id, qualityMatch?.[1] || 'maxresdefault');
         }
 
         const qualityMatch = value.match(/\/(maxresdefault|sddefault|hqdefault|mqdefault|default)\.(?:jpg|webp)/i);
