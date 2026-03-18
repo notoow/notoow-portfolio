@@ -40,7 +40,7 @@ const portfolioVideos = {
             thumbnail: "https://i9.ytimg.com/vi/j4O7CKTEONI/mqdefault.jpg?sqp=CIyK5s0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGUgZShlMA8=&rs=AOn4CLD4LD8UqgDSbXn5mKLtj4n0wAPqTA",
         },
         {
-            title: "구슬 애착인형 경연대회",
+            title: "[편집] 구슬언니 애착인형 경연대회",
             url: "https://www.youtube.com/watch?v=RZ2EzlKigqo",
             section: "edit",
             type: "YouTube Unlisted",
@@ -230,7 +230,7 @@ const portfolioVideos = {
             thumbnail: "https://i9.ytimg.com/vi/jCedoH9wStg/mqdefault.jpg?sqp=CIyK5s0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGFYgZShkMA8=&rs=AOn4CLBelgwt7Z1DXSmL2xQ_IiNVuyQLew",
         },
         {
-            title: "현대 연구성과 교류회",
+            title: "현대엔지비 연구성과 교류회",
             url: "https://www.youtube.com/watch?v=tVDkecL1Vxw",
             type: "YouTube Unlisted",
             thumbnail: "https://i9.ytimg.com/vi/tVDkecL1Vxw/mqdefault.jpg?sqp=CIyK5s0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGFIgWyhlMA8=&rs=AOn4CLBBniXA_e696lNF_ePpFVUD641mhw",

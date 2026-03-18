@@ -47,7 +47,7 @@ const SKILLS_DATA = [
         title: '촬영',
         en: 'CINEMATOGRAPHY',
         num: '01',
-        desc: '드론, 멀티캠, 현장 스케치 등 다양한 촬영 환경에서의 실전 경험을 쌓아왔습니다.',
+        desc: '드론, 멀티캠, 현장 스케치 등 다양한 촬영 환경에서의 실전 경험. 의료, 커머스, 스포츠 등 다방면의 촬영 경험',
         detail: '다방면 촬영 · 드론 운용',
         color: 'var(--tone-warm)',
         reelUrl: '#film',
@@ -59,8 +59,8 @@ const SKILLS_DATA = [
         title: '편집',
         en: 'POST-PRODUCTION',
         num: '02',
-        desc: '영상편집, 모션그래픽, 디자인 제작, 컬러그레이딩까지 포스트 프로덕션 전반을 다룹니다.',
-        detail: '영상편집 · 모션그래픽 · 컬러그레이딩',
+        desc: '영상편집, 모션그래픽, 디자인 제작, AI 등 포스트 프로덕션 포트폴리오',
+        detail: '영상편집 · 모션그래픽 · AI',
         color: 'var(--tone-cool)',
         reelUrl: '#edit',
         reelLabel: '편집 포트폴리오',
@@ -83,7 +83,7 @@ const SKILLS_DATA = [
         title: '개발',
         en: 'DEVELOPMENT',
         num: '04',
-        desc: '웹앱, 자동화 도구, AI 통합 서비스를 직접 설계하고 구현합니다.',
+        desc: '웹 애플리케이션, 자동화 도구, AI 통합 서비스. 아이디어를 실제 프로덕트로 구현.',
         detail: 'React · Python · FFmpeg',
         color: 'var(--tone-mint)',
         reelUrl: '#dev',
@@ -112,10 +112,24 @@ const DEV_PROJECTS = [
         status: 'Live', accent: 'var(--tone-mint)',
     },
     {
+        title: 'Nurschedule',
+        desc: '간호 스케줄 관리 아이디어를 다룬 일정 관리 프로젝트 저장소.',
+        tech: ['GitHub', 'Scheduling', 'Web'],
+        status: 'Live', accent: 'var(--tone-cool)',
+        url: 'https://notoow.github.io/nurschedule/',
+    },
+    {
         title: 'Notoow Portfolio',
         desc: '지금 이 사이트. Vite + React, Three.js 3D 씬, Framer Motion 시네마틱 애니메이션.',
         tech: ['React', 'Three.js', 'Framer Motion'],
         status: 'Live', accent: 'var(--accent)',
+    },
+    {
+        title: 'AutoCAD PDF/DWF Exporter',
+        desc: '모델 공간 시트 경계를 감지해 용지 크기를 맞추고 시트별 PDF/DWF를 일괄 출력하는 AutoLISP 도구.',
+        tech: ['AutoLISP', 'AutoCAD', 'Export'],
+        status: 'Live', accent: 'var(--tone-vivid)',
+        url: 'https://notoow.github.io/autocad-dwf-exporter/',
     },
     {
         title: 'DRM Defense PoC',
@@ -128,6 +142,13 @@ const DEV_PROJECTS = [
         desc: '영상 파일 분류, 렌더 큐 관리, 클라이언트 전달 파이프라인 자동화.',
         tech: ['Python', 'FFmpeg', 'Automation'],
         status: 'Internal', accent: 'var(--tone-warm)',
+    },
+    {
+        title: 'Soundeffect Lab',
+        desc: '효과음 자산을 정리하고 탐색하기 위한 실험용 사운드 프로젝트 저장소.',
+        tech: ['GitHub', 'Audio', 'Lab'],
+        status: 'Live', accent: 'var(--tone-mint)',
+        url: 'https://notoow.github.io/soundeffect-lab/',
     },
 ];
 
@@ -973,6 +994,7 @@ function DevShowcase() {
 
 function DevCard({ project: p, index: i }) {
     const cardRef = useRef(null);
+    const isClickable = Boolean(p.url);
 
     const handleMouseMove = (e) => {
         if (!cardRef.current) return;
@@ -984,6 +1006,11 @@ function DevCard({ project: p, index: i }) {
 
     const handleMouseLeave = () => {
         if (cardRef.current) cardRef.current.style.transform = 'perspective(600px) rotateY(0) rotateX(0) translateY(0)';
+    };
+
+    const openProject = () => {
+        if (!p.url) return;
+        window.open(p.url, '_blank', 'noopener,noreferrer');
     };
 
     return (
@@ -998,6 +1025,17 @@ function DevCard({ project: p, index: i }) {
                 handleMouseLeave();
                 event.currentTarget.style.borderColor = 'var(--border)';
             }}
+            onClick={openProject}
+            onKeyDown={(event) => {
+                if (!isClickable) return;
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    openProject();
+                }
+            }}
+            role={isClickable ? 'button' : undefined}
+            tabIndex={isClickable ? 0 : -1}
+            aria-label={isClickable ? `${p.title} 열기` : undefined}
             style={{
                 padding: '2rem', borderRadius: '12px',
                 border: '1px solid var(--border)', background: 'var(--bg-card)',
@@ -1008,6 +1046,8 @@ function DevCard({ project: p, index: i }) {
                 flexDirection: 'column',
                 transition: 'transform 0.15s ease-out, border-color 0.3s',
                 transformStyle: 'preserve-3d',
+                cursor: isClickable ? 'pointer' : 'default',
+                outline: 'none',
             }}
             onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--border-hover)'}
         >
@@ -1032,6 +1072,18 @@ function DevCard({ project: p, index: i }) {
                     }}>{t}</span>
                 ))}
             </div>
+            {isClickable && (
+                <span style={{
+                    marginTop: '0.9rem',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.62rem',
+                    color: 'var(--text-muted)',
+                    letterSpacing: '0.08em',
+                    position: 'relative',
+                }}>
+                    OPEN ↗
+                </span>
+            )}
         </motion.div>
     );
 }

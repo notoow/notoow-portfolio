@@ -11,7 +11,7 @@ const CATEGORY = {
     id: 'edit',
     title: '편집',
     en: 'POST-PRODUCTION',
-    desc: '영상편집, 모션그래픽, 디자인 제작, AI 작업을 분리해서 보여주는 포스트 프로덕션 포트폴리오.',
+    desc: '영상편집, 모션그래픽, 디자인 제작, AI 등 포스트 프로덕션 포트폴리오',
     color: 'var(--tone-cool)',
 };
 

@@ -302,10 +302,10 @@ function BentoPreview() {
 
     const items = [
         { title: '촬영', en: 'CINEMATOGRAPHY', desc: '드론 · 멀티캠 · 현장 스케치', span: isMobile ? 'span 1' : 'span 1', h: '280px', accent: 'var(--tone-warm)', reelUrl: '#film' },
-        { title: '편집', en: 'POST-PRODUCTION', desc: '모션그래픽 · 컬러그레이딩 · 유튜브', span: isMobile ? 'span 1' : 'span 1', h: '280px', accent: 'var(--tone-cool)', reelUrl: '#edit' },
+        { title: '편집', en: 'POST-PRODUCTION', desc: '영상편집 · 모션그래픽 · AI', span: isMobile ? 'span 1' : 'span 1', h: '280px', accent: 'var(--tone-cool)', reelUrl: '#edit' },
         { title: '3D', en: '3D VISUALIZATION', desc: '제품 렌더링 · 애니메이션 · 로고', span: isMobile ? 'span 1' : 'span 1', h: '280px', accent: 'var(--tone-vivid)', reelUrl: '#3d' },
         // Development & Full Portfolio: Full width on mobile
-        { title: '개발', en: 'DEVELOPMENT', desc: 'React · Python · 자동화 도구', span: isMobile ? 'span 1' : 'span 2', h: '200px', accent: 'var(--tone-mint)', reelUrl: '#dev' },
+        { title: '개발', en: 'DEVELOPMENT', desc: '웹앱 · 자동화 · AI 서비스', span: isMobile ? 'span 1' : 'span 2', h: '200px', accent: 'var(--tone-mint)', reelUrl: '#dev' },
         { title: '전체 보기', en: 'FULL PORTFOLIO', desc: '모든 작업물 한눈에', span: isMobile ? 'span 1' : 'span 1', h: '200px', accent: 'var(--accent)', reelUrl: '#portfolio' },
     ];
 

@@ -24,15 +24,15 @@ const CATEGORY = {
     id: 'dev',
     title: '개발',
     en: 'DEVELOPMENT',
-    desc: '웹 애플리케이션, 자동화 도구, AI 통합 서비스. 아이디어를 실제 프로덕트로 구현합니다.',
+    desc: '웹 애플리케이션, 자동화 도구, AI 통합 서비스. 아이디어를 실제 프로덕트로 구현',
     color: '#5DB8A8', // mint tone
 };
 
 const PROJECTS = [
     {
         title: '클로드코드로 생산성 10배 올리기',
-        type: 'YouTube / Dev Workflow',
-        desc: 'Claude Code를 활용해 영상 제작과 개발 워크플로우를 자동화하고, 실제 작업 생산성을 끌어올린 과정을 정리한 영상.',
+        type: '전자책 / Dev Workflow',
+        desc: 'Claude Code를 활용해 영상 제작과 개발 워크플로우를 자동화하고, 실제 작업 생산성을 끌어올린 과정을 정리한 콘텐츠.',
         media: `https://i.ytimg.com/vi/${CLAUDE_CODE_VIDEO_ID}/hqdefault.jpg`,
         popupType: 'case-study',
         videoId: CLAUDE_CODE_VIDEO_ID,
@@ -82,6 +82,30 @@ const PROJECTS = [
         url: 'https://notoow.github.io/google-maps-local-guides-leaderboards/index.html',
         color: 'linear-gradient(to right, #43e97b 0%, #38f9d7 100%)',
         textColor: '#004d40'
+    },
+    {
+        title: 'Nurschedule',
+        type: 'Web / Schedule Tool',
+        desc: '간호 스케줄 관리 아이디어를 다룬 일정 관리 프로젝트 저장소.',
+        url: 'https://notoow.github.io/nurschedule/',
+        color: 'linear-gradient(135deg, #c3ecff 0%, #e8f5ff 100%)',
+        textColor: '#1f4052'
+    },
+    {
+        title: 'AutoCAD PDF/DWF Exporter',
+        type: 'Web / AutoCAD Utility',
+        desc: '모델 공간 시트 경계를 감지해 용지 크기를 맞추고 시트별 PDF/DWF를 일괄 출력하는 AutoLISP 도구.',
+        url: 'https://notoow.github.io/autocad-dwf-exporter/',
+        color: 'linear-gradient(135deg, #ffe0b2 0%, #ffd180 100%)',
+        textColor: '#5d3a00'
+    },
+    {
+        title: 'Soundeffect Lab',
+        type: 'Web / Audio Utility',
+        desc: '효과음 자산을 정리하고 탐색하기 위한 실험용 사운드 프로젝트 저장소.',
+        url: 'https://notoow.github.io/soundeffect-lab/',
+        color: 'linear-gradient(135deg, #e4d6ff 0%, #c5b3ff 100%)',
+        textColor: '#382268'
     },
 ];
 
