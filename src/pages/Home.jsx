@@ -164,12 +164,14 @@ function CinematicHero({
             {!sceneReady && (
                 <div style={{
                     position: 'absolute',
-                    left: isMobile ? '1rem' : '3rem',
-                    right: isMobile ? '1rem' : 'auto',
-                    bottom: isMobile ? '5.5rem' : '3.5rem',
-                    width: isMobile ? 'auto' : 'min(320px, 28vw)',
+                    left: isMobile ? '50%' : 'auto',
+                    right: isMobile ? 'auto' : '3rem',
+                    transform: isMobile ? 'translateX(-50%)' : 'none',
+                    bottom: isMobile ? '6.6rem' : '9rem',
+                    width: isMobile ? 'min(240px, calc(100vw - 2rem))' : 'min(260px, 22vw)',
                     zIndex: 11,
                     pointerEvents: 'none',
+                    textAlign: isMobile ? 'center' : 'left',
                 }}>
                     <div style={{
                         fontFamily: 'var(--font-mono)',
