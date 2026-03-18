@@ -3,7 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useResponsive } from '../hooks/useResponsive';
 
 const BASE_URL = import.meta.env.BASE_URL;
-const WOOJU_DAESTAR_GIF = `${BASE_URL}images/wooju-daestar.gif?v=20260318`;
+const CLAUDE_CODE_VIDEO_ID = 'ggYmI9DIgJs';
+const CLAUDE_CODE_SLIDES_URL = 'https://docs.google.com/presentation/d/1O4yzG5smFp_4LtlkihSf3dFOp1o3C7ufR4A58YpQLeg/embed?start=false&loop=false&delayms=3000';
+const CLAUDE_CODE_SLIDES_VIEW_URL = 'https://docs.google.com/presentation/d/1O4yzG5smFp_4LtlkihSf3dFOp1o3C7ufR4A58YpQLeg/edit?slide=id.g3ab9e0cd2cf_0_1#slide=id.g3ab9e0cd2cf_0_1';
+const WOOJU_DAESTAR_VIDEO_ID = 'yi1iuJM1Vww';
+const WOOJU_DAESTAR_THUMBNAIL = `https://i.ytimg.com/vi/${WOOJU_DAESTAR_VIDEO_ID}/hqdefault.jpg`;
+
+const ytEmbed = (id) => `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&controls=1`;
 
 const CATEGORY = {
     id: 'dev',
@@ -18,8 +24,11 @@ const PROJECTS = [
         title: '클로드코드로 생산성 10배 올리기',
         type: 'YouTube / Dev Workflow',
         desc: 'Claude Code를 활용해 영상 제작과 개발 워크플로우를 자동화하고, 실제 작업 생산성을 끌어올린 과정을 정리한 영상.',
-        url: 'https://www.youtube.com/watch?v=ggYmI9DIgJs',
-        media: 'https://i.ytimg.com/vi/ggYmI9DIgJs/hqdefault.jpg',
+        media: `https://i.ytimg.com/vi/${CLAUDE_CODE_VIDEO_ID}/hqdefault.jpg`,
+        popupType: 'case-study',
+        videoId: CLAUDE_CODE_VIDEO_ID,
+        slidesEmbedUrl: CLAUDE_CODE_SLIDES_URL,
+        slidesViewUrl: CLAUDE_CODE_SLIDES_VIEW_URL,
         color: 'linear-gradient(135deg, #162a2d 0%, #2f766b 100%)',
         textColor: '#f6fffd'
     },
@@ -27,9 +36,9 @@ const PROJECTS = [
         title: '우주 대스타 (Cosmic Superstar)',
         type: 'Unity / Kinect v2',
         desc: '고양 스타필드 매직플로우 체험존. Kinect v2의 깊이와 가속도 데이터를 정밀 제어하여 사용자를 실시간 미러링하는 인터랙티브 XR 서비스.',
-        media: WOOJU_DAESTAR_GIF,
-        popupMedia: WOOJU_DAESTAR_GIF,
-        popupType: 'image',
+        media: WOOJU_DAESTAR_THUMBNAIL,
+        popupType: 'video',
+        videoId: WOOJU_DAESTAR_VIDEO_ID,
         color: 'linear-gradient(135deg, #1d2438 0%, #2f3a5d 100%)',
         textColor: '#fff'
     },
@@ -96,6 +105,10 @@ const MANIFESTO = [
 
 function MediaLightbox({ item, onClose }) {
     const { isMobile } = useResponsive();
+    const isImage = item.popupType === 'image';
+    const isVideo = item.popupType === 'video';
+    const isCaseStudy = item.popupType === 'case-study';
+
     React.useEffect(() => {
         const onKeyDown = (event) => {
             if (event.key === 'Escape') onClose();
@@ -126,7 +139,7 @@ function MediaLightbox({ item, onClose }) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '2rem',
+                padding: isMobile ? '1rem' : '2rem',
             }}
         >
             <motion.div
@@ -136,15 +149,16 @@ function MediaLightbox({ item, onClose }) {
                 transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                 onClick={(event) => event.stopPropagation()}
                 style={{
-                    width: 'min(100%, 1100px)',
+                    width: isCaseStudy ? 'min(100%, 1200px)' : 'min(100%, 1100px)',
+                    maxHeight: isCaseStudy ? '90vh' : 'unset',
                     borderRadius: '20px',
-                    overflow: 'hidden',
+                    overflow: isCaseStudy ? 'auto' : 'hidden',
                     border: '1px solid var(--border-hover)',
                     background: 'rgba(12,12,12,0.96)',
                     boxShadow: '0 30px 90px rgba(0,0,0,0.45)',
                 }}
             >
-                {item.popupType === 'image' && (
+                {isImage && (
                     <img
                         src={item.popupMedia}
                         alt={item.title}
@@ -156,6 +170,22 @@ function MediaLightbox({ item, onClose }) {
                             background: '#050505',
                         }}
                     />
+                )}
+
+                {(isVideo || isCaseStudy) && item.videoId && (
+                    <div style={{
+                        width: '100%',
+                        aspectRatio: '16 / 9',
+                        background: '#050505',
+                    }}>
+                        <iframe
+                            src={ytEmbed(item.videoId)}
+                            title={item.title}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
+                        />
+                    </div>
                 )}
 
                 <div style={{
@@ -182,24 +212,99 @@ function MediaLightbox({ item, onClose }) {
                             color: 'var(--text-hero)',
                         }}>{item.title}</strong>
                     </div>
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        style={{
-                            padding: '0.75rem 1rem',
-                            borderRadius: '999px',
-                            border: '1px solid var(--border)',
-                            background: 'transparent',
-                            color: 'var(--text-secondary)',
-                            fontFamily: 'var(--font-mono)',
-                            fontSize: '0.68rem',
-                            letterSpacing: '0.08em',
-                            cursor: 'pointer',
-                        }}
-                    >
-                        CLOSE
-                    </button>
+                    <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                        {isCaseStudy && item.slidesViewUrl && (
+                            <a
+                                href={item.slidesViewUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                style={{
+                                    padding: '0.75rem 1rem',
+                                    borderRadius: '999px',
+                                    border: '1px solid rgba(93,184,168,0.25)',
+                                    background: 'rgba(93,184,168,0.08)',
+                                    color: 'var(--tone-mint)',
+                                    fontFamily: 'var(--font-mono)',
+                                    fontSize: '0.68rem',
+                                    letterSpacing: '0.08em',
+                                    textDecoration: 'none',
+                                }}
+                            >
+                                OPEN SLIDES
+                            </a>
+                        )}
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            style={{
+                                padding: '0.75rem 1rem',
+                                borderRadius: '999px',
+                                border: '1px solid var(--border)',
+                                background: 'transparent',
+                                color: 'var(--text-secondary)',
+                                fontFamily: 'var(--font-mono)',
+                                fontSize: '0.68rem',
+                                letterSpacing: '0.08em',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            CLOSE
+                        </button>
+                    </div>
                 </div>
+
+                {isCaseStudy && item.slidesEmbedUrl && (
+                    <div style={{
+                        padding: isMobile ? '0 1rem 1rem' : '0 1.5rem 1.5rem',
+                        display: 'grid',
+                        gap: '1rem',
+                    }}>
+                        <div style={{
+                            padding: isMobile ? '1rem' : '1.25rem',
+                            borderRadius: '18px',
+                            border: '1px solid var(--border)',
+                            background: 'rgba(255,255,255,0.02)',
+                        }}>
+                            <span style={{
+                                display: 'block',
+                                fontFamily: 'var(--font-mono)',
+                                fontSize: '0.62rem',
+                                color: 'var(--text-muted)',
+                                letterSpacing: '0.12em',
+                                marginBottom: '0.7rem',
+                            }}>
+                                CASE STUDY
+                            </span>
+                            <p style={{
+                                color: 'var(--text-secondary)',
+                                lineHeight: 1.75,
+                                fontSize: '0.95rem',
+                            }}>
+                                상단에서 워크플로우 영상을 보고, 아래에서 실제 발표 자료를 이어서 확인할 수 있게 묶었습니다.
+                            </p>
+                        </div>
+
+                        <div style={{
+                            borderRadius: '18px',
+                            overflow: 'hidden',
+                            border: '1px solid var(--border)',
+                            background: '#0a0a0a',
+                        }}>
+                            <iframe
+                                src={item.slidesEmbedUrl}
+                                title={`${item.title} slides`}
+                                allowFullScreen
+                                style={{
+                                    display: 'block',
+                                    width: '100%',
+                                    minHeight: isMobile ? '58vh' : '72vh',
+                                    border: 'none',
+                                    background: '#0a0a0a',
+                                }}
+                            />
+                        </div>
+                    </div>
+                )}
             </motion.div>
         </motion.div>
     );
@@ -395,7 +500,7 @@ export default function DevPage() {
     const [lightboxItem, setLightboxItem] = useState(null);
     const projects = PROJECTS.map((item) => ({
         ...item,
-        onClick: item.popupMedia
+        onClick: item.popupType
             ? () => setLightboxItem(item)
             : () => {
                 if (item.url) {

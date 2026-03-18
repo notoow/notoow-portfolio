@@ -462,33 +462,19 @@ useGLTF.preload('/macbook_pro_m3_16_inch_2024.glb');
    ═══════════════════════════════════════════════════ */
 export function CursorGlow() {
     const glowRef = useRef(null);
-    const trailRefs = useRef([]);
-    const positions = useRef(Array(5).fill({ x: 0, y: 0 }));
+    const position = useRef({ x: 0, y: 0 });
 
     React.useEffect(() => {
         let animFrame;
         const handler = (e) => {
-            positions.current[0] = { x: e.clientX, y: e.clientY };
+            position.current = { x: e.clientX, y: e.clientY };
         };
         window.addEventListener('mousemove', handler);
 
         const animate = () => {
-            // Main glow
             if (glowRef.current) {
-                glowRef.current.style.left = positions.current[0].x + 'px';
-                glowRef.current.style.top = positions.current[0].y + 'px';
-            }
-
-            // Trail dots — follow with delay
-            for (let i = positions.current.length - 1; i > 0; i--) {
-                positions.current[i] = {
-                    x: positions.current[i].x + (positions.current[i - 1].x - positions.current[i].x) * 0.15,
-                    y: positions.current[i].y + (positions.current[i - 1].y - positions.current[i].y) * 0.15,
-                };
-                if (trailRefs.current[i - 1]) {
-                    trailRefs.current[i - 1].style.left = positions.current[i].x + 'px';
-                    trailRefs.current[i - 1].style.top = positions.current[i].y + 'px';
-                }
+                glowRef.current.style.left = position.current.x + 'px';
+                glowRef.current.style.top = position.current.y + 'px';
             }
             animFrame = requestAnimationFrame(animate);
         };
@@ -502,7 +488,6 @@ export function CursorGlow() {
 
     return (
         <>
-            {/* Main glow */}
             <div ref={glowRef} style={{
                 position: 'fixed', width: '250px', height: '250px',
                 borderRadius: '50%', pointerEvents: 'none', zIndex: 9998,
@@ -510,22 +495,6 @@ export function CursorGlow() {
                 filter: 'blur(40px)',
                 transform: 'translate(-50%, -50%)',
             }} />
-
-            {/* Trail dots */}
-            {Array(4).fill(null).map((_, i) => (
-                <div
-                    key={i}
-                    ref={el => trailRefs.current[i] = el}
-                    style={{
-                        position: 'fixed',
-                        width: `${8 - i * 1.5}px`, height: `${8 - i * 1.5}px`,
-                        borderRadius: '50%', pointerEvents: 'none', zIndex: 9998,
-                        background: `rgba(224, 90, 58, ${0.35 - i * 0.07})`,
-                        transform: 'translate(-50%, -50%)',
-                        transition: 'none',
-                    }}
-                />
-            ))}
         </>
     );
 }

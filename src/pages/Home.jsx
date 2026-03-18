@@ -298,35 +298,17 @@ function BentoPreview() {
 }
 
 function TiltCard({ item, index, isMobile }) {
-    const cardRef = useRef(null);
     const [hov, setHov] = useState(false);
-
-    const handleMouseMove = (e) => {
-        if (isMobile) return;
-        if (!cardRef.current) return;
-        const rect = cardRef.current.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width - 0.5;
-        const y = (e.clientY - rect.top) / rect.height - 0.5;
-        cardRef.current.style.transform = `perspective(600px) rotateY(${x * 10}deg) rotateX(${-y * 10}deg) scale3d(1.02, 1.02, 1.02)`;
-    };
-
-    const handleMouseLeave = () => {
-        setHov(false);
-        if (!cardRef.current) return;
-        cardRef.current.style.transform = 'perspective(600px) rotateY(0) rotateX(0) scale3d(1,1,1)';
-    };
 
     return (
         <motion.a
-            ref={cardRef}
             href={item.reelUrl}
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ delay: index * 0.06, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            onMouseMove={handleMouseMove}
             onMouseEnter={() => setHov(true)}
-            onMouseLeave={handleMouseLeave}
+            onMouseLeave={() => setHov(false)}
             style={{
                 gridColumn: item.span,
                 height: isMobile ? 'auto' : item.h,
@@ -337,9 +319,9 @@ function TiltCard({ item, index, isMobile }) {
                 display: 'flex', flexDirection: 'column',
                 justifyContent: 'space-between',
                 position: 'relative', overflow: 'hidden',
-                transition: 'border-color 0.4s, box-shadow 0.4s, transform 0.15s ease-out',
+                transition: 'border-color 0.4s, box-shadow 0.4s, transform 0.3s var(--ease-expo)',
                 cursor: isMobile ? 'pointer' : 'none',
-                transformStyle: 'preserve-3d',
+                transform: hov ? 'translateY(-4px)' : 'translateY(0)',
                 boxShadow: hov ? `0 20px 60px ${item.accent}10` : 'none',
                 wordBreak: 'keep-all',
             }}
