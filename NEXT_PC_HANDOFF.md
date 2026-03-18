@@ -133,6 +133,14 @@ node scripts/studio-import.mjs
 node scripts/studio-import.mjs "C:\path\to\studio-videos.json"
 ```
 
+중요:
+
+- 이제 `scripts/studio-import.mjs` 는 `Downloads` 와 `Desktop/CustomDownloads` 안의
+  `studio-videos.json`, `studio-videos (1).json`, `studio-videos (2).json` 같은 파일 중
+  가장 최근 수정된 export를 자동으로 선택함
+- 예전에는 exact filename(`studio-videos.json`)만 읽어서 최신 export가 반영 안 되는 문제가 있었음
+- `고양시지속가능발전협의회 홍보영상` 같은 수동 추가 영상은 import 후에도 유지되도록 스크립트에 반영함
+
 ## Known Good Current State
 
 - 메인 홈/포트폴리오/상세 페이지 해시 라우팅 정리됨
