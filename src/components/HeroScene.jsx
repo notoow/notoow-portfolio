@@ -8,7 +8,7 @@ import * as THREE from 'three';
 const isMobileViewport = typeof window !== 'undefined' && window.innerWidth < 768;
 const assetUrl = (path) => `${import.meta.env.BASE_URL}${path}`;
 
-export default function HeroScene({ mousePos, onReady }) {
+const HeroScene = React.memo(function HeroScene({ onReady }) {
     const [isVisible, setIsVisible] = useState(false);
 
     const handleReady = () => {
@@ -39,7 +39,7 @@ export default function HeroScene({ mousePos, onReady }) {
                 <pointLight position={[3, -2, 3]} intensity={2} color="#5DB8A8" distance={10} />
 
                 <Suspense fallback={null}>
-                    <SceneContent mousePos={mousePos} onReady={handleReady} />
+                    <SceneContent onReady={handleReady} />
                 </Suspense>
 
                 <EffectComposer enabled={!isMobileViewport}>
@@ -60,10 +60,13 @@ export default function HeroScene({ mousePos, onReady }) {
             <MotionRequest />
         </div>
     );
-}
+});
 
-function SceneContent({ mousePos, onReady }) {
+export default HeroScene;
+
+function SceneContent({ onReady }) {
     const didReportReady = useRef(false);
+    const pointerRef = useRef({ x: 0, y: 0 });
 
     useEffect(() => {
         if (didReportReady.current) return;
@@ -73,8 +76,8 @@ function SceneContent({ mousePos, onReady }) {
 
     return (
         <>
-            {isMobileViewport ? <GyroTracker /> : <MouseTracker mousePos={mousePos} />}
-            <FloatingModels />
+            {isMobileViewport ? <GyroTracker /> : <MouseTracker pointerRef={pointerRef} />}
+            <FloatingModels pointerRef={pointerRef} />
             <Environment preset="city" />
             <ParticleField count={isMobileViewport ? 180 : 420} />
         </>
@@ -133,18 +136,42 @@ function MotionRequest() {
     );
 }
 
-function MouseTracker({ mousePos }) {
+function MouseTracker({ pointerRef }) {
     const { camera } = useThree();
-    const targetRotation = useRef({ x: 0, y: 0 });
+    const pointer = pointerRef;
+
+    useEffect(() => {
+        const handleMouseMove = (event) => {
+            pointer.current.x = (event.clientX / window.innerWidth - 0.5) * 2;
+            pointer.current.y = (event.clientY / window.innerHeight - 0.5) * 2;
+        };
+
+        const resetPointer = () => {
+            pointer.current.x = 0;
+            pointer.current.y = 0;
+        };
+
+        window.addEventListener('mousemove', handleMouseMove, { passive: true });
+        window.addEventListener('blur', resetPointer);
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('blur', resetPointer);
+        };
+    }, [pointer]);
 
     useFrame(() => {
-        targetRotation.current.x = mousePos.y * 0.08;
-        targetRotation.current.y = mousePos.x * 0.12;
+        const targetX = pointer.current.y * 0.12;
+        const targetY = pointer.current.x * 0.18;
+        const targetPositionX = pointer.current.x * 0.18;
+        const targetPositionY = pointer.current.y * 0.12;
 
         // React Three Fiber cameras are imperative scene objects.
         /* eslint-disable react-hooks/immutability */
-        camera.rotation.x += (targetRotation.current.x - camera.rotation.x) * 0.03;
-        camera.rotation.y += (targetRotation.current.y - camera.rotation.y) * 0.03;
+        camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, targetX, 0.12);
+        camera.rotation.y = THREE.MathUtils.lerp(camera.rotation.y, targetY, 0.12);
+        camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetPositionX, 0.09);
+        camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetPositionY, 0.09);
         /* eslint-enable react-hooks/immutability */
     });
 
@@ -189,7 +216,7 @@ function GyroTracker() {
     return null;
 }
 
-function FloatingModels() {
+function FloatingModels({ pointerRef }) {
     const mac = useGLTF(assetUrl('macbook_pro_m3_16_inch_2024.glb'));
     const camera = useGLTF(assetUrl('canon_at-2_retro_camera.glb'));
     const vhs = useGLTF(assetUrl('vhs_tape.glb'));
@@ -201,9 +228,35 @@ function FloatingModels() {
     const printer = useGLTF(assetUrl('3d_printer.glb'));
 
     const scaleFactor = isMobileViewport ? 0.7 : 1;
+    const groupRef = useRef(null);
+
+    useFrame(() => {
+        if (!groupRef.current || !pointerRef) return;
+
+        groupRef.current.rotation.x = THREE.MathUtils.lerp(
+            groupRef.current.rotation.x,
+            pointerRef.current.y * -0.05,
+            0.09,
+        );
+        groupRef.current.rotation.y = THREE.MathUtils.lerp(
+            groupRef.current.rotation.y,
+            pointerRef.current.x * 0.08,
+            0.09,
+        );
+        groupRef.current.position.x = THREE.MathUtils.lerp(
+            groupRef.current.position.x,
+            pointerRef.current.x * 0.2,
+            0.06,
+        );
+        groupRef.current.position.y = THREE.MathUtils.lerp(
+            groupRef.current.position.y,
+            pointerRef.current.y * 0.08,
+            0.06,
+        );
+    });
 
     return (
-        <group>
+        <group ref={groupRef}>
             <Float speed={1.5} rotationIntensity={0.5} floatIntensity={1}>
                 <primitive
                     object={mac.scene}

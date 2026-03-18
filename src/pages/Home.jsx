@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, startTransition, useEffect, useRef, useState } from 'react';
+import React, { Suspense, lazy, startTransition, useCallback, useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import CursorGlow from '../components/CursorGlow';
 import { useResponsive } from '../hooks/useResponsive';
@@ -17,6 +17,7 @@ export default function Home() {
     const { isMobile } = useResponsive();
     const mouseFrameRef = useRef(0);
     const latestMouseRef = useRef({ x: 0, y: 0 });
+    const handleSceneReady = useCallback(() => setSceneReady(true), []);
 
     useEffect(() => {
         const handler = (e) => {
@@ -87,7 +88,7 @@ export default function Home() {
                 isMobile={isMobile}
                 shouldRenderScene={shouldRenderScene}
                 sceneReady={sceneReady}
-                onSceneReady={() => setSceneReady(true)}
+                onSceneReady={handleSceneReady}
             />
             <RollingStrip />
             <BentoPreview />
@@ -122,7 +123,7 @@ function CinematicHero({ mousePos, isMobile, shouldRenderScene, sceneReady, onSc
             {/* 3D Scene (behind everything) */}
             {shouldRenderScene && (
                 <Suspense fallback={null}>
-                    <LazyHeroScene mousePos={mousePos} onReady={onSceneReady} />
+                    <LazyHeroScene onReady={onSceneReady} />
                 </Suspense>
             )}
 
@@ -206,7 +207,7 @@ function CinematicHero({ mousePos, isMobile, shouldRenderScene, sceneReady, onSc
                             fontSize: 'clamp(3.5rem, 9vw, 8rem)',
                             fontWeight: 800, lineHeight: 0.95, letterSpacing: '-0.04em',
                             transform: `translate(${mousePos.x * 5}px, ${mousePos.y * 3}px)`,
-                            transition: 'transform 0.6s var(--ease-smooth)',
+                            transition: 'transform 0.22s var(--ease-smooth)',
                         }}>
                             <span style={{ display: 'block', color: 'var(--text-hero)' }}>촬영부터</span>
                             <span style={{
