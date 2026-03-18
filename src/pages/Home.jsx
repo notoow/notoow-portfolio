@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { HeroScene, CursorGlow } from '../components/Scene3D';
+import CursorGlow from '../components/CursorGlow';
 import { useResponsive } from '../hooks/useResponsive';
+
+const LazyHeroScene = lazy(() => import('../components/HeroScene'));
 
 /* ═══════════════════════════════════════════
    HOME — Cinematic 3D Landing
@@ -9,6 +11,7 @@ import { useResponsive } from '../hooks/useResponsive';
 
 export default function Home() {
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    const [shouldRenderScene, setShouldRenderScene] = useState(false);
     const { isMobile } = useResponsive();
 
     useEffect(() => {
@@ -40,13 +43,39 @@ export default function Home() {
         return () => window.clearTimeout(timer);
     }, []);
 
+    useEffect(() => {
+        let frameId = 0;
+        let timeoutId = 0;
+        let idleId = 0;
+
+        const enableScene = () => {
+            frameId = window.requestAnimationFrame(() => {
+                setShouldRenderScene(true);
+            });
+        };
+
+        if (typeof window.requestIdleCallback === 'function') {
+            idleId = window.requestIdleCallback(enableScene, { timeout: 900 });
+        } else {
+            timeoutId = window.setTimeout(enableScene, 120);
+        }
+
+        return () => {
+            window.cancelAnimationFrame(frameId);
+            window.clearTimeout(timeoutId);
+            if (typeof window.cancelIdleCallback === 'function') {
+                window.cancelIdleCallback(idleId);
+            }
+        };
+    }, []);
+
     return (
         <div id="home" style={{
             background: 'var(--bg-void)', color: 'var(--text-hero)',
             minHeight: '100vh', overflow: 'hidden', cursor: 'auto',
         }}>
             <CursorGlow />
-            <CinematicHero mousePos={mousePos} isMobile={isMobile} />
+            <CinematicHero mousePos={mousePos} isMobile={isMobile} shouldRenderScene={shouldRenderScene} />
             <RollingStrip />
             <BentoPreview />
             <MinimalFooter />
@@ -55,7 +84,7 @@ export default function Home() {
 }
 
 /* ─── CINEMATIC 3D HERO ─── */
-function CinematicHero({ mousePos, isMobile }) {
+function CinematicHero({ mousePos, isMobile, shouldRenderScene }) {
     const [time, setTime] = useState('');
     const containerRef = useRef(null);
     const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end start'] });
@@ -78,7 +107,11 @@ function CinematicHero({ mousePos, isMobile }) {
             justifyContent: 'center', position: 'relative', overflow: 'hidden',
         }}>
             {/* 3D Scene (behind everything) */}
-            <HeroScene mousePos={mousePos} />
+            {shouldRenderScene && (
+                <Suspense fallback={null}>
+                    <LazyHeroScene mousePos={mousePos} />
+                </Suspense>
+            )}
 
             {/* Noise grain */}
             <div style={{
@@ -265,13 +298,7 @@ function RollingStrip() {
 
 /* ─── BENTO PREVIEW GRID — 카테고리별 포트폴리오 링크 ─── */
 function BentoPreview() {
-    const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 768);
-
-    useEffect(() => {
-        const handleResize = () => setIsMobile(window.innerWidth < 768);
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+    const { isMobile } = useResponsive();
 
     const items = [
         { title: '촬영', en: 'CINEMATOGRAPHY', desc: '드론 · 멀티캠 · 현장 스케치', span: isMobile ? 'span 1' : 'span 1', h: '280px', accent: 'var(--tone-warm)', reelUrl: '#film' },

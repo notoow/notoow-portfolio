@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 import Home from './pages/Home';
-import Minimalist from './pages/Minimalist';
-import Interactive from './pages/Interactive';
-import CyberTerminal from './pages/CyberTerminal';
-import FilmPage from './pages/FilmPage';
-import EditPage from './pages/EditPage';
-import ThreeDPage from './pages/ThreeDPage';
-import DevPage from './pages/DevPage';
-import VideoAdminPage from './pages/VideoAdminPage';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GlobalLoader } from './components/Scene3D';
+import PageLoader from './components/PageLoader';
 import './App.css';
 
 const ENABLE_ADMIN_PAGE = import.meta.env.DEV || import.meta.env.VITE_ENABLE_ADMIN_PAGE === 'true';
+const Minimalist = lazy(() => import('./pages/Minimalist'));
+const Interactive = lazy(() => import('./pages/Interactive'));
+const CyberTerminal = lazy(() => import('./pages/CyberTerminal'));
+const FilmPage = lazy(() => import('./pages/FilmPage'));
+const EditPage = lazy(() => import('./pages/EditPage'));
+const ThreeDPage = lazy(() => import('./pages/ThreeDPage'));
+const DevPage = lazy(() => import('./pages/DevPage'));
+const VideoAdminPage = lazy(() => import('./pages/VideoAdminPage'));
 
 function getPageFromHash() {
   const hash = window.location.hash.replace('#', '');
@@ -53,31 +53,33 @@ function App() {
     };
   }, []);
 
-  return (
-    <>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={page}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.4 }}
-          style={{ width: '100%', minHeight: '100vh' }}
-        >
-          {page === 'portfolio' && <Interactive />}
-          {page === 'minimal' && <Minimalist />}
-          {page === 'terminal' && <CyberTerminal />}
-          {page === 'film' && <FilmPage />}
-          {page === 'edit' && <EditPage />}
-          {page === '3d' && <ThreeDPage />}
-          {page === 'dev' && <DevPage />}
-          {ENABLE_ADMIN_PAGE && page === 'admin-videos' && <VideoAdminPage />}
-          {page === 'home' && <Home />}
-        </motion.div>
-      </AnimatePresence>
+  const CurrentPage = (() => {
+    if (page === 'portfolio') return Interactive;
+    if (page === 'minimal') return Minimalist;
+    if (page === 'terminal') return CyberTerminal;
+    if (page === 'film') return FilmPage;
+    if (page === 'edit') return EditPage;
+    if (page === '3d') return ThreeDPage;
+    if (page === 'dev') return DevPage;
+    if (ENABLE_ADMIN_PAGE && page === 'admin-videos') return VideoAdminPage;
+    return Home;
+  })();
 
-      <GlobalLoader />
-    </>
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={page}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.4 }}
+        style={{ width: '100%', minHeight: '100vh' }}
+      >
+        <Suspense fallback={<PageLoader label="Loading page" />}>
+          <CurrentPage />
+        </Suspense>
+      </motion.div>
+    </AnimatePresence>
   );
 }
 

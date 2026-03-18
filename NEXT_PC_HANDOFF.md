@@ -10,6 +10,9 @@
 
 - 메인 홈 카드 hover 떨림 완화
 - 커서 꼬리 이펙트 제거, 단일 glow만 유지
+- 첫 진입 번들 최적화:
+  홈 텍스트 먼저 렌더 -> 3D HeroScene은 idle 시점 lazy load
+  나머지 상세/포트폴리오/개발 페이지도 route-level lazy load
 - `우주 대스타` GIF 제거 후 실제 YouTube 영상 모달로 교체
 - Dev 페이지 `클로드코드로 생산성 10배 올리기`를 긴 구글슬라이드 iframe 대신
   `영상 + 한 장씩 넘기는 슬라이드 덱` 구조로 개선
@@ -66,7 +69,10 @@ npm run deploy
 - `src/pages/Interactive.jsx`: 전체 포트폴리오
 - `src/pages/CategoryDetail.jsx`: 촬영/편집/3D 공통 상세
 - `src/pages/DevPage.jsx`: 개발 페이지
-- `src/components/Scene3D.jsx`: 홈/포트폴리오 3D 및 커서 glow
+- `src/components/HeroScene.jsx`: 홈 첫 화면 3D 씬 전용
+- `src/components/CursorGlow.jsx`: 가벼운 커서 glow
+- `src/components/PageLoader.jsx`: lazy route 로딩 fallback
+- `src/components/Scene3D.jsx`: 예전 3D 실험/보관 파일
 - `src/data/portfolioVideos.js`: 실제 영상 데이터
 - `src/components/AdaptiveThumbnail.jsx`: 공용 썸네일 표시 / fallback
 - `src/hooks/useResponsive.js`: 공용 모바일/태블릿 판별
@@ -148,6 +154,7 @@ node scripts/studio-import.mjs "C:\path\to\studio-videos.json"
 - 상세 페이지 진입 시 스크롤 상단 리셋됨
 - 연락 버튼은 메일 앱이 아니라 사이트 내부 팝업 사용
 - 문의 이메일: `tan0123@naver.com`
+- 첫 진입에서 Three/Drei가 메인 번들에 직접 실리지 않도록 정리됨
 - 개발 페이지 `우주 대스타`는 현재 YouTube 영상 모달 사용
 - `고양시지속가능발전협의회 홍보영상` 썸네일은 고정 `hqdefault` 로 설정됨
 - `#home`, `#portfolio`, `#film`, `#edit`, `#3d`, `#dev` 모바일 반응형 1차 정리 완료
@@ -158,6 +165,15 @@ node scripts/studio-import.mjs "C:\path\to\studio-videos.json"
 - Dev 페이지 케이스 스터디는 현재 `scroll-heavy` 가 아니라 `step-by-step deck` 방식
 - `Scene3D.jsx` 의 GLB 로딩은 `import.meta.env.BASE_URL` 기준으로 정리됨
 - 편집 페이지는 현재 `영상편집 / 모션그래픽 / 디자인 제작 / AI` 4섹션 구조
+
+## Bundle Notes
+
+- 이전에는 `App.jsx` 와 `Home.jsx` 가 처음부터 모든 페이지와 Three 씬을 정적 import 했음
+- 지금은:
+  - `App.jsx` 에서 `Interactive / Film / Edit / 3D / Dev / Terminal / Minimal / Admin` 모두 lazy load
+  - `Home.jsx` 는 텍스트/레이아웃 먼저 렌더하고 `HeroScene.jsx` 를 idle 시점에 lazy load
+  - `CursorGlow` 와 로딩 UI도 Three 파일에서 분리
+- 그래서 첫 진입 index 청크가 크게 줄었고, 무거운 `three / drei` 청크는 홈 3D가 실제로 필요할 때만 내려받음
 
 ## Responsive Scope
 

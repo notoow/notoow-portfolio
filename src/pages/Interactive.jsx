@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import AdaptiveThumbnail from '../components/AdaptiveThumbnail';
-import { CursorGlow } from '../components/Scene3D';
+import CursorGlow from '../components/CursorGlow';
 import { getPortfolioVideosByCategory } from '../data/portfolioVideos';
 import { useResponsive } from '../hooks/useResponsive';
 
@@ -994,7 +994,10 @@ function DevCard({ project: p, index: i }) {
             viewport={{ once: true, margin: '-60px' }}
             transition={{ delay: i * 0.1, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
+            onMouseLeave={(event) => {
+                handleMouseLeave();
+                event.currentTarget.style.borderColor = 'var(--border)';
+            }}
             style={{
                 padding: '2rem', borderRadius: '12px',
                 border: '1px solid var(--border)', background: 'var(--bg-card)',
@@ -1007,7 +1010,6 @@ function DevCard({ project: p, index: i }) {
                 transformStyle: 'preserve-3d',
             }}
             onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--border-hover)'}
-            onMouseLeaveCapture={e => e.currentTarget.style.borderColor = 'var(--border)'}
         >
             <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '100px', height: '100px', background: `radial-gradient(circle, ${p.accent}10, transparent 65%)`, filter: 'blur(20px)', pointerEvents: 'none' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', marginBottom: '0.8rem', position: 'relative' }}>
