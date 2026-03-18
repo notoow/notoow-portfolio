@@ -26,9 +26,14 @@ function getHeroProfile(isMobileViewport) {
         return {
             useGyro: isMobileViewport,
             bloomEnabled: !isMobileViewport,
-            dpr: isMobileViewport ? [1, 1] : [1, 1.05],
-            environmentResolution: isMobileViewport ? 40 : 64,
-            particleCount: isMobileViewport ? 90 : 220,
+            dpr: [1, 1],
+            environmentResolution: isMobileViewport ? 32 : 36,
+            particleCount: isMobileViewport ? 72 : 120,
+            cameraRotationLerp: isMobileViewport ? 0.12 : 0.3,
+            cameraPositionLerp: isMobileViewport ? 0.08 : 0.22,
+            groupRotationLerp: isMobileViewport ? 0.16 : 0.28,
+            groupPositionLerp: isMobileViewport ? 0.12 : 0.2,
+            bubbleSegments: isMobileViewport ? 18 : 20,
             canvasMode: isMobileViewport ? 'mobile' : 'desktop',
         };
     }
@@ -38,15 +43,20 @@ function getHeroProfile(isMobileViewport) {
     const deviceMemory = navigator.deviceMemory ?? 4;
     const hardwareConcurrency = navigator.hardwareConcurrency ?? 6;
     const looksLikePhoneHardware = coarsePointer || touchPoints > 0;
-    const shouldReduceEffects = looksLikePhoneHardware || deviceMemory <= 4 || hardwareConcurrency <= 6;
+    const isStrongDesktop = !looksLikePhoneHardware && deviceMemory >= 8 && hardwareConcurrency >= 10;
 
     return {
         useGyro: looksLikePhoneHardware,
-        bloomEnabled: !shouldReduceEffects,
-        dpr: shouldReduceEffects ? [1, 1] : [1, 1.05],
-        environmentResolution: shouldReduceEffects ? 40 : 64,
-        particleCount: shouldReduceEffects ? 90 : 220,
-        canvasMode: shouldReduceEffects ? 'reduced' : 'desktop',
+        bloomEnabled: isStrongDesktop,
+        dpr: [1, 1],
+        environmentResolution: looksLikePhoneHardware ? 32 : isStrongDesktop ? 36 : 24,
+        particleCount: looksLikePhoneHardware ? 72 : isStrongDesktop ? 120 : 88,
+        cameraRotationLerp: looksLikePhoneHardware ? 0.12 : 0.3,
+        cameraPositionLerp: looksLikePhoneHardware ? 0.08 : 0.22,
+        groupRotationLerp: looksLikePhoneHardware ? 0.16 : 0.28,
+        groupPositionLerp: looksLikePhoneHardware ? 0.12 : 0.2,
+        bubbleSegments: looksLikePhoneHardware ? 18 : isStrongDesktop ? 20 : 14,
+        canvasMode: looksLikePhoneHardware ? 'mobile' : isStrongDesktop ? 'desktop-strong' : 'desktop-lean',
     };
 }
 
@@ -159,9 +169,13 @@ function SceneContent({ profile, onReady }) {
 
     return (
         <>
-            {profile.useGyro ? <GyroTracker /> : <MouseTracker pointerRef={pointerRef} />}
-            <FloatingModels isMobile={profile.useGyro} pointerRef={pointerRef} />
-            <Environment preset="city" resolution={profile.environmentResolution} />
+            {profile.useGyro ? (
+                <GyroTracker profile={profile} />
+            ) : (
+                <MouseTracker pointerRef={pointerRef} profile={profile} />
+            )}
+            <FloatingModels isMobile={profile.useGyro} pointerRef={pointerRef} profile={profile} />
+            <Environment preset="city" resolution={profile.environmentResolution} frames={1} />
             <ParticleField count={profile.particleCount} />
         </>
     );
@@ -256,7 +270,7 @@ function MotionRequest({ isMobile }) {
     );
 }
 
-function MouseTracker({ pointerRef }) {
+function MouseTracker({ pointerRef, profile }) {
     const { camera } = useThree();
     const pointer = pointerRef;
 
@@ -288,17 +302,17 @@ function MouseTracker({ pointerRef }) {
 
         // React Three Fiber cameras are imperative scene objects.
         /* eslint-disable react-hooks/immutability */
-        camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, targetX, 0.18);
-        camera.rotation.y = THREE.MathUtils.lerp(camera.rotation.y, targetY, 0.18);
-        camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetPositionX, 0.14);
-        camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetPositionY, 0.14);
+        camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, targetX, profile.cameraRotationLerp);
+        camera.rotation.y = THREE.MathUtils.lerp(camera.rotation.y, targetY, profile.cameraRotationLerp);
+        camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetPositionX, profile.cameraPositionLerp);
+        camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetPositionY, profile.cameraPositionLerp);
         /* eslint-enable react-hooks/immutability */
     });
 
     return null;
 }
 
-function GyroTracker() {
+function GyroTracker({ profile }) {
     const { camera } = useThree();
     const target = useRef({ x: 0, y: 0 });
     const smoothed = useRef({ x: 0, y: 0 });
@@ -353,17 +367,17 @@ function GyroTracker() {
 
         // React Three Fiber cameras are imperative scene objects.
         /* eslint-disable react-hooks/immutability */
-        camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, smoothed.current.x, 0.12);
-        camera.rotation.y = THREE.MathUtils.lerp(camera.rotation.y, smoothed.current.y, 0.12);
-        camera.position.x = THREE.MathUtils.lerp(camera.position.x, smoothed.current.y * 0.45, 0.08);
-        camera.position.y = THREE.MathUtils.lerp(camera.position.y, smoothed.current.x * 0.32, 0.08);
+        camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, smoothed.current.x, profile.cameraRotationLerp);
+        camera.rotation.y = THREE.MathUtils.lerp(camera.rotation.y, smoothed.current.y, profile.cameraRotationLerp);
+        camera.position.x = THREE.MathUtils.lerp(camera.position.x, smoothed.current.y * 0.45, profile.cameraPositionLerp);
+        camera.position.y = THREE.MathUtils.lerp(camera.position.y, smoothed.current.x * 0.32, profile.cameraPositionLerp);
         /* eslint-enable react-hooks/immutability */
     });
 
     return null;
 }
 
-function FloatingModels({ isMobile, pointerRef }) {
+function FloatingModels({ isMobile, pointerRef, profile }) {
     const mac = useGLTF(assetUrl('macbook_pro_m3_16_inch_2024.glb'));
     const camera = useGLTF(assetUrl('canon_at-2_retro_camera.glb'));
     const vhs = useGLTF(assetUrl('vhs_tape.glb'));
@@ -381,22 +395,22 @@ function FloatingModels({ isMobile, pointerRef }) {
         groupRef.current.rotation.x = THREE.MathUtils.lerp(
             groupRef.current.rotation.x,
             pointerRef.current.y * -0.08,
-            0.16,
+            profile.groupRotationLerp,
         );
         groupRef.current.rotation.y = THREE.MathUtils.lerp(
             groupRef.current.rotation.y,
             pointerRef.current.x * 0.12,
-            0.16,
+            profile.groupRotationLerp,
         );
         groupRef.current.position.x = THREE.MathUtils.lerp(
             groupRef.current.position.x,
             pointerRef.current.x * 0.28,
-            0.12,
+            profile.groupPositionLerp,
         );
         groupRef.current.position.y = THREE.MathUtils.lerp(
             groupRef.current.position.y,
             pointerRef.current.y * 0.14,
-            0.12,
+            profile.groupPositionLerp,
         );
     });
 
@@ -431,7 +445,7 @@ function FloatingModels({ isMobile, pointerRef }) {
 
             <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
                 <mesh position={[0, 1, -5]}>
-                    <sphereGeometry args={[1.1, 32, 32]} />
+                    <sphereGeometry args={[1.1, profile.bubbleSegments, profile.bubbleSegments]} />
                     <MeshDistortMaterial
                         color="#E05A3A"
                         emissive="#E05A3A"

@@ -25,6 +25,9 @@
   홈 3D 오브젝트 수도 줄이고 postprocessing은 Bloom 위주로 경량화
   모바일 자이로는 기준점 재설정 + 각도 wrap 보정 + smoothing 적용
   터치 기기에서 Chrome 데스크톱 모드를 켜도 모바일 하드웨어로 보이면 reduced profile 유지
+  데스크톱도 기본은 responsive-first profile 로 돌리고, 강한 하드웨어에서만 Bloom/높은 환경 해상도 사용
+  실제 데스크톱 체감 개선을 위해 기본 desktop profile도 더 lean하게 조정하고,
+  마우스 추종 lerp는 더 빠르게 올려 첫인상 반응성을 우선하도록 맞춤
 - `우주 대스타` GIF 제거 후 실제 YouTube 영상 모달로 교체
 - Dev 페이지 `클로드코드로 생산성 10배 올리기`를 긴 구글슬라이드 iframe 대신
   `영상 + 한 장씩 넘기는 슬라이드 덱` 구조로 개선
