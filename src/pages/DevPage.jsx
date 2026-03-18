@@ -63,7 +63,7 @@ const PROJECTS = [
         title: 'Vietls',
         type: 'Web Service',
         desc: '영상 편집 효율화 툴. 자막 및 프리미어 프로 워크플로우 최적화.',
-        url: 'http://vietls.com',
+        url: 'https://vietls.com',
         color: 'linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%)',
         textColor: '#004d40'
     },

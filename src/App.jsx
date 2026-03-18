@@ -46,13 +46,6 @@ function App() {
     return () => window.cancelAnimationFrame(frameId);
   }, [page]);
 
-  // Global navigate function via window
-  useEffect(() => {
-    window.__navigate = (to) => {
-      window.location.hash = to;
-    };
-  }, []);
-
   const CurrentPage = (() => {
     if (page === 'portfolio') return Interactive;
     if (page === 'minimal') return Minimalist;

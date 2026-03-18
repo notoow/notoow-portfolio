@@ -19,17 +19,7 @@ const shortestAngleDelta = (current, initial) => {
 
     return delta;
 };
-
-if (typeof THREE.setConsoleFunction === 'function') {
-    THREE.setConsoleFunction((level, message, ...params) => {
-        if (level === 'log' && typeof message === 'string' && message.includes('THREE.WebGLRenderer: Context Lost.')) {
-            return;
-        }
-
-        const method = console[level] || console.log;
-        method(message, ...params);
-    });
-}
+const MOTION_PERMISSION_STORAGE_KEY = 'notoow-hero-motion-enabled';
 
 const HeroScene = React.memo(function HeroScene({ isMobile = false, onReady }) {
     const [isVisible, setIsVisible] = useState(false);
@@ -39,6 +29,34 @@ const HeroScene = React.memo(function HeroScene({ isMobile = false, onReady }) {
         setIsVisible(true);
         onReady?.();
     };
+
+    useEffect(() => {
+        if (typeof THREE.setConsoleFunction !== 'function') {
+            return undefined;
+        }
+
+        const previous = typeof THREE.getConsoleFunction === 'function'
+            ? THREE.getConsoleFunction()
+            : null;
+
+        THREE.setConsoleFunction((level, message, ...params) => {
+            if (level === 'log' && typeof message === 'string' && message.includes('THREE.WebGLRenderer: Context Lost.')) {
+                return;
+            }
+
+            if (previous) {
+                previous(level, message, ...params);
+                return;
+            }
+
+            const method = console[level] || console.log;
+            method(message, ...params);
+        });
+
+        return () => {
+            THREE.setConsoleFunction(previous || null);
+        };
+    }, []);
 
     return (
         <div
@@ -106,18 +124,53 @@ function SceneContent({ isMobile, onReady }) {
 }
 
 function MotionRequest({ isMobile }) {
-    const [dismissed, setDismissed] = useState(false);
+    const [dismissed, setDismissed] = useState(() => {
+        if (typeof window === 'undefined') return false;
+
+        try {
+            return window.localStorage.getItem(MOTION_PERMISSION_STORAGE_KEY) === 'granted';
+        } catch {
+            return false;
+        }
+    });
     const canRequestMotion = (
         isMobile &&
         typeof DeviceOrientationEvent !== 'undefined' &&
         typeof DeviceOrientationEvent.requestPermission === 'function'
     );
 
+    useEffect(() => {
+        if (!canRequestMotion || dismissed) return undefined;
+
+        const handleMotionSignal = (event) => {
+            if (event.gamma === null || event.beta === null) return;
+
+            setDismissed(true);
+
+            try {
+                window.localStorage.setItem(MOTION_PERMISSION_STORAGE_KEY, 'granted');
+            } catch {
+                // Ignore storage failures and keep the current session state only.
+            }
+        };
+
+        window.addEventListener('deviceorientation', handleMotionSignal, { passive: true });
+        return () => {
+            window.removeEventListener('deviceorientation', handleMotionSignal);
+        };
+    }, [canRequestMotion, dismissed]);
+
     const requestAccess = () => {
         DeviceOrientationEvent.requestPermission()
             .then((response) => {
                 if (response === 'granted') {
                     setDismissed(true);
+
+                    try {
+                        window.localStorage.setItem(MOTION_PERMISSION_STORAGE_KEY, 'granted');
+                    } catch {
+                        // Ignore storage failures and keep the current session state only.
+                    }
                 }
             })
             .catch(() => setDismissed(true));
