@@ -16,14 +16,11 @@ export default function Home() {
     const [sceneProgress, setSceneProgress] = useState(0);
     const { isMobile } = useResponsive();
     const handleSceneReady = useCallback(() => setSceneReady(true), []);
-    const handleSceneProgress = useCallback((nextProgress) => {
-        const safeProgress = Number.isFinite(nextProgress) ? Math.max(0, Math.min(100, nextProgress)) : 0;
-        setSceneProgress((previous) => (safeProgress < previous && safeProgress !== 0 ? previous : safeProgress));
-    }, []);
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
     const parallaxX = useSpring(mouseX, { stiffness: 260, damping: 28, mass: 0.2 });
     const parallaxY = useSpring(mouseY, { stiffness: 260, damping: 28, mass: 0.2 });
+    const displaySceneProgress = sceneReady ? 100 : sceneProgress;
 
     useEffect(() => {
         const handler = (e) => {
@@ -63,6 +60,7 @@ export default function Home() {
         frameId = window.requestAnimationFrame(() => {
             void loadHeroScene();
             timeoutId = window.setTimeout(() => {
+                setSceneProgress(8);
                 startTransition(() => {
                     setShouldRenderScene(true);
                 });
@@ -75,6 +73,20 @@ export default function Home() {
         };
     }, []);
 
+    useEffect(() => {
+        if (!shouldRenderScene) return undefined;
+        if (sceneReady) return undefined;
+
+        const intervalId = window.setInterval(() => {
+            setSceneProgress((previous) => {
+                if (previous >= 92) return previous;
+                return previous + Math.max(2, (92 - previous) * 0.18);
+            });
+        }, 90);
+
+        return () => window.clearInterval(intervalId);
+    }, [sceneReady, shouldRenderScene]);
+
     return (
         <div id="home" style={{
             background: 'var(--bg-void)', color: 'var(--text-hero)',
@@ -86,8 +98,7 @@ export default function Home() {
                 shouldRenderScene={shouldRenderScene}
                 sceneReady={sceneReady}
                 onSceneReady={handleSceneReady}
-                onSceneProgress={handleSceneProgress}
-                sceneProgress={sceneProgress}
+                sceneProgress={displaySceneProgress}
                 parallaxX={parallaxX}
                 parallaxY={parallaxY}
             />
@@ -104,7 +115,6 @@ function CinematicHero({
     shouldRenderScene,
     sceneReady,
     onSceneReady,
-    onSceneProgress,
     sceneProgress,
     parallaxX,
     parallaxY,
@@ -135,7 +145,7 @@ function CinematicHero({
             {/* 3D Scene (behind everything) */}
             {shouldRenderScene && (
                 <Suspense fallback={null}>
-                    <LazyHeroScene onReady={onSceneReady} onProgress={onSceneProgress} />
+                    <LazyHeroScene onReady={onSceneReady} />
                 </Suspense>
             )}
 

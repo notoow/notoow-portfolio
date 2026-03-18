@@ -19,6 +19,7 @@
   placeholder gradient + 퍼센트 로딩바로 빈 장면 노출 방지
   particle / DPR도 살짝 낮춰 버벅임 완화
   마우스 추적은 React state 경유를 줄이고 HeroScene 내부에서 직접 처리
+  홈 3D 오브젝트 수도 줄이고 postprocessing은 Bloom 위주로 경량화
 - `우주 대스타` GIF 제거 후 실제 YouTube 영상 모달로 교체
 - Dev 페이지 `클로드코드로 생산성 10배 올리기`를 긴 구글슬라이드 iframe 대신
   `영상 + 한 장씩 넘기는 슬라이드 덱` 구조로 개선

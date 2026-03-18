@@ -1,14 +1,13 @@
 import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Environment, Float, MeshDistortMaterial, useGLTF, useProgress } from '@react-three/drei';
-import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing';
-import { BlendFunction } from 'postprocessing';
+import { Environment, Float, MeshDistortMaterial, useGLTF } from '@react-three/drei';
+import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from 'three';
 
 const isMobileViewport = typeof window !== 'undefined' && window.innerWidth < 768;
 const assetUrl = (path) => `${import.meta.env.BASE_URL}${path}`;
 
-const HeroScene = React.memo(function HeroScene({ onReady, onProgress }) {
+const HeroScene = React.memo(function HeroScene({ onReady }) {
     const [isVisible, setIsVisible] = useState(false);
 
     const handleReady = () => {
@@ -29,8 +28,9 @@ const HeroScene = React.memo(function HeroScene({ onReady, onProgress }) {
         >
             <Canvas
                 camera={{ position: [0, 0, 8], fov: 45 }}
-                dpr={isMobileViewport ? [1, 1.3] : [1, 1.2]}
-                gl={{ antialias: isMobileViewport, alpha: true, powerPreference: 'high-performance' }}
+                dpr={isMobileViewport ? [1, 1] : [1, 1.05]}
+                gl={{ antialias: false, alpha: true, powerPreference: 'high-performance' }}
+                performance={{ min: 0.8 }}
                 style={{ background: 'transparent' }}
             >
                 <ambientLight intensity={0.5} />
@@ -38,24 +38,16 @@ const HeroScene = React.memo(function HeroScene({ onReady, onProgress }) {
                 <pointLight position={[-3, 2, 4]} intensity={2} color="#E05A3A" distance={12} />
                 <pointLight position={[3, -2, 3]} intensity={2} color="#5DB8A8" distance={10} />
 
-                <SceneProgressBridge onProgress={onProgress} />
-
                 <Suspense fallback={null}>
                     <SceneContent onReady={handleReady} />
                 </Suspense>
 
                 <EffectComposer enabled={!isMobileViewport}>
                     <Bloom
-                        intensity={0.4}
-                        luminanceThreshold={0.6}
-                        luminanceSmoothing={0.9}
-                        mipmapBlur
+                        intensity={0.28}
+                        luminanceThreshold={0.72}
+                        luminanceSmoothing={0.92}
                     />
-                    <ChromaticAberration
-                        blendFunction={BlendFunction.NORMAL}
-                        offset={new THREE.Vector2(0.0008, 0.0008)}
-                    />
-                    <Vignette darkness={0.5} offset={0.3} />
                 </EffectComposer>
             </Canvas>
 
@@ -65,17 +57,6 @@ const HeroScene = React.memo(function HeroScene({ onReady, onProgress }) {
 });
 
 export default HeroScene;
-
-function SceneProgressBridge({ onProgress }) {
-    const { active, progress } = useProgress();
-
-    useEffect(() => {
-        const normalizedProgress = active ? progress : 100;
-        onProgress?.(normalizedProgress);
-    }, [active, onProgress, progress]);
-
-    return null;
-}
 
 function SceneContent({ onReady }) {
     const didReportReady = useRef(false);
@@ -92,8 +73,8 @@ function SceneContent({ onReady }) {
         <>
             {isMobileViewport ? <GyroTracker /> : <MouseTracker pointerRef={pointerRef} />}
             <FloatingModels pointerRef={pointerRef} />
-            <Environment preset="city" />
-            <ParticleField count={isMobileViewport ? 180 : 420} />
+            <Environment preset="city" resolution={64} />
+            <ParticleField count={isMobileViewport ? 90 : 220} />
         </>
     );
 }
@@ -234,12 +215,8 @@ function FloatingModels({ pointerRef }) {
     const mac = useGLTF(assetUrl('macbook_pro_m3_16_inch_2024.glb'));
     const camera = useGLTF(assetUrl('canon_at-2_retro_camera.glb'));
     const vhs = useGLTF(assetUrl('vhs_tape.glb'));
-    const headphone = useGLTF(assetUrl('headphone_with_stand.glb'));
-    const mouse = useGLTF(assetUrl('logitech_mx_vertical_mouse.glb'));
     const mic = useGLTF(assetUrl('microphone_gxl_066_bafhcteks.glb'));
-    const light = useGLTF(assetUrl('studio_umbrella_light.glb'));
     const drone = useGLTF(assetUrl('dji_3_mini_pro.glb'));
-    const printer = useGLTF(assetUrl('3d_printer.glb'));
 
     const scaleFactor = isMobileViewport ? 0.7 : 1;
     const groupRef = useRef(null);
@@ -298,27 +275,9 @@ function FloatingModels({ pointerRef }) {
                 />
             </Float>
 
-            <Float speed={1.2} rotationIntensity={0.5} floatIntensity={0.8}>
-                <primitive
-                    object={headphone.scene}
-                    scale={5 * scaleFactor}
-                    position={[4.5, -1, -4]}
-                    rotation={[0, -0.5, 0.2]}
-                />
-            </Float>
-
-            <Float speed={1} rotationIntensity={1.5} floatIntensity={1}>
-                <primitive
-                    object={mouse.scene}
-                    scale={2.5 * scaleFactor}
-                    position={[-4, 0.5, -2]}
-                    rotation={[0.2, 4.8, 0.2]}
-                />
-            </Float>
-
             <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
                 <mesh position={[0, 1, -5]}>
-                    <sphereGeometry args={[1.1, 64, 64]} />
+                    <sphereGeometry args={[1.1, 32, 32]} />
                     <MeshDistortMaterial
                         color="#E05A3A"
                         emissive="#E05A3A"
@@ -334,18 +293,9 @@ function FloatingModels({ pointerRef }) {
             <Float speed={1} rotationIntensity={0.4} floatIntensity={0.5}>
                 <primitive
                     object={mic.scene}
-                    scale={0.8 * scaleFactor}
+                    scale={0.72 * scaleFactor}
                     position={[1.5, -2.5, -3]}
                     rotation={[0, 0, 0.3]}
-                />
-            </Float>
-
-            <Float speed={1} rotationIntensity={0.2} floatIntensity={0.5}>
-                <primitive
-                    object={light.scene}
-                    scale={0.005 * scaleFactor}
-                    position={[-23, -1, -17]}
-                    rotation={[0.5, 1.5, 0]}
                 />
             </Float>
 
@@ -357,15 +307,6 @@ function FloatingModels({ pointerRef }) {
                     rotation={[0.2, 0.5, 0.1]}
                 />
             </Float>
-
-            <Float speed={0.8} rotationIntensity={0.3} floatIntensity={0.5}>
-                <primitive
-                    object={printer.scene}
-                    scale={0.016 * scaleFactor}
-                    position={[8, -4, -3]}
-                    rotation={[0.1, -0.5, 0]}
-                />
-            </Float>
         </group>
     );
 }
@@ -373,11 +314,8 @@ function FloatingModels({ pointerRef }) {
 useGLTF.preload(assetUrl('macbook_pro_m3_16_inch_2024.glb'));
 useGLTF.preload(assetUrl('canon_at-2_retro_camera.glb'));
 useGLTF.preload(assetUrl('vhs_tape.glb'));
-useGLTF.preload(assetUrl('headphone_with_stand.glb'));
-useGLTF.preload(assetUrl('logitech_mx_vertical_mouse.glb'));
 useGLTF.preload(assetUrl('microphone_gxl_066_bafhcteks.glb'));
 useGLTF.preload(assetUrl('dji_3_mini_pro.glb'));
-useGLTF.preload(assetUrl('3d_printer.glb'));
 
 function ParticleField({ count = 800 }) {
     const mesh = useRef();
