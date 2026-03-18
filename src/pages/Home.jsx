@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, startTransition, useCallback, useEffect, useRef, useState } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useMotionValue, useScroll, useSpring, useTransform } from 'framer-motion';
 import CursorGlow from '../components/CursorGlow';
 import { useResponsive } from '../hooks/useResponsive';
 
@@ -11,34 +11,32 @@ const LazyHeroScene = lazy(loadHeroScene);
    ═══════════════════════════════════════════ */
 
 export default function Home() {
-    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const [shouldRenderScene, setShouldRenderScene] = useState(false);
     const [sceneReady, setSceneReady] = useState(false);
+    const [sceneProgress, setSceneProgress] = useState(0);
     const { isMobile } = useResponsive();
-    const mouseFrameRef = useRef(0);
-    const latestMouseRef = useRef({ x: 0, y: 0 });
     const handleSceneReady = useCallback(() => setSceneReady(true), []);
+    const handleSceneProgress = useCallback((nextProgress) => {
+        const safeProgress = Number.isFinite(nextProgress) ? Math.max(0, Math.min(100, nextProgress)) : 0;
+        setSceneProgress((previous) => (safeProgress < previous && safeProgress !== 0 ? previous : safeProgress));
+    }, []);
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+    const parallaxX = useSpring(mouseX, { stiffness: 260, damping: 28, mass: 0.2 });
+    const parallaxY = useSpring(mouseY, { stiffness: 260, damping: 28, mass: 0.2 });
 
     useEffect(() => {
         const handler = (e) => {
-            latestMouseRef.current = {
-                x: (e.clientX / window.innerWidth - 0.5) * 2,
-                y: (e.clientY / window.innerHeight - 0.5) * 2,
-            };
-
-            if (mouseFrameRef.current) return;
-
-            mouseFrameRef.current = window.requestAnimationFrame(() => {
-                mouseFrameRef.current = 0;
-                setMousePos(latestMouseRef.current);
-            });
+            mouseX.set((e.clientX / window.innerWidth - 0.5) * 2);
+            mouseY.set((e.clientY / window.innerHeight - 0.5) * 2);
         };
         window.addEventListener('mousemove', handler);
         return () => {
             window.removeEventListener('mousemove', handler);
-            window.cancelAnimationFrame(mouseFrameRef.current);
+            mouseX.set(0);
+            mouseY.set(0);
         };
-    }, []);
+    }, [mouseX, mouseY]);
 
     useEffect(() => {
         const timer = window.setTimeout(() => {
@@ -84,11 +82,14 @@ export default function Home() {
         }}>
             <CursorGlow />
             <CinematicHero
-                mousePos={mousePos}
                 isMobile={isMobile}
                 shouldRenderScene={shouldRenderScene}
                 sceneReady={sceneReady}
                 onSceneReady={handleSceneReady}
+                onSceneProgress={handleSceneProgress}
+                sceneProgress={sceneProgress}
+                parallaxX={parallaxX}
+                parallaxY={parallaxY}
             />
             <RollingStrip />
             <BentoPreview />
@@ -98,12 +99,23 @@ export default function Home() {
 }
 
 /* ─── CINEMATIC 3D HERO ─── */
-function CinematicHero({ mousePos, isMobile, shouldRenderScene, sceneReady, onSceneReady }) {
+function CinematicHero({
+    isMobile,
+    shouldRenderScene,
+    sceneReady,
+    onSceneReady,
+    onSceneProgress,
+    sceneProgress,
+    parallaxX,
+    parallaxY,
+}) {
     const [time, setTime] = useState('');
     const containerRef = useRef(null);
     const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end start'] });
     const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
     const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
+    const titleX = useTransform(parallaxX, (value) => value * 5);
+    const titleY = useTransform(parallaxY, (value) => value * 3);
 
     useEffect(() => {
         const update = () => {
@@ -123,7 +135,7 @@ function CinematicHero({ mousePos, isMobile, shouldRenderScene, sceneReady, onSc
             {/* 3D Scene (behind everything) */}
             {shouldRenderScene && (
                 <Suspense fallback={null}>
-                    <LazyHeroScene onReady={onSceneReady} />
+                    <LazyHeroScene onReady={onSceneReady} onProgress={onSceneProgress} />
                 </Suspense>
             )}
 
@@ -138,6 +150,50 @@ function CinematicHero({ mousePos, isMobile, shouldRenderScene, sceneReady, onSc
                     transition: 'opacity 0.8s var(--ease-expo)',
                 }}
             />
+
+            {!sceneReady && (
+                <div style={{
+                    position: 'absolute',
+                    left: isMobile ? '1rem' : '3rem',
+                    right: isMobile ? '1rem' : 'auto',
+                    bottom: isMobile ? '5.5rem' : '3.5rem',
+                    width: isMobile ? 'auto' : 'min(320px, 28vw)',
+                    zIndex: 11,
+                    pointerEvents: 'none',
+                }}>
+                    <div style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '0.62rem',
+                        letterSpacing: '0.18em',
+                        color: 'var(--text-muted)',
+                        marginBottom: '0.6rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '0.8rem',
+                    }}>
+                        <span>LOADING 3D</span>
+                        <span>{Math.round(sceneProgress)}%</span>
+                    </div>
+                    <div style={{
+                        position: 'relative',
+                        height: '3px',
+                        borderRadius: '999px',
+                        background: 'rgba(255,255,255,0.08)',
+                        overflow: 'hidden',
+                    }}>
+                        <div style={{
+                            position: 'absolute',
+                            inset: 0,
+                            width: `${Math.max(sceneProgress, 6)}%`,
+                            borderRadius: '999px',
+                            background: 'linear-gradient(90deg, var(--accent), #F5A87A)',
+                            transition: 'width 0.22s ease-out, opacity 0.3s ease-out',
+                            opacity: sceneReady ? 0 : 1,
+                        }} />
+                    </div>
+                </div>
+            )}
 
             {/* Noise grain */}
             <div style={{
@@ -202,12 +258,12 @@ function CinematicHero({ mousePos, isMobile, shouldRenderScene, sceneReady, onSc
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
                     >
-                        <h1 style={{
+                        <motion.h1 style={{
                             fontFamily: 'var(--font-kr)',
                             fontSize: 'clamp(3.5rem, 9vw, 8rem)',
                             fontWeight: 800, lineHeight: 0.95, letterSpacing: '-0.04em',
-                            transform: `translate(${mousePos.x * 5}px, ${mousePos.y * 3}px)`,
-                            transition: 'transform 0.22s var(--ease-smooth)',
+                            x: titleX,
+                            y: titleY,
                         }}>
                             <span style={{ display: 'block', color: 'var(--text-hero)' }}>촬영부터</span>
                             <span style={{
@@ -218,7 +274,7 @@ function CinematicHero({ mousePos, isMobile, shouldRenderScene, sceneReady, onSc
                             }}>
                                 개발까지.
                             </span>
-                        </h1>
+                        </motion.h1>
                     </motion.div>
 
                     <motion.div

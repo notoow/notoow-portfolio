@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Environment, Float, MeshDistortMaterial, useGLTF } from '@react-three/drei';
+import { Environment, Float, MeshDistortMaterial, useGLTF, useProgress } from '@react-three/drei';
 import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing';
 import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
@@ -8,7 +8,7 @@ import * as THREE from 'three';
 const isMobileViewport = typeof window !== 'undefined' && window.innerWidth < 768;
 const assetUrl = (path) => `${import.meta.env.BASE_URL}${path}`;
 
-const HeroScene = React.memo(function HeroScene({ onReady }) {
+const HeroScene = React.memo(function HeroScene({ onReady, onProgress }) {
     const [isVisible, setIsVisible] = useState(false);
 
     const handleReady = () => {
@@ -38,6 +38,8 @@ const HeroScene = React.memo(function HeroScene({ onReady }) {
                 <pointLight position={[-3, 2, 4]} intensity={2} color="#E05A3A" distance={12} />
                 <pointLight position={[3, -2, 3]} intensity={2} color="#5DB8A8" distance={10} />
 
+                <SceneProgressBridge onProgress={onProgress} />
+
                 <Suspense fallback={null}>
                     <SceneContent onReady={handleReady} />
                 </Suspense>
@@ -64,6 +66,17 @@ const HeroScene = React.memo(function HeroScene({ onReady }) {
 
 export default HeroScene;
 
+function SceneProgressBridge({ onProgress }) {
+    const { active, progress } = useProgress();
+
+    useEffect(() => {
+        const normalizedProgress = active ? progress : 100;
+        onProgress?.(normalizedProgress);
+    }, [active, onProgress, progress]);
+
+    return null;
+}
+
 function SceneContent({ onReady }) {
     const didReportReady = useRef(false);
     const pointerRef = useRef({ x: 0, y: 0 });
@@ -71,7 +84,8 @@ function SceneContent({ onReady }) {
     useEffect(() => {
         if (didReportReady.current) return;
         didReportReady.current = true;
-        onReady?.();
+        const frameId = window.requestAnimationFrame(() => onReady?.());
+        return () => window.cancelAnimationFrame(frameId);
     }, [onReady]);
 
     return (
@@ -161,17 +175,17 @@ function MouseTracker({ pointerRef }) {
     }, [pointer]);
 
     useFrame(() => {
-        const targetX = pointer.current.y * 0.12;
-        const targetY = pointer.current.x * 0.18;
-        const targetPositionX = pointer.current.x * 0.18;
-        const targetPositionY = pointer.current.y * 0.12;
+        const targetX = pointer.current.y * 0.16;
+        const targetY = pointer.current.x * 0.24;
+        const targetPositionX = pointer.current.x * 0.28;
+        const targetPositionY = pointer.current.y * 0.18;
 
         // React Three Fiber cameras are imperative scene objects.
         /* eslint-disable react-hooks/immutability */
-        camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, targetX, 0.12);
-        camera.rotation.y = THREE.MathUtils.lerp(camera.rotation.y, targetY, 0.12);
-        camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetPositionX, 0.09);
-        camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetPositionY, 0.09);
+        camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, targetX, 0.18);
+        camera.rotation.y = THREE.MathUtils.lerp(camera.rotation.y, targetY, 0.18);
+        camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetPositionX, 0.14);
+        camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetPositionY, 0.14);
         /* eslint-enable react-hooks/immutability */
     });
 
@@ -235,23 +249,23 @@ function FloatingModels({ pointerRef }) {
 
         groupRef.current.rotation.x = THREE.MathUtils.lerp(
             groupRef.current.rotation.x,
-            pointerRef.current.y * -0.05,
-            0.09,
+            pointerRef.current.y * -0.08,
+            0.16,
         );
         groupRef.current.rotation.y = THREE.MathUtils.lerp(
             groupRef.current.rotation.y,
-            pointerRef.current.x * 0.08,
-            0.09,
+            pointerRef.current.x * 0.12,
+            0.16,
         );
         groupRef.current.position.x = THREE.MathUtils.lerp(
             groupRef.current.position.x,
-            pointerRef.current.x * 0.2,
-            0.06,
+            pointerRef.current.x * 0.28,
+            0.12,
         );
         groupRef.current.position.y = THREE.MathUtils.lerp(
             groupRef.current.position.y,
-            pointerRef.current.y * 0.08,
-            0.06,
+            pointerRef.current.y * 0.14,
+            0.12,
         );
     });
 
