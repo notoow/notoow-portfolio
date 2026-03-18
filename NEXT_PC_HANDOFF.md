@@ -2,18 +2,19 @@
 
 ## Latest Snapshot
 
-- latest commit: `4aa5917`
 - branch: `main`
-- working tree on this PC: clean
-- GitHub Pages deploy after latest commit: done
+- working tree on this PC: clean after commit/push
+- GitHub Pages deploy: latest state reflected after `npm run deploy`
 
-오늘 기준으로 추가 반영된 핵심:
+오늘 기준 핵심 변경:
 
-- `#portfolio` 포함 주요 페이지 모바일 반응형 개선
-- YouTube 썸네일 로직 고도화
-- 수동 지정한 `ytimg` 썸네일 우선 존중
-- 썸네일이 깨질 때 후보 썸네일 + `oEmbed` fallback 사용
-- 공용 반응형 훅 / 공용 적응형 썸네일 컴포넌트 추가
+- 메인 홈 카드 hover 떨림 완화
+- 커서 꼬리 이펙트 제거, 단일 glow만 유지
+- `우주 대스타` GIF 제거 후 실제 YouTube 영상 모달로 교체
+- Dev 페이지 `클로드코드로 생산성 10배 올리기`를 긴 구글슬라이드 iframe 대신
+  `영상 + 한 장씩 넘기는 슬라이드 덱` 구조로 개선
+- 로컬 PPT를 슬라이드 이미지로 export 해서 사이트에서 직접 렌더링
+- 3D GLB 경로를 GitHub Pages base 경로 기준으로 정리
 
 ## Working Tomorrow
 
@@ -33,7 +34,12 @@ git rev-parse --short HEAD
 git status
 ```
 
-정상이라면 `HEAD` 는 `4aa5917` 이어야 합니다.
+정상 여부는 아래로 바로 확인:
+
+```bash
+git rev-parse --short HEAD
+git status
+```
 
 배포:
 
@@ -60,12 +66,44 @@ npm run deploy
 - `src/pages/Interactive.jsx`: 전체 포트폴리오
 - `src/pages/CategoryDetail.jsx`: 촬영/편집/3D 공통 상세
 - `src/pages/DevPage.jsx`: 개발 페이지
+- `src/components/Scene3D.jsx`: 홈/포트폴리오 3D 및 커서 glow
 - `src/data/portfolioVideos.js`: 실제 영상 데이터
 - `src/components/AdaptiveThumbnail.jsx`: 공용 썸네일 표시 / fallback
 - `src/hooks/useResponsive.js`: 공용 모바일/태블릿 판별
 - `src/lib/youtubeThumbnails.js`: YouTube 썸네일 후보 / probe / oEmbed fallback
 - `scripts/studio-browser-export.js`: YouTube Studio export
 - `scripts/studio-import.mjs`: export JSON import
+- `scripts/export_case_study_slides.ps1`: 로컬 PPT를 슬라이드 이미지로 export
+
+## Dev Case Study
+
+현재 Dev 페이지 첫 카드 `클로드코드로 생산성 10배 올리기`는:
+
+- 상단: YouTube 영상
+- 우측/하단: one-by-one 슬라이드 덱
+- 썸네일 클릭 / Prev / Next / 좌우 화살표 키로 탐색
+- 외부 원본은 Google Slides 링크로 별도 열기 가능
+
+슬라이드 이미지는 여기서 읽습니다:
+
+- `public/case-studies/claude-code/slide-01.jpg`
+- ...
+- `public/case-studies/claude-code/slide-22.jpg`
+
+로컬 PPT에서 다시 export 해야 할 때:
+
+```powershell
+./scripts/export_case_study_slides.ps1
+```
+
+기본 입력 파일:
+
+- `C:\Users\tan01\Desktop\@ALLFILES\우탄개발폴더\탄_최종자료.pptx`
+
+주의:
+
+- 이 PPTX는 300MB가 넘어서 일반 GitHub repo에 직접 커밋 불가
+- 실제 배포엔 export된 `jpg` 슬라이드만 포함
 
 ## Video Workflow
 
@@ -101,13 +139,15 @@ node scripts/studio-import.mjs "C:\path\to\studio-videos.json"
 - 상세 페이지 진입 시 스크롤 상단 리셋됨
 - 연락 버튼은 메일 앱이 아니라 사이트 내부 팝업 사용
 - 문의 이메일: `tan0123@naver.com`
-- 개발 페이지 `우주 대스타`는 현재 GIF 팝업 사용
+- 개발 페이지 `우주 대스타`는 현재 YouTube 영상 모달 사용
 - `고양시지속가능발전협의회 홍보영상` 썸네일은 고정 `hqdefault` 로 설정됨
 - `#home`, `#portfolio`, `#film`, `#edit`, `#3d`, `#dev` 모바일 반응형 1차 정리 완료
 - `Interactive.jsx` 의 스킬 섹션 / 가로 갤러리 / CTA / 푸터도 모바일 대응 반영
 - 촬영/편집/3D 상세 카드와 라이트박스도 모바일 대응 반영
 - 썸네일은 이제 `maxresdefault -> sddefault -> hqdefault -> mqdefault -> oEmbed` 순서로 더 똑똑하게 fallback
 - 이미 수동으로 넣어둔 같은 영상의 `ytimg` 썸네일 URL은 강제로 다른 품질로 바꾸지 않음
+- Dev 페이지 케이스 스터디는 현재 `scroll-heavy` 가 아니라 `step-by-step deck` 방식
+- `Scene3D.jsx` 의 GLB 로딩은 `import.meta.env.BASE_URL` 기준으로 정리됨
 
 ## Responsive Scope
 
@@ -141,7 +181,6 @@ node scripts/studio-import.mjs "C:\path\to\studio-videos.json"
 
 ## Nice Next Improvements
 
-- `우주 대스타` 실제 YouTube 링크 받으면 GIF 팝업 대신 영상 모달로 교체
 - 포트폴리오 카드별 설명문을 조금 더 프로젝트 중심으로 다듬기
 - 편집 / 촬영 / 3D 상세 페이지에서 대표작 우선순위 재정렬
 - 썸네일 누락 영상 자동 점검 스크립트 추가
@@ -150,6 +189,9 @@ node scripts/studio-import.mjs "C:\path\to\studio-videos.json"
 - `Home.jsx` 의 `BentoPreview` 도 `useResponsive` 훅으로 통일 가능
 - 페이지별 터치 제스처 / hover-only 인터랙션을 더 줄여서 모바일 UX 다듬기
 - 실제 기기에서 세로/가로 회전 시 레이아웃 재확인
+- 케이스 스터디 슬라이드에 섹션 라벨/챕터 메타데이터 추가
+- 필요하면 슬라이드 이미지를 `webp` 로 더 압축
+- Dev 케이스 스터디를 다른 프로젝트에도 재사용 가능한 공용 모달로 추출
 
 ## Quick Check Before Push
 

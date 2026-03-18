@@ -4,10 +4,19 @@ import { useResponsive } from '../hooks/useResponsive';
 
 const BASE_URL = import.meta.env.BASE_URL;
 const CLAUDE_CODE_VIDEO_ID = 'ggYmI9DIgJs';
-const CLAUDE_CODE_SLIDES_URL = 'https://docs.google.com/presentation/d/1O4yzG5smFp_4LtlkihSf3dFOp1o3C7ufR4A58YpQLeg/embed?start=false&loop=false&delayms=3000';
 const CLAUDE_CODE_SLIDES_VIEW_URL = 'https://docs.google.com/presentation/d/1O4yzG5smFp_4LtlkihSf3dFOp1o3C7ufR4A58YpQLeg/edit?slide=id.g3ab9e0cd2cf_0_1#slide=id.g3ab9e0cd2cf_0_1';
 const WOOJU_DAESTAR_VIDEO_ID = 'yi1iuJM1Vww';
 const WOOJU_DAESTAR_THUMBNAIL = `https://i.ytimg.com/vi/${WOOJU_DAESTAR_VIDEO_ID}/hqdefault.jpg`;
+const CLAUDE_CODE_SLIDES = Array.from({ length: 22 }, (_, index) => ({
+    id: index + 1,
+    src: `${BASE_URL}case-studies/claude-code/slide-${String(index + 1).padStart(2, '0')}.jpg`,
+    alt: `클로드코드 발표자료 슬라이드 ${index + 1}`,
+}));
+const CLAUDE_CODE_CASE_STUDY_POINTS = [
+    '영상 제작 파이프라인 자동화',
+    '비개발자 관점의 Claude Code 실전 도입',
+    '웹앱 구축부터 반복 업무 제거까지 연결',
+];
 
 const ytEmbed = (id) => `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&controls=1`;
 
@@ -27,7 +36,7 @@ const PROJECTS = [
         media: `https://i.ytimg.com/vi/${CLAUDE_CODE_VIDEO_ID}/hqdefault.jpg`,
         popupType: 'case-study',
         videoId: CLAUDE_CODE_VIDEO_ID,
-        slidesEmbedUrl: CLAUDE_CODE_SLIDES_URL,
+        slides: CLAUDE_CODE_SLIDES,
         slidesViewUrl: CLAUDE_CODE_SLIDES_VIEW_URL,
         color: 'linear-gradient(135deg, #162a2d 0%, #2f766b 100%)',
         textColor: '#f6fffd'
@@ -103,15 +112,460 @@ const MANIFESTO = [
     }
 ];
 
+function CaseStudyModal({ item, isMobile, onClose, activeSlide, onSelectSlide }) {
+    const slides = item.slides || [];
+    const currentSlide = slides[activeSlide];
+    const progress = slides.length ? ((activeSlide + 1) / slides.length) * 100 : 0;
+    const goPrev = () => onSelectSlide(Math.max(activeSlide - 1, 0));
+    const goNext = () => onSelectSlide(Math.min(activeSlide + 1, slides.length - 1));
+
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={onClose}
+            style={{
+                position: 'fixed',
+                inset: 0,
+                zIndex: 9999,
+                background: 'rgba(0,0,0,0.86)',
+                backdropFilter: 'blur(16px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: isMobile ? '0.75rem' : '1.5rem',
+            }}
+        >
+            <motion.div
+                initial={{ opacity: 0, y: 18, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 18, scale: 0.98 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                onClick={(event) => event.stopPropagation()}
+                style={{
+                    width: 'min(100%, 1320px)',
+                    height: isMobile ? 'min(100%, 94vh)' : 'min(92vh, 920px)',
+                    borderRadius: isMobile ? '20px' : '26px',
+                    overflow: 'hidden',
+                    border: '1px solid var(--border-hover)',
+                    background: 'rgba(10,10,10,0.98)',
+                    boxShadow: '0 30px 90px rgba(0,0,0,0.5)',
+                    display: 'grid',
+                    gridTemplateRows: 'auto 1fr',
+                }}
+            >
+                <div style={{
+                    padding: isMobile ? '0.9rem 1rem' : '1rem 1.25rem',
+                    borderBottom: '1px solid var(--border)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: isMobile ? 'flex-start' : 'center',
+                    gap: '1rem',
+                    flexDirection: isMobile ? 'column' : 'row',
+                    background: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01))',
+                }}>
+                    <div>
+                        <span style={{
+                            display: 'block',
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: '0.62rem',
+                            color: 'var(--tone-mint)',
+                            letterSpacing: '0.14em',
+                            marginBottom: '0.35rem',
+                        }}>
+                            CASE STUDY / SLIDE DECK
+                        </span>
+                        <strong style={{
+                            display: 'block',
+                            fontSize: isMobile ? '1rem' : '1.08rem',
+                            fontWeight: 700,
+                            color: 'var(--text-hero)',
+                        }}>
+                            {item.title}
+                        </strong>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '0.7rem', flexWrap: 'wrap' }}>
+                        {item.slidesViewUrl && (
+                            <a
+                                href={item.slidesViewUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                style={{
+                                    padding: '0.75rem 1rem',
+                                    borderRadius: '999px',
+                                    border: '1px solid rgba(93,184,168,0.25)',
+                                    background: 'rgba(93,184,168,0.08)',
+                                    color: 'var(--tone-mint)',
+                                    fontFamily: 'var(--font-mono)',
+                                    fontSize: '0.68rem',
+                                    letterSpacing: '0.08em',
+                                    textDecoration: 'none',
+                                }}
+                            >
+                                GOOGLE SLIDES
+                            </a>
+                        )}
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            style={{
+                                padding: '0.75rem 1rem',
+                                borderRadius: '999px',
+                                border: '1px solid var(--border)',
+                                background: 'transparent',
+                                color: 'var(--text-secondary)',
+                                fontFamily: 'var(--font-mono)',
+                                fontSize: '0.68rem',
+                                letterSpacing: '0.08em',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            CLOSE
+                        </button>
+                    </div>
+                </div>
+
+                <div style={{
+                    minHeight: 0,
+                    display: 'grid',
+                    gridTemplateColumns: isMobile ? '1fr' : '360px minmax(0, 1fr)',
+                    gap: 0,
+                }}>
+                    <aside style={{
+                        minHeight: 0,
+                        overflow: 'auto',
+                        borderRight: isMobile ? 'none' : '1px solid var(--border)',
+                        borderBottom: isMobile ? '1px solid var(--border)' : 'none',
+                        padding: isMobile ? '1rem' : '1.15rem',
+                        display: 'grid',
+                        alignContent: 'start',
+                        gap: '1rem',
+                        background: 'linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.005))',
+                    }}>
+                        <div style={{
+                            borderRadius: '18px',
+                            overflow: 'hidden',
+                            border: '1px solid var(--border)',
+                            background: '#050505',
+                            aspectRatio: '16 / 9',
+                        }}>
+                            <iframe
+                                src={ytEmbed(item.videoId)}
+                                title={item.title}
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
+                            />
+                        </div>
+
+                        <div style={{
+                            padding: isMobile ? '1rem' : '1.1rem',
+                            borderRadius: '18px',
+                            border: '1px solid var(--border)',
+                            background: 'rgba(255,255,255,0.02)',
+                            display: 'grid',
+                            gap: '0.9rem',
+                        }}>
+                            <div>
+                                <span style={{
+                                    display: 'block',
+                                    fontFamily: 'var(--font-mono)',
+                                    fontSize: '0.62rem',
+                                    color: 'var(--text-muted)',
+                                    letterSpacing: '0.12em',
+                                    marginBottom: '0.55rem',
+                                }}>
+                                    OVERVIEW
+                                </span>
+                                <p style={{
+                                    color: 'var(--text-secondary)',
+                                    lineHeight: 1.75,
+                                    fontSize: '0.95rem',
+                                }}>
+                                    {item.desc}
+                                </p>
+                            </div>
+
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+                                gap: '0.7rem',
+                            }}>
+                                <div style={{
+                                    padding: '0.8rem',
+                                    borderRadius: '14px',
+                                    border: '1px solid rgba(255,255,255,0.06)',
+                                    background: 'rgba(255,255,255,0.015)',
+                                }}>
+                                    <span style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
+                                        FORMAT
+                                    </span>
+                                    <strong style={{ display: 'block', marginTop: '0.35rem', color: 'var(--text-hero)', fontSize: '0.92rem' }}>
+                                        Video + Deck
+                                    </strong>
+                                </div>
+                                <div style={{
+                                    padding: '0.8rem',
+                                    borderRadius: '14px',
+                                    border: '1px solid rgba(255,255,255,0.06)',
+                                    background: 'rgba(255,255,255,0.015)',
+                                }}>
+                                    <span style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
+                                        SLIDES
+                                    </span>
+                                    <strong style={{ display: 'block', marginTop: '0.35rem', color: 'var(--text-hero)', fontSize: '0.92rem' }}>
+                                        {slides.length} pages
+                                    </strong>
+                                </div>
+                                <div style={{
+                                    padding: '0.8rem',
+                                    borderRadius: '14px',
+                                    border: '1px solid rgba(255,255,255,0.06)',
+                                    background: 'rgba(255,255,255,0.015)',
+                                }}>
+                                    <span style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
+                                        MODE
+                                    </span>
+                                    <strong style={{ display: 'block', marginTop: '0.35rem', color: 'var(--text-hero)', fontSize: '0.92rem' }}>
+                                        Step by step
+                                    </strong>
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'grid', gap: '0.55rem' }}>
+                                {CLAUDE_CODE_CASE_STUDY_POINTS.map((point) => (
+                                    <div
+                                        key={point}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.7rem',
+                                            color: 'var(--text-secondary)',
+                                            fontSize: '0.9rem',
+                                        }}
+                                    >
+                                        <span style={{
+                                            width: '8px',
+                                            height: '8px',
+                                            borderRadius: '999px',
+                                            background: 'var(--tone-mint)',
+                                            boxShadow: '0 0 0 6px rgba(93,184,168,0.1)',
+                                            flexShrink: 0,
+                                        }} />
+                                        <span>{point}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </aside>
+
+                    <section style={{
+                        minHeight: 0,
+                        overflow: 'auto',
+                        padding: isMobile ? '1rem' : '1.25rem',
+                        display: 'grid',
+                        gap: '1rem',
+                        alignContent: 'start',
+                    }}>
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: isMobile ? 'flex-start' : 'center',
+                            gap: '1rem',
+                            flexDirection: isMobile ? 'column' : 'row',
+                        }}>
+                            <div style={{ minWidth: 0 }}>
+                                <span style={{
+                                    display: 'block',
+                                    fontFamily: 'var(--font-mono)',
+                                    fontSize: '0.62rem',
+                                    color: 'var(--text-muted)',
+                                    letterSpacing: '0.12em',
+                                    marginBottom: '0.4rem',
+                                }}>
+                                    DECK NAVIGATION
+                                </span>
+                                <strong style={{ color: 'var(--text-hero)', fontSize: '1rem' }}>
+                                    Slide {String(activeSlide + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
+                                </strong>
+                            </div>
+
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.75rem',
+                                width: isMobile ? '100%' : 'auto',
+                            }}>
+                                <div style={{
+                                    width: isMobile ? '100%' : '180px',
+                                    height: '6px',
+                                    borderRadius: '999px',
+                                    background: 'rgba(255,255,255,0.08)',
+                                    overflow: 'hidden',
+                                }}>
+                                    <div style={{
+                                        width: `${progress}%`,
+                                        height: '100%',
+                                        background: 'linear-gradient(90deg, #5DB8A8, #9fe6da)',
+                                    }} />
+                                </div>
+                                <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+                                    <button
+                                        type="button"
+                                        onClick={goPrev}
+                                        disabled={activeSlide === 0}
+                                        style={{
+                                            padding: '0.7rem 0.95rem',
+                                            borderRadius: '999px',
+                                            border: '1px solid var(--border)',
+                                            background: activeSlide === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.05)',
+                                            color: activeSlide === 0 ? 'var(--text-muted)' : 'var(--text-hero)',
+                                            cursor: activeSlide === 0 ? 'not-allowed' : 'pointer',
+                                        }}
+                                    >
+                                        Prev
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={goNext}
+                                        disabled={activeSlide === slides.length - 1}
+                                        style={{
+                                            padding: '0.7rem 0.95rem',
+                                            borderRadius: '999px',
+                                            border: '1px solid rgba(93,184,168,0.25)',
+                                            background: activeSlide === slides.length - 1 ? 'rgba(93,184,168,0.05)' : 'rgba(93,184,168,0.12)',
+                                            color: activeSlide === slides.length - 1 ? 'var(--text-muted)' : 'var(--tone-mint)',
+                                            cursor: activeSlide === slides.length - 1 ? 'not-allowed' : 'pointer',
+                                        }}
+                                    >
+                                        Next
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {currentSlide && (
+                            <div style={{
+                                borderRadius: isMobile ? '18px' : '22px',
+                                overflow: 'hidden',
+                                border: '1px solid var(--border)',
+                                background: '#070707',
+                                boxShadow: '0 24px 70px rgba(0,0,0,0.26)',
+                            }}>
+                                <img
+                                    src={currentSlide.src}
+                                    alt={currentSlide.alt}
+                                    style={{
+                                        display: 'block',
+                                        width: '100%',
+                                        height: 'auto',
+                                        objectFit: 'contain',
+                                        background: '#070707',
+                                    }}
+                                />
+                            </div>
+                        )}
+
+                        <div style={{
+                            display: 'grid',
+                            gap: '0.7rem',
+                        }}>
+                            <span style={{
+                                fontFamily: 'var(--font-mono)',
+                                fontSize: '0.62rem',
+                                color: 'var(--text-muted)',
+                                letterSpacing: '0.12em',
+                            }}>
+                                THUMBNAILS
+                            </span>
+
+                            <div style={{
+                                display: 'grid',
+                                gridAutoFlow: 'column',
+                                gridAutoColumns: isMobile ? '112px' : '140px',
+                                gap: '0.75rem',
+                                overflowX: 'auto',
+                                paddingBottom: '0.25rem',
+                            }}>
+                                {slides.map((slide, index) => {
+                                    const active = index === activeSlide;
+                                    return (
+                                        <button
+                                            key={slide.id}
+                                            type="button"
+                                            onClick={() => onSelectSlide(index)}
+                                            style={{
+                                                display: 'grid',
+                                                gap: '0.45rem',
+                                                padding: '0.45rem',
+                                                borderRadius: '16px',
+                                                border: active ? '1px solid rgba(93,184,168,0.7)' : '1px solid var(--border)',
+                                                background: active ? 'rgba(93,184,168,0.08)' : 'rgba(255,255,255,0.02)',
+                                                cursor: 'pointer',
+                                                textAlign: 'left',
+                                            }}
+                                        >
+                                            <div style={{
+                                                borderRadius: '12px',
+                                                overflow: 'hidden',
+                                                aspectRatio: '16 / 9',
+                                                background: '#050505',
+                                            }}>
+                                                <img
+                                                    src={slide.src}
+                                                    alt={slide.alt}
+                                                    style={{
+                                                        display: 'block',
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        objectFit: 'cover',
+                                                    }}
+                                                />
+                                            </div>
+                                            <span style={{
+                                                fontFamily: 'var(--font-mono)',
+                                                fontSize: '0.62rem',
+                                                color: active ? 'var(--tone-mint)' : 'var(--text-secondary)',
+                                                letterSpacing: '0.08em',
+                                            }}>
+                                                SLIDE {String(index + 1).padStart(2, '0')}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </motion.div>
+        </motion.div>
+    );
+}
+
 function MediaLightbox({ item, onClose }) {
     const { isMobile } = useResponsive();
     const isImage = item.popupType === 'image';
     const isVideo = item.popupType === 'video';
     const isCaseStudy = item.popupType === 'case-study';
+    const slides = item.slides || [];
+    const [activeSlide, setActiveSlide] = useState(0);
 
     React.useEffect(() => {
         const onKeyDown = (event) => {
             if (event.key === 'Escape') onClose();
+
+            if (isCaseStudy && slides.length > 0) {
+                if (event.key === 'ArrowRight') {
+                    setActiveSlide((prev) => Math.min(prev + 1, slides.length - 1));
+                }
+
+                if (event.key === 'ArrowLeft') {
+                    setActiveSlide((prev) => Math.max(prev - 1, 0));
+                }
+            }
         };
 
         document.addEventListener('keydown', onKeyDown);
@@ -121,7 +575,23 @@ function MediaLightbox({ item, onClose }) {
             document.removeEventListener('keydown', onKeyDown);
             document.body.style.overflow = '';
         };
-    }, [onClose]);
+    }, [isCaseStudy, onClose, slides.length]);
+
+    React.useEffect(() => {
+        setActiveSlide(0);
+    }, [item]);
+
+    if (isCaseStudy) {
+        return (
+            <CaseStudyModal
+                item={item}
+                isMobile={isMobile}
+                onClose={onClose}
+                activeSlide={activeSlide}
+                onSelectSlide={setActiveSlide}
+            />
+        );
+    }
 
     return (
         <motion.div
@@ -149,10 +619,9 @@ function MediaLightbox({ item, onClose }) {
                 transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                 onClick={(event) => event.stopPropagation()}
                 style={{
-                    width: isCaseStudy ? 'min(100%, 1200px)' : 'min(100%, 1100px)',
-                    maxHeight: isCaseStudy ? '90vh' : 'unset',
+                    width: 'min(100%, 1100px)',
                     borderRadius: '20px',
-                    overflow: isCaseStudy ? 'auto' : 'hidden',
+                    overflow: 'hidden',
                     border: '1px solid var(--border-hover)',
                     background: 'rgba(12,12,12,0.96)',
                     boxShadow: '0 30px 90px rgba(0,0,0,0.45)',
@@ -252,59 +721,6 @@ function MediaLightbox({ item, onClose }) {
                         </button>
                     </div>
                 </div>
-
-                {isCaseStudy && item.slidesEmbedUrl && (
-                    <div style={{
-                        padding: isMobile ? '0 1rem 1rem' : '0 1.5rem 1.5rem',
-                        display: 'grid',
-                        gap: '1rem',
-                    }}>
-                        <div style={{
-                            padding: isMobile ? '1rem' : '1.25rem',
-                            borderRadius: '18px',
-                            border: '1px solid var(--border)',
-                            background: 'rgba(255,255,255,0.02)',
-                        }}>
-                            <span style={{
-                                display: 'block',
-                                fontFamily: 'var(--font-mono)',
-                                fontSize: '0.62rem',
-                                color: 'var(--text-muted)',
-                                letterSpacing: '0.12em',
-                                marginBottom: '0.7rem',
-                            }}>
-                                CASE STUDY
-                            </span>
-                            <p style={{
-                                color: 'var(--text-secondary)',
-                                lineHeight: 1.75,
-                                fontSize: '0.95rem',
-                            }}>
-                                상단에서 워크플로우 영상을 보고, 아래에서 실제 발표 자료를 이어서 확인할 수 있게 묶었습니다.
-                            </p>
-                        </div>
-
-                        <div style={{
-                            borderRadius: '18px',
-                            overflow: 'hidden',
-                            border: '1px solid var(--border)',
-                            background: '#0a0a0a',
-                        }}>
-                            <iframe
-                                src={item.slidesEmbedUrl}
-                                title={`${item.title} slides`}
-                                allowFullScreen
-                                style={{
-                                    display: 'block',
-                                    width: '100%',
-                                    minHeight: isMobile ? '58vh' : '72vh',
-                                    border: 'none',
-                                    background: '#0a0a0a',
-                                }}
-                            />
-                        </div>
-                    </div>
-                )}
             </motion.div>
         </motion.div>
     );

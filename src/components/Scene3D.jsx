@@ -6,6 +6,7 @@ import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
 
 const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+const assetUrl = (path) => `${import.meta.env.BASE_URL}${path}`;
 
 /* ═══════════════════════════════════════════════════
    3D HERO SCENE — Floating geometric objects
@@ -164,15 +165,15 @@ function GyroTracker() {
 /* ─── Floating 3D Models ─── */
 function FloatingModels() {
     // Load models
-    const mac = useGLTF('macbook_pro_m3_16_inch_2024.glb');
-    const camera = useGLTF('canon_at-2_retro_camera.glb');
-    const vhs = useGLTF('vhs_tape.glb');
-    const headphone = useGLTF('headphone_with_stand.glb');
-    const mouse = useGLTF('logitech_mx_vertical_mouse.glb');
-    const mic = useGLTF('microphone_gxl_066_bafhcteks.glb');
-    const light = useGLTF('studio_umbrella_light.glb');
-    const drone = useGLTF('dji_3_mini_pro.glb');
-    const printer = useGLTF('3d_printer.glb');
+    const mac = useGLTF(assetUrl('macbook_pro_m3_16_inch_2024.glb'));
+    const camera = useGLTF(assetUrl('canon_at-2_retro_camera.glb'));
+    const vhs = useGLTF(assetUrl('vhs_tape.glb'));
+    const headphone = useGLTF(assetUrl('headphone_with_stand.glb'));
+    const mouse = useGLTF(assetUrl('logitech_mx_vertical_mouse.glb'));
+    const mic = useGLTF(assetUrl('microphone_gxl_066_bafhcteks.glb'));
+    const light = useGLTF(assetUrl('studio_umbrella_light.glb'));
+    const drone = useGLTF(assetUrl('dji_3_mini_pro.glb'));
+    const printer = useGLTF(assetUrl('3d_printer.glb'));
 
     // Scale adjustment helper
     const S = isMobile ? 0.7 : 1;
@@ -288,15 +289,15 @@ function FloatingModels() {
 }
 
 // Preload to avoid pop-in
-useGLTF.preload('macbook_pro_m3_16_inch_2024.glb');
-useGLTF.preload('canon_at-2_retro_camera.glb');
-useGLTF.preload('vhs_tape.glb');
-useGLTF.preload('headphone_with_stand.glb');
-useGLTF.preload('logitech_mx_vertical_mouse.glb');
-useGLTF.preload('microphone_gxl_066_bafhcteks.glb');
-useGLTF.preload('speaker_with_stand.glb');
-useGLTF.preload('dji_3_mini_pro.glb');
-useGLTF.preload('3d_printer.glb');
+useGLTF.preload(assetUrl('macbook_pro_m3_16_inch_2024.glb'));
+useGLTF.preload(assetUrl('canon_at-2_retro_camera.glb'));
+useGLTF.preload(assetUrl('vhs_tape.glb'));
+useGLTF.preload(assetUrl('headphone_with_stand.glb'));
+useGLTF.preload(assetUrl('logitech_mx_vertical_mouse.glb'));
+useGLTF.preload(assetUrl('microphone_gxl_066_bafhcteks.glb'));
+useGLTF.preload(assetUrl('speaker_with_stand.glb'));
+useGLTF.preload(assetUrl('dji_3_mini_pro.glb'));
+useGLTF.preload(assetUrl('3d_printer.glb'));
 
 /* ─── Particle Field — thousands of tiny floating dots ─── */
 function ParticleField({ count = 800 }) {
@@ -392,10 +393,10 @@ function SkillObject({ skillId }) {
     const ref = useRef();
 
     // Load models for skills
-    const cam = useGLTF('canon_at-1_retro_camera.glb');
-    const vhs = useGLTF('vhs_tape.glb');
-    const speaker = useGLTF('speaker_with_stand.glb');
-    const mac = useGLTF('macbook_pro_m3_16_inch_2024.glb');
+    const cam = useGLTF(assetUrl('canon_at-1_retro_camera.glb'));
+    const vhs = useGLTF(assetUrl('vhs_tape.glb'));
+    const speaker = useGLTF(assetUrl('speaker_with_stand.glb'));
+    const mac = useGLTF(assetUrl('macbook_pro_m3_16_inch_2024.glb'));
 
     useFrame(({ clock }) => {
         if (!ref.current) return;
@@ -449,10 +450,10 @@ function SkillObject({ skillId }) {
     );
 }
 
-useGLTF.preload('/canon_at-1_retro_camera.glb');
-useGLTF.preload('/vhs_tape.glb');
-useGLTF.preload('/speaker_with_stand.glb');
-useGLTF.preload('/macbook_pro_m3_16_inch_2024.glb');
+useGLTF.preload(assetUrl('canon_at-1_retro_camera.glb'));
+useGLTF.preload(assetUrl('vhs_tape.glb'));
+useGLTF.preload(assetUrl('speaker_with_stand.glb'));
+useGLTF.preload(assetUrl('macbook_pro_m3_16_inch_2024.glb'));
 
 /* ═══════════════════════════════════════════════════
    3D TILT CARD — mouse-reactive perspective
