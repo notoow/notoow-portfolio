@@ -5,13 +5,6 @@ export const portfolioVideoMode = 'manual';
 const portfolioVideos = {
     디자인: [
         {
-            title: "고양시지속가능발전협의회 홍보영상",
-            url: "https://youtu.be/rQkWrjpCgKs",
-            section: "motion",
-            type: "YouTube Unlisted",
-            thumbnail: "https://i.ytimg.com/vi/rQkWrjpCgKs/hqdefault.jpg",
-        },
-        {
             title: "롯데홈쇼핑 바로알기 | 이천 자동화 물류센터",
             url: "https://www.youtube.com/watch?v=Iv8xAVWP-Ds",
             section: "motion",
@@ -89,13 +82,6 @@ const portfolioVideos = {
             thumbnail: "https://i9.ytimg.com/vi/jENZhdkI9RY/mqdefault.jpg?sqp=CIyK5s0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGMgYyhjMA8=&rs=AOn4CLCcaV1JqwxXhrOnIK4vujRF1WkRKQ",
         },
         {
-            title: "크립토 차트",
-            url: "https://www.youtube.com/watch?v=tSYy9GYdmRc",
-            section: "edit",
-            type: "YouTube Unlisted",
-            thumbnail: "https://i9.ytimg.com/vi/tSYy9GYdmRc/mqdefault.jpg?sqp=CIyK5s0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGHIgPihTMA8=&rs=AOn4CLCTuSVF1cgGwc1qsI928ZHcVADZLw",
-        },
-        {
             title: "여행 인트로",
             url: "https://www.youtube.com/watch?v=maM5_DQNwgI",
             section: "design",
@@ -122,6 +108,20 @@ const portfolioVideos = {
             section: "design",
             type: "YouTube Unlisted",
             thumbnail: "https://i9.ytimg.com/vi/LIX9c_AlvAA/mqdefault.jpg?sqp=CIyK5s0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGEQgSihlMA8=&rs=AOn4CLBbjhpMwdw7YmN3XmHwYM7L-f_Ryg",
+        },
+        {
+            title: "고양시지속가능발전협의회 홍보영상",
+            url: "https://youtu.be/rQkWrjpCgKs",
+            section: "motion",
+            type: "YouTube Unlisted",
+            thumbnail: "https://i.ytimg.com/vi/rQkWrjpCgKs/hqdefault.jpg",
+        },
+        {
+            title: "이수근채널 자연인과 당구인의 불꽃튀는 맞대결!!👏 ｜ 이수근,윤택 VS 육중완,김민수 2：2 스카치 매치 🎱",
+            url: "https://www.youtube.com/watch?v=_hCncYfDHkc",
+            section: "edit",
+            type: "YouTube Unlisted",
+            thumbnail: "https://i.ytimg.com/vi/_hCncYfDHkc/hqdefault.jpg",
         },
     ],
     '3D': [

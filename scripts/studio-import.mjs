@@ -9,9 +9,14 @@ const EXCLUDED_VIDEO_IDS = new Set([
     'ggYmI9DIgJs', // dev case study
     'yi1iuJM1Vww', // cosmic superstar
     'Zi4oV9esC3w', // duplicate with Fitbot / private now
+    'tSYy9GYdmRc', // crypto chart / private now
 ]);
 
 const VIDEO_OVERRIDES = {
+    '_hCncYfDHkc': {
+        category: '디자인',
+        section: 'edit',
+    },
     'Iv8xAVWP-Ds': {
         category: '디자인',
         section: 'motion',
@@ -56,11 +61,6 @@ const VIDEO_OVERRIDES = {
         category: '디자인',
         section: 'design',
         title: '한줄 유튜브 인트로',
-    },
-    'tSYy9GYdmRc': {
-        category: '디자인',
-        section: 'edit',
-        title: '크립토 차트',
     },
     'maM5_DQNwgI': {
         category: '디자인',
@@ -144,6 +144,10 @@ const VIDEO_OVERRIDES = {
         category: '3D',
         title: '파레트밴드 홍보영상',
     },
+    'F2Fr5sdQDfE': {
+        category: '3D',
+        title: 'Fitbot 안마기 홍보영상',
+    },
     'vomJJrpoT1k': {
         category: '예능',
         title: '박성웅 유딱날 2',
@@ -179,6 +183,14 @@ const MANUAL_ENTRIES = [
         type: 'YouTube Unlisted',
         thumbnail: 'https://i.ytimg.com/vi/rQkWrjpCgKs/hqdefault.jpg',
     },
+    {
+        category: '디자인',
+        title: '이수근채널 자연인과 당구인의 불꽃튀는 맞대결!!👏 ｜ 이수근,윤택 VS 육중완,김민수 2：2 스카치 매치 🎱',
+        url: 'https://www.youtube.com/watch?v=_hCncYfDHkc',
+        section: 'edit',
+        type: 'YouTube Unlisted',
+        thumbnail: 'https://i.ytimg.com/vi/_hCncYfDHkc/hqdefault.jpg',
+    },
 ];
 
 function normalize(value) {
@@ -203,6 +215,35 @@ function extractVideoId(input) {
     }
 
     return '';
+}
+
+function getEntryVideoId(entry) {
+    if (!entry) return '';
+    return extractVideoId(entry.videoId || entry.url || '');
+}
+
+function upsertGroupedEntry(grouped, category, entry, { prefer = 'incoming' } = {}) {
+    const list = grouped[category];
+    if (!Array.isArray(list)) return;
+
+    const videoId = getEntryVideoId(entry);
+    if (!videoId) {
+        list.push(entry);
+        return;
+    }
+
+    const existingIndex = list.findIndex((item) => getEntryVideoId(item) === videoId);
+    if (existingIndex === -1) {
+        list.push(entry);
+        return;
+    }
+
+    if (prefer === 'existing') return;
+
+    list[existingIndex] = {
+        ...list[existingIndex],
+        ...entry,
+    };
 }
 
 function listMatchingFiles(dir) {
@@ -409,15 +450,20 @@ function main() {
     }
 
     const grouped = {
-        디자인: MANUAL_ENTRIES.filter((entry) => entry.category === '디자인').map(({ category, ...entry }) => entry),
-        '3D': MANUAL_ENTRIES.filter((entry) => entry.category === '3D').map(({ category, ...entry }) => entry),
-        예능: MANUAL_ENTRIES.filter((entry) => entry.category === '예능').map(({ category, ...entry }) => entry),
+        디자인: [],
+        '3D': [],
+        예능: [],
     };
 
     for (const row of unlisted) {
         const mapped = toEntry(row);
         if (!mapped) continue;
-        grouped[mapped.category].push(mapped.entry);
+        upsertGroupedEntry(grouped, mapped.category, mapped.entry);
+    }
+
+    for (const manualEntry of MANUAL_ENTRIES) {
+        const { category, ...entry } = manualEntry;
+        upsertGroupedEntry(grouped, category, entry, { prefer: 'existing' });
     }
 
     fs.writeFileSync(targetPath, buildFileContent(grouped), 'utf8');
