@@ -145,7 +145,7 @@ function CinematicHero({
             {/* 3D Scene (behind everything) */}
             {shouldRenderScene && (
                 <Suspense fallback={null}>
-                    <LazyHeroScene onReady={onSceneReady} />
+                    <LazyHeroScene isMobile={isMobile} onReady={onSceneReady} />
                 </Suspense>
             )}
 

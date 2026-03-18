@@ -86,7 +86,7 @@ const PROJECTS = [
     {
         title: 'Nurschedule',
         type: 'Web / Schedule Tool',
-        desc: '간호 스케줄 관리 아이디어를 다룬 일정 관리 프로젝트 저장소.',
+        desc: '간호 스케줄을 빠르게 구성하고 관리할 수 있는 일정 관리 웹앱.',
         url: 'https://nurschedule.vercel.app/',
         color: 'linear-gradient(135deg, #c3ecff 0%, #e8f5ff 100%)',
         textColor: '#1f4052'
@@ -102,7 +102,7 @@ const PROJECTS = [
     {
         title: 'Soundeffect Lab',
         type: 'Web / Audio Utility',
-        desc: '효과음 자산을 정리하고 탐색하기 위한 실험용 사운드 프로젝트 저장소.',
+        desc: '효과음 자산을 정리하고 탐색할 수 있는 실험형 오디오 웹 툴.',
         url: 'https://notoow.github.io/soundeffect-lab/',
         color: 'linear-gradient(135deg, #e4d6ff 0%, #c5b3ff 100%)',
         textColor: '#382268'

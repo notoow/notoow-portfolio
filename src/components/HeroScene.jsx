@@ -4,7 +4,6 @@ import { Environment, Float, MeshDistortMaterial, useGLTF } from '@react-three/d
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from 'three';
 
-const isMobileViewport = typeof window !== 'undefined' && window.innerWidth < 768;
 const assetUrl = (path) => `${import.meta.env.BASE_URL}${path}`;
 const getScreenAngle = () => {
     if (typeof window === 'undefined') return 0;
@@ -21,8 +20,20 @@ const shortestAngleDelta = (current, initial) => {
     return delta;
 };
 
-const HeroScene = React.memo(function HeroScene({ onReady }) {
+if (typeof THREE.setConsoleFunction === 'function') {
+    THREE.setConsoleFunction((level, message, ...params) => {
+        if (level === 'log' && typeof message === 'string' && message.includes('THREE.WebGLRenderer: Context Lost.')) {
+            return;
+        }
+
+        const method = console[level] || console.log;
+        method(message, ...params);
+    });
+}
+
+const HeroScene = React.memo(function HeroScene({ isMobile = false, onReady }) {
     const [isVisible, setIsVisible] = useState(false);
+    const viewportMode = isMobile ? 'mobile' : 'desktop';
 
     const handleReady = () => {
         setIsVisible(true);
@@ -41,8 +52,9 @@ const HeroScene = React.memo(function HeroScene({ onReady }) {
             }}
         >
             <Canvas
+                key={viewportMode}
                 camera={{ position: [0, 0, 8], fov: 45 }}
-                dpr={isMobileViewport ? [1, 1] : [1, 1.05]}
+                dpr={isMobile ? [1, 1] : [1, 1.05]}
                 gl={{ antialias: false, alpha: true, powerPreference: 'high-performance' }}
                 performance={{ min: 0.8 }}
                 style={{ background: 'transparent' }}
@@ -53,10 +65,10 @@ const HeroScene = React.memo(function HeroScene({ onReady }) {
                 <pointLight position={[3, -2, 3]} intensity={2} color="#5DB8A8" distance={10} />
 
                 <Suspense fallback={null}>
-                    <SceneContent onReady={handleReady} />
+                    <SceneContent isMobile={isMobile} onReady={handleReady} />
                 </Suspense>
 
-                <EffectComposer enabled={!isMobileViewport}>
+                <EffectComposer enabled={!isMobile}>
                     <Bloom
                         intensity={0.28}
                         luminanceThreshold={0.72}
@@ -65,14 +77,14 @@ const HeroScene = React.memo(function HeroScene({ onReady }) {
                 </EffectComposer>
             </Canvas>
 
-            <MotionRequest />
+            <MotionRequest isMobile={isMobile} />
         </div>
     );
 });
 
 export default HeroScene;
 
-function SceneContent({ onReady }) {
+function SceneContent({ isMobile, onReady }) {
     const didReportReady = useRef(false);
     const pointerRef = useRef({ x: 0, y: 0 });
 
@@ -85,31 +97,33 @@ function SceneContent({ onReady }) {
 
     return (
         <>
-            {isMobileViewport ? <GyroTracker /> : <MouseTracker pointerRef={pointerRef} />}
-            <FloatingModels pointerRef={pointerRef} />
+            {isMobile ? <GyroTracker /> : <MouseTracker pointerRef={pointerRef} />}
+            <FloatingModels isMobile={isMobile} pointerRef={pointerRef} />
             <Environment preset="city" resolution={64} />
-            <ParticleField count={isMobileViewport ? 90 : 220} />
+            <ParticleField count={isMobile ? 90 : 220} />
         </>
     );
 }
 
-function MotionRequest() {
-    const [show, setShow] = useState(() => (
+function MotionRequest({ isMobile }) {
+    const [dismissed, setDismissed] = useState(false);
+    const canRequestMotion = (
+        isMobile &&
         typeof DeviceOrientationEvent !== 'undefined' &&
         typeof DeviceOrientationEvent.requestPermission === 'function'
-    ));
+    );
 
     const requestAccess = () => {
         DeviceOrientationEvent.requestPermission()
             .then((response) => {
                 if (response === 'granted') {
-                    setShow(false);
+                    setDismissed(true);
                 }
             })
-            .catch(() => setShow(false));
+            .catch(() => setDismissed(true));
     };
 
-    if (!show) return null;
+    if (!canRequestMotion || dismissed) return null;
 
     return (
         <button
@@ -252,7 +266,7 @@ function GyroTracker() {
     return null;
 }
 
-function FloatingModels({ pointerRef }) {
+function FloatingModels({ isMobile, pointerRef }) {
     const mac = useGLTF(assetUrl('macbook_pro_m3_16_inch_2024.glb'));
     const camera = useGLTF(assetUrl('canon_at-2_retro_camera.glb'));
     const vhs = useGLTF(assetUrl('vhs_tape.glb'));
@@ -261,7 +275,7 @@ function FloatingModels({ pointerRef }) {
     const drone = useGLTF(assetUrl('dji_3_mini_pro.glb'));
     const printer = useGLTF(assetUrl('3d_printer.glb'));
 
-    const scaleFactor = isMobileViewport ? 0.7 : 1;
+    const scaleFactor = isMobile ? 0.7 : 1;
     const groupRef = useRef(null);
 
     useFrame(() => {

@@ -110,11 +110,12 @@ const DEV_PROJECTS = [
         desc: 'Premiere Pro .prproj에서 자막을 자동 추출. 그래픽 자막, 캡션, 중첩 시퀀스 파싱.',
         tech: ['React', 'TypeScript', 'Hugging Face'],
         status: 'Live', accent: 'var(--tone-mint)',
+        url: 'https://huggingface.co/spaces/notoow/paper-image-extractor',
     },
     {
         title: 'Nurschedule',
-        desc: '간호 스케줄 관리 아이디어를 다룬 일정 관리 프로젝트 저장소.',
-        tech: ['GitHub', 'Scheduling', 'Web'],
+        desc: '간호 스케줄을 빠르게 구성하고 관리할 수 있는 일정 관리 웹앱.',
+        tech: ['Scheduling', 'Web App', 'Vercel'],
         status: 'Live', accent: 'var(--tone-cool)',
         url: 'https://nurschedule.vercel.app/',
     },
@@ -123,6 +124,7 @@ const DEV_PROJECTS = [
         desc: '지금 이 사이트. Vite + React, Three.js 3D 씬, Framer Motion 시네마틱 애니메이션.',
         tech: ['React', 'Three.js', 'Framer Motion'],
         status: 'Live', accent: 'var(--accent)',
+        url: 'https://notoow.github.io/notoow-portfolio/',
     },
     {
         title: 'AutoCAD PDF/DWF Exporter',
@@ -145,8 +147,8 @@ const DEV_PROJECTS = [
     },
     {
         title: 'Soundeffect Lab',
-        desc: '효과음 자산을 정리하고 탐색하기 위한 실험용 사운드 프로젝트 저장소.',
-        tech: ['GitHub', 'Audio', 'Lab'],
+        desc: '효과음 자산을 정리하고 탐색할 수 있는 실험형 오디오 웹 툴.',
+        tech: ['Web', 'Audio', 'Lab'],
         status: 'Live', accent: 'var(--tone-mint)',
         url: 'https://notoow.github.io/soundeffect-lab/',
     },
@@ -647,6 +649,12 @@ function SkillSlide({ skill, index, onPlay }) {
     const textY = useTransform(scrollYProgress, [0, 0.5, 1], [60, 0, -40]);
     const [imgHov, setImgHov] = useState(false);
     const isEven = index % 2 === 0;
+    const isPlayable = Boolean(skill.videoId);
+    const activatePreview = () => {
+        if (isPlayable) {
+            onPlay(skill.videoId);
+        }
+    };
 
     return (
         <div ref={ref} style={{
@@ -655,10 +663,20 @@ function SkillSlide({ skill, index, onPlay }) {
         }}>
             {/* Image side with 3D object overlay */}
             <motion.div
-                style={{ position: 'relative', overflow: 'hidden', order: isMobile ? 1 : (isEven ? 1 : 2), background: 'var(--bg-deep)', cursor: 'pointer', minHeight: isMobile ? '44vh' : 'auto' }}
+                style={{ position: 'relative', overflow: 'hidden', order: isMobile ? 1 : (isEven ? 1 : 2), background: 'var(--bg-deep)', cursor: isPlayable ? 'pointer' : 'default', minHeight: isMobile ? '44vh' : 'auto' }}
                 onMouseEnter={() => setImgHov(true)}
                 onMouseLeave={() => setImgHov(false)}
-                onClick={() => skill.videoId && onPlay(skill.videoId)}
+                onClick={activatePreview}
+                onKeyDown={(event) => {
+                    if (!isPlayable) return;
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        activatePreview();
+                    }
+                }}
+                role={isPlayable ? 'button' : undefined}
+                tabIndex={isPlayable ? 0 : -1}
+                aria-label={isPlayable ? `${skill.title} 미리보기 재생` : undefined}
             >
                 <motion.div
                     style={{
@@ -882,6 +900,12 @@ function GalleryCard({ work, index, onPlay }) {
     const { isMobile } = useResponsive();
     const [hov, setHov] = useState(false);
     const cardRef = useRef(null);
+    const isPlayable = Boolean(work.videoId);
+    const activateCard = () => {
+        if (isPlayable) {
+            onPlay(work.videoId);
+        }
+    };
 
     const handleMouseMove = (e) => {
         if (isMobile) return;
@@ -903,9 +927,19 @@ function GalleryCard({ work, index, onPlay }) {
             onMouseEnter={() => setHov(true)}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
-            onClick={() => work.videoId && onPlay(work.videoId)}
+            onClick={activateCard}
+            onKeyDown={(event) => {
+                if (!isPlayable) return;
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    activateCard();
+                }
+            }}
+            role={isPlayable ? 'button' : undefined}
+            tabIndex={isPlayable ? 0 : -1}
+            aria-label={isPlayable ? `${work.title} 미리보기 재생` : undefined}
             style={{
-                flexShrink: 0, width: '100%', cursor: 'pointer',
+                flexShrink: 0, width: '100%', cursor: isPlayable ? 'pointer' : 'default',
                 transition: 'transform 0.15s ease-out',
                 transformStyle: 'preserve-3d',
                 scrollSnapAlign: 'start',
