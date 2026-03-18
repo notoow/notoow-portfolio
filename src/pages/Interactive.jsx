@@ -19,6 +19,7 @@ const EDIT_SECTION_LABELS = {
     edit: '영상편집',
     motion: '모션그래픽',
     design: '디자인 제작',
+    ai: 'AI',
 };
 
 function toSkillVideo(item, fallback) {

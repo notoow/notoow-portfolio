@@ -68,6 +68,20 @@ const portfolioVideos = {
             thumbnail: "https://i9.ytimg.com/vi/IHwd8zO2KRk/mqdefault.jpg?sqp=CIyK5s0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGCwgVSh_MA8=&rs=AOn4CLBwqhwSa8rdAwKfnZ2U732joKgMow",
         },
         {
+            title: "도깨비 동화 1",
+            url: "https://www.youtube.com/watch?v=dZg5tkabopg",
+            section: "ai",
+            type: "YouTube Unlisted",
+            thumbnail: "https://i9.ytimg.com/vi/dZg5tkabopg/mqdefault.jpg?sqp=CIyK5s0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGHIgYSg5MA8=&rs=AOn4CLCE_XG8-MrhGXRQCDf6RtlXAZOB2A",
+        },
+        {
+            title: "도깨비 동화 2",
+            url: "https://www.youtube.com/watch?v=XCxamMM_7vM",
+            section: "ai",
+            type: "YouTube Unlisted",
+            thumbnail: "https://i9.ytimg.com/vi/XCxamMM_7vM/mqdefault.jpg?sqp=CIyK5s0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGUgYShFMA8=&rs=AOn4CLAbEDttGnAUXHSRR7fwsp2r-oZWog",
+        },
+        {
             title: "한줄 유튜브 인트로",
             url: "https://www.youtube.com/watch?v=jENZhdkI9RY",
             section: "design",

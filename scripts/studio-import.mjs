@@ -8,8 +8,6 @@ const FILE_NAME_PATTERN = /^studio-videos(?: \(\d+\))?\.json$/i;
 const EXCLUDED_VIDEO_IDS = new Set([
     'ggYmI9DIgJs', // dev case study
     'yi1iuJM1Vww', // cosmic superstar
-    'dZg5tkabopg', // AI
-    'XCxamMM_7vM', // AI
 ]);
 
 const VIDEO_OVERRIDES = {
@@ -82,6 +80,16 @@ const VIDEO_OVERRIDES = {
         category: '디자인',
         section: 'design',
         title: '비뇨기과산부인과 자막 디자인',
+    },
+    'dZg5tkabopg': {
+        category: '디자인',
+        section: 'ai',
+        title: '도깨비 동화 1',
+    },
+    'XCxamMM_7vM': {
+        category: '디자인',
+        section: 'ai',
+        title: '도깨비 동화 2',
     },
     'Cjg20fAQUSI': {
         category: '3D',
@@ -239,14 +247,15 @@ function classifyCategory(row, videoId) {
     const text = normalize(`${row.title} ${row.text}`).toLowerCase();
 
     if (/\[(개발|dev)\]/i.test(text)) return null;
-    if (/\[(ai)\]/i.test(text)) return null;
+    if (/\[(ai)\]/i.test(text)) return '디자인';
     if (/\[(3d|3디)\]/i.test(text)) return '3D';
     if (/\[(예능|film|촬영|cinematography)\]/i.test(text)) return '예능';
     if (/\[(디자인|edit|편집|design|모션|motion)\]/i.test(text)) return '디자인';
 
     if (/blender|octane|3d|모델링|렌더/.test(text)) return '3D';
     if (/드론|촬영|현장|멀티캠|스케치|film|cinematography/.test(text)) return '예능';
-    if (/ai|개발|dev/.test(text)) return null;
+    if (/개발|dev/.test(text)) return null;
+    if (/ai/.test(text)) return '디자인';
 
     return '디자인';
 }
@@ -257,6 +266,7 @@ function inferEditSection(row, videoId) {
 
     const text = normalize(`${row.title} ${row.text}`).toLowerCase();
 
+    if (/\[(ai)\]/i.test(text) || /\bai\b/.test(text)) return 'ai';
     if (/모션|motion|립싱크|애니메이션|그래픽/.test(text)) return 'motion';
     if (/디자인|자막|타이틀|인트로|썸네일/.test(text)) return 'design';
 

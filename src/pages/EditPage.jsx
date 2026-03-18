@@ -11,7 +11,7 @@ const CATEGORY = {
     id: 'edit',
     title: '편집',
     en: 'POST-PRODUCTION',
-    desc: '영상편집, 모션그래픽, 디자인 제작을 분리해서 보여주는 포스트 프로덕션 포트폴리오.',
+    desc: '영상편집, 모션그래픽, 디자인 제작, AI 작업을 분리해서 보여주는 포스트 프로덕션 포트폴리오.',
     color: 'var(--tone-cool)',
 };
 
@@ -30,6 +30,11 @@ const EDIT_SECTIONS = [
         key: 'design',
         title: '디자인 제작',
         desc: '자막, 타이틀, 화면용 그래픽 요소처럼 영상 안의 비주얼 시스템을 다듬는 작업입니다.',
+    },
+    {
+        key: 'ai',
+        title: 'AI',
+        desc: '생성형 AI를 활용한 실험적 영상 작업을 모았습니다.',
     },
 ];
 

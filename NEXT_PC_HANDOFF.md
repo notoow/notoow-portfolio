@@ -116,6 +116,7 @@ npm run deploy
 - `section: 'edit'`
 - `section: 'motion'`
 - `section: 'design'`
+- `section: 'ai'`
 
 ### One-time Studio import
 
@@ -156,6 +157,7 @@ node scripts/studio-import.mjs "C:\path\to\studio-videos.json"
 - 이미 수동으로 넣어둔 같은 영상의 `ytimg` 썸네일 URL은 강제로 다른 품질로 바꾸지 않음
 - Dev 페이지 케이스 스터디는 현재 `scroll-heavy` 가 아니라 `step-by-step deck` 방식
 - `Scene3D.jsx` 의 GLB 로딩은 `import.meta.env.BASE_URL` 기준으로 정리됨
+- 편집 페이지는 현재 `영상편집 / 모션그래픽 / 디자인 제작 / AI` 4섹션 구조
 
 ## Responsive Scope
 
