@@ -8,6 +8,7 @@ const FILE_NAME_PATTERN = /^studio-videos(?: \(\d+\))?\.json$/i;
 const EXCLUDED_VIDEO_IDS = new Set([
     'ggYmI9DIgJs', // dev case study
     'yi1iuJM1Vww', // cosmic superstar
+    'Zi4oV9esC3w', // duplicate with Fitbot / private now
 ]);
 
 const VIDEO_OVERRIDES = {
@@ -94,10 +95,6 @@ const VIDEO_OVERRIDES = {
     'Cjg20fAQUSI': {
         category: '3D',
         title: '멀티탭 홍보영상',
-    },
-    'Zi4oV9esC3w': {
-        category: '3D',
-        title: '안마기 제품 홍보',
     },
     'Je54gM1ccDw': {
         category: '3D',

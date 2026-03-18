@@ -132,12 +132,6 @@ const portfolioVideos = {
             thumbnail: "https://i9.ytimg.com/vi/Cjg20fAQUSI/mqdefault.jpg?sqp=CIyK5s0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGUgZShlMA8=&rs=AOn4CLDzmwPeLVr7H_84Ts_2knWv9EozSQ",
         },
         {
-            title: "안마기 제품 홍보",
-            url: "https://www.youtube.com/watch?v=Zi4oV9esC3w",
-            type: "YouTube Unlisted",
-            thumbnail: "https://i9.ytimg.com/vi/Zi4oV9esC3w/mqdefault.jpg?sqp=CIyK5s0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGEAgVihyMA8=&rs=AOn4CLAU-vXfzzosGxjo2o0S6CteLDkCVw",
-        },
-        {
             title: "수경재배기구 제품 홍보",
             url: "https://www.youtube.com/watch?v=Je54gM1ccDw",
             type: "YouTube Unlisted",
