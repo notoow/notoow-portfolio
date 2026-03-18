@@ -12,6 +12,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { GlobalLoader } from './components/Scene3D';
 import './App.css';
 
+const ENABLE_ADMIN_PAGE = import.meta.env.DEV || import.meta.env.VITE_ENABLE_ADMIN_PAGE === 'true';
+
 function getPageFromHash() {
   const hash = window.location.hash.replace('#', '');
   if (hash === '/interactive' || hash === 'interactive' || hash === '/portfolio' || hash === 'portfolio') return 'portfolio';
@@ -21,7 +23,7 @@ function getPageFromHash() {
   if (hash === '/edit' || hash === 'edit') return 'edit';
   if (hash === '/3d' || hash === '3d') return '3d';
   if (hash === '/dev' || hash === 'dev') return 'dev';
-  if (hash === '/admin-videos' || hash === 'admin-videos') return 'admin-videos';
+  if (ENABLE_ADMIN_PAGE && (hash === '/admin-videos' || hash === 'admin-videos')) return 'admin-videos';
   return 'home';
 }
 
@@ -69,7 +71,7 @@ function App() {
           {page === 'edit' && <EditPage />}
           {page === '3d' && <ThreeDPage />}
           {page === 'dev' && <DevPage />}
-          {page === 'admin-videos' && <VideoAdminPage />}
+          {ENABLE_ADMIN_PAGE && page === 'admin-videos' && <VideoAdminPage />}
           {page === 'home' && <Home />}
         </motion.div>
       </AnimatePresence>

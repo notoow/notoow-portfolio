@@ -141,6 +141,13 @@ const TOOLS = [
 /* ─── YouTube helpers ─── */
 const ytEmbed = (id) => `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&controls=1`;
 
+function scrollToInteractiveSection(sectionId) {
+    if (typeof document === 'undefined') return;
+    const target = document.getElementById(sectionId);
+    if (!target) return;
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 /* ═══════════════════════════════════════════════════
    LIGHTBOX
    ═══════════════════════════════════════════════════ */
@@ -241,41 +248,49 @@ export default function Interactive() {
    ═══════════════════════════════════════════════════ */
 function FloatingNav() {
     const { isMobile } = useResponsive();
-    const [visible, setVisible] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
+
     useEffect(() => {
-        const fn = () => setVisible(window.scrollY > window.innerHeight * 0.5);
+        const fn = () => setScrolled(window.scrollY > 24);
+        fn();
         window.addEventListener('scroll', fn, { passive: true });
         return () => window.removeEventListener('scroll', fn);
     }, []);
 
     return (
         <motion.nav
-            initial={{ y: -80 }}
-            animate={{ y: visible ? 0 : -80 }}
+            initial={{ y: -24, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             style={{
                 position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
                 padding: isMobile ? '0.8rem 1rem' : '0.8rem 3rem',
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                background: 'rgba(2,2,2,0.85)',
+                background: scrolled ? 'rgba(2,2,2,0.85)' : 'rgba(2,2,2,0.38)',
                 backdropFilter: 'blur(24px) saturate(1.5)',
-                borderBottom: '1px solid var(--border)',
+                borderBottom: `1px solid ${scrolled ? 'var(--border)' : 'rgba(255,255,255,0.06)'}`,
             }}
         >
             <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '0.9rem' : '1.5rem' }}>
                 <a href="#home" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.1em', transition: 'color 0.3s' }}
                     onMouseEnter={e => e.currentTarget.style.color = 'var(--text-hero)'}
-                    onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>← HOME</a>
+                    onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>← BACK</a>
                 <a href="#home" style={{ fontFamily: 'var(--font-en)', fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-hero)', textDecoration: 'none' }}>
                     notoow<span style={{ color: 'var(--accent)' }}>.</span>
                 </a>
             </div>
             <div style={{ display: isMobile ? 'none' : 'flex', gap: '2rem' }}>
-                {['About', 'Skills', 'Works', 'Dev', 'Contact'].map(l => (
-                    <a key={l} href={`#${l.toLowerCase()}`}
-                        style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.08em', transition: 'color 0.3s' }}
+                {[
+                    { label: 'About', target: 'about' },
+                    { label: 'Skills', target: 'skills' },
+                    { label: 'Works', target: 'works' },
+                    { label: 'Dev', target: 'dev' },
+                    { label: 'Contact', target: 'contact' },
+                ].map((item) => (
+                    <button key={item.label} type="button" onClick={() => scrollToInteractiveSection(item.target)}
+                        style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.08em', transition: 'color 0.3s', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
                         onMouseEnter={e => e.currentTarget.style.color = 'var(--text-hero)'}
-                        onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>{l}</a>
+                        onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>{item.label}</button>
                 ))}
             </div>
         </motion.nav>
@@ -1266,14 +1281,23 @@ function Footer() {
         }}>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '0.12em' }}>© 2026 NOTOOW</span>
             <div style={{ display: 'flex', gap: '1.5rem' }}>
-                {[
-                    { label: 'YouTube', href: 'https://www.youtube.com/@notoow_official' },
-                    { label: 'Contact', href: '#contact' },
-                ].map((item) => (
-                    <a key={item.label} href={item.href} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '0.08em', transition: 'color 0.3s' }}
-                        onMouseEnter={e => e.currentTarget.style.color = 'var(--text-hero)'}
-                        onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>{item.label}</a>
-                ))}
+                <a
+                    href="https://www.youtube.com/@notoow_official"
+                    style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '0.08em', transition: 'color 0.3s' }}
+                    onMouseEnter={e => e.currentTarget.style.color = 'var(--text-hero)'}
+                    onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+                >
+                    YouTube
+                </a>
+                <button
+                    type="button"
+                    onClick={() => scrollToInteractiveSection('contact')}
+                    style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '0.08em', transition: 'color 0.3s', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+                    onMouseEnter={e => e.currentTarget.style.color = 'var(--text-hero)'}
+                    onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+                >
+                    Contact
+                </button>
             </div>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '0.12em' }}>SEOUL, KR</span>
         </footer>

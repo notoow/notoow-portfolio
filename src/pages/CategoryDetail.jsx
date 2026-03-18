@@ -79,6 +79,16 @@ function VideoCard({ item, index, onPlay }) {
     const hasExternalUrl = Boolean(item.url);
     const isClickable = hasVideoId || hasExternalUrl;
 
+    const activateCard = useCallback(() => {
+        if (hasVideoId) {
+            onPlay(item.videoId, item.title);
+            return;
+        }
+        if (hasExternalUrl) {
+            window.open(item.url, '_blank', 'noopener,noreferrer');
+        }
+    }, [hasExternalUrl, hasVideoId, item.title, item.url, item.videoId, onPlay]);
+
     // Staggered heights for masonry feel
     const heights = isMobile ? ['280px', '280px', '280px', '280px'] : ['340px', '280px', '360px', '300px', '320px', '290px'];
     const h = heights[index % heights.length];
@@ -91,15 +101,17 @@ function VideoCard({ item, index, onPlay }) {
             transition={{ delay: (index % 3) * 0.08, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             onMouseEnter={() => setHov(true)}
             onMouseLeave={() => setHov(false)}
-            onClick={() => {
-                if (hasVideoId) {
-                    onPlay(item.videoId, item.title);
-                    return;
-                }
-                if (hasExternalUrl) {
-                    window.open(item.url, '_blank', 'noopener,noreferrer');
+            onClick={activateCard}
+            onKeyDown={(event) => {
+                if (!isClickable) return;
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    activateCard();
                 }
             }}
+            role={isClickable ? 'button' : undefined}
+            tabIndex={isClickable ? 0 : -1}
+            aria-label={isClickable ? `${item.title} 열기` : undefined}
             style={{
                 position: 'relative', overflow: 'hidden',
                 borderRadius: '10px', cursor: isClickable ? 'pointer' : 'default',
@@ -107,6 +119,7 @@ function VideoCard({ item, index, onPlay }) {
                 border: `1px solid ${hov ? 'var(--border-hover)' : 'var(--border)'}`,
                 transition: 'border-color 0.3s, box-shadow 0.3s',
                 boxShadow: hov ? '0 20px 60px rgba(0,0,0,0.3)' : 'none',
+                outline: 'none',
             }}
         >
             {/* Thumbnail */}
