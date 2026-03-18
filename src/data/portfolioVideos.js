@@ -204,7 +204,7 @@ const portfolioVideos = {
             thumbnail: "https://i9.ytimg.com/vi/URX0C7XdF0g/mqdefault.jpg?sqp=CIyK5s0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGHIgXChDMA8=&rs=AOn4CLA4v3Nq5B5t25pKeBkwUOnfMH4Miw",
         },
         {
-            title: "Fitbot 2차 수정본",
+            title: "Fitbot 안마기 홍보영상",
             url: "https://www.youtube.com/watch?v=F2Fr5sdQDfE",
             type: "YouTube Unlisted",
             thumbnail: "https://i9.ytimg.com/vi/F2Fr5sdQDfE/mqdefault.jpg?sqp=CIyK5s0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGEEgVyhyMA8=&rs=AOn4CLDrxvI2qRSy4vGGswIbL2G4aaDiOg",

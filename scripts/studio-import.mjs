@@ -144,10 +144,6 @@ const VIDEO_OVERRIDES = {
         category: '3D',
         title: '파레트밴드 홍보영상',
     },
-    'F2Fr5sdQDfE': {
-        category: '3D',
-        title: 'Fitbot 2차 수정본',
-    },
     'vomJJrpoT1k': {
         category: '예능',
         title: '박성웅 유딱날 2',
