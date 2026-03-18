@@ -6,11 +6,11 @@ import { Terminal, Monitor, Video, Code, Palette, Play } from 'lucide-react';
 const FILES = {
     'projects': [
         { id: 'vid_01', name: 'cinematic_travel_vlog.mp4', type: 'video', size: '2.4GB', date: '2025-01-15', desc: '4K Cinematic Travel Vlog - Edited in Premiere Pro' },
-        { id: 'vid_02', name: '3d_motion_reel.mov', type: 'video', size: '1.8GB', date: '2024-11-20', desc: 'C4D & After Effects motion graphics showcase' },
+        { id: 'vid_02', name: '3d_motion_reel.mov', type: 'video', size: '1.8GB', date: '2024-11-20', desc: 'Blender & After Effects motion graphics showcase' },
         { id: 'vid_03', name: 'commercial_shoot_bts.mp4', type: 'video', size: '850MB', date: '2024-10-05', desc: 'Behind the scenes of tech commercial shoot' },
     ],
     'code': [
-        { id: 'dev_01', name: 'portfolio_source.js', type: 'code', size: '12KB', date: '2026-02-12', desc: 'Source code for this interactive terminal' },
+        { id: 'dev_01', name: 'portfolio_source.js', type: 'code', size: '12KB', date: '2026-02-12', desc: 'Source code for the portfolio interaction system' },
         { id: 'dev_02', name: 'video_processing_script.py', type: 'code', size: '4KB', date: '2025-12-01', desc: 'Python script for automating ffmpeg tasks' },
     ],
     'design': [

@@ -473,7 +473,7 @@ export default function CategoryDetail({
                             <p style={{
                                 fontSize: '0.85rem', color: 'var(--text-dim)',
                                 marginTop: '0.5rem',
-                            }}>곧 업데이트됩니다 🎬</p>
+                            }}>곧 업데이트 예정입니다.</p>
                         </div>
                     )}
                 </div>
