@@ -10,6 +10,7 @@
 
 - 메인 홈 카드 hover 떨림 완화
 - 커서 꼬리 이펙트 제거, 단일 glow만 유지
+- 미사용 보관용 3D 파일 정리
 - 첫 진입 번들 최적화:
   홈 텍스트 먼저 렌더 -> 3D HeroScene은 첫 페인트 직후 별도 preload/lazy mount
   나머지 상세/포트폴리오/개발 페이지도 route-level lazy load
@@ -80,7 +81,6 @@ npm run deploy
 - `src/components/HeroScene.jsx`: 홈 첫 화면 3D 씬 전용
 - `src/components/CursorGlow.jsx`: 가벼운 커서 glow
 - `src/components/PageLoader.jsx`: lazy route 로딩 fallback
-- `src/components/Scene3D.jsx`: 예전 3D 실험/보관 파일
 - `src/data/portfolioVideos.js`: 실제 영상 데이터
 - `src/components/AdaptiveThumbnail.jsx`: 공용 썸네일 표시 / fallback
 - `src/hooks/useResponsive.js`: 공용 모바일/태블릿 판별
@@ -171,7 +171,6 @@ node scripts/studio-import.mjs "C:\path\to\studio-videos.json"
 - 썸네일은 이제 `maxresdefault -> sddefault -> hqdefault -> mqdefault -> oEmbed` 순서로 더 똑똑하게 fallback
 - 이미 수동으로 넣어둔 같은 영상의 `ytimg` 썸네일 URL은 강제로 다른 품질로 바꾸지 않음
 - Dev 페이지 케이스 스터디는 현재 `scroll-heavy` 가 아니라 `step-by-step deck` 방식
-- `Scene3D.jsx` 의 GLB 로딩은 `import.meta.env.BASE_URL` 기준으로 정리됨
 - 편집 페이지는 현재 `영상편집 / 모션그래픽 / 디자인 제작 / AI` 4섹션 구조
 
 ## Bundle Notes
