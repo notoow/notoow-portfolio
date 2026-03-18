@@ -87,7 +87,7 @@ const PROJECTS = [
         title: 'Nurschedule',
         type: 'Web / Schedule Tool',
         desc: '간호 스케줄 관리 아이디어를 다룬 일정 관리 프로젝트 저장소.',
-        url: 'https://notoow.github.io/nurschedule/',
+        url: 'https://nurschedule.vercel.app/',
         color: 'linear-gradient(135deg, #c3ecff 0%, #e8f5ff 100%)',
         textColor: '#1f4052'
     },

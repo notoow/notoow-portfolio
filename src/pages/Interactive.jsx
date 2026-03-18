@@ -116,7 +116,7 @@ const DEV_PROJECTS = [
         desc: '간호 스케줄 관리 아이디어를 다룬 일정 관리 프로젝트 저장소.',
         tech: ['GitHub', 'Scheduling', 'Web'],
         status: 'Live', accent: 'var(--tone-cool)',
-        url: 'https://notoow.github.io/nurschedule/',
+        url: 'https://nurschedule.vercel.app/',
     },
     {
         title: 'Notoow Portfolio',
