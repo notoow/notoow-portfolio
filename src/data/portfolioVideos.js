@@ -117,6 +117,13 @@ const portfolioVideos = {
             thumbnail: "https://i.ytimg.com/vi/rQkWrjpCgKs/hqdefault.jpg",
         },
         {
+            title: "블록체인 교육 영상 모션 그래픽",
+            url: "https://www.youtube.com/watch?v=pYqseLZM-aM",
+            section: "motion",
+            type: "YouTube Unlisted",
+            thumbnail: "https://i.ytimg.com/vi/pYqseLZM-aM/hqdefault.jpg",
+        },
+        {
             title: "이수근채널 자연인 vs 당구인 스카치 매치",
             url: "https://www.youtube.com/watch?v=_hCncYfDHkc",
             section: "edit",

@@ -82,6 +82,12 @@ const VIDEO_OVERRIDES = {
         section: 'design',
         title: '비뇨기과산부인과 자막 디자인',
     },
+    'pYqseLZM-aM': {
+        category: '디자인',
+        section: 'motion',
+        title: '블록체인 교육 영상 모션 그래픽',
+        thumbnail: 'https://i.ytimg.com/vi/pYqseLZM-aM/hqdefault.jpg',
+    },
     'dZg5tkabopg': {
         category: '디자인',
         section: 'ai',
@@ -182,6 +188,14 @@ const MANUAL_ENTRIES = [
         section: 'motion',
         type: 'YouTube Unlisted',
         thumbnail: 'https://i.ytimg.com/vi/rQkWrjpCgKs/hqdefault.jpg',
+    },
+    {
+        category: '디자인',
+        title: '블록체인 교육 영상 모션 그래픽',
+        url: 'https://www.youtube.com/watch?v=pYqseLZM-aM',
+        section: 'motion',
+        type: 'YouTube Unlisted',
+        thumbnail: 'https://i.ytimg.com/vi/pYqseLZM-aM/hqdefault.jpg',
     },
     {
         category: '디자인',
